@@ -11,7 +11,7 @@ SpecFly — мультиязычная спецификационная сист
 
 ## Страница документации
 
-GitHub Pages: https://nektobit.github.io/specfly/
+GitHub Pages: https://nektobit.github.io/SpecFly/
 
 ## Манифест
 

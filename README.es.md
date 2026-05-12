@@ -11,7 +11,7 @@ SpecFly es un sistema de especificaciones multilingue donde el idioma del usuari
 
 ## Sitio De Documentacion
 
-GitHub Pages: https://nektobit.github.io/specfly/
+GitHub Pages: https://nektobit.github.io/SpecFly/
 
 ## Manifiesto
 

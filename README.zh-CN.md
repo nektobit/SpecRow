@@ -11,7 +11,7 @@ SpecFly 是一个多语言规格系统。在 SpecFly 中，用户的语言是用
 
 ## 文档站点
 
-GitHub Pages: https://nektobit.github.io/specfly/
+GitHub Pages: https://nektobit.github.io/SpecFly/
 
 ## 宣言
 
