@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SpecFly Documentation</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f4ee;
+        --text: #1f2523;
+        --muted: #58615d;
+        --line: #d9d1c4;
+        --accent: #226b5d;
+        --accent-strong: #174b42;
+        --panel: #fffdf8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.6;
+      }
+
+      header {
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      .wrap {
+        width: min(1040px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 18px 0;
+      }
+
+      .brand {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      nav a {
+        min-height: 36px;
+        padding: 7px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-weight: 650;
+      }
+
+      nav a:hover,
+      nav a:focus {
+        border-color: var(--accent);
+        outline: none;
+      }
+
+      main {
+        padding: 34px 0 56px;
+      }
+
+      .intro {
+        max-width: 780px;
+        margin-bottom: 34px;
+      }
+
+      .intro h2 {
+        margin: 0 0 12px;
+        font-size: clamp(34px, 6vw, 58px);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .intro p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      section {
+        padding: 26px 0;
+        border-top: 1px solid var(--line);
+        scroll-margin-top: 24px;
+      }
+
+      section h2 {
+        margin: 0 0 18px;
+        font-size: 28px;
+        line-height: 1.2;
+      }
+
+      article {
+        max-width: 820px;
+      }
+
+      article h3 {
+        margin: 24px 0 8px;
+        font-size: 20px;
+        line-height: 1.25;
+      }
+
+      article p,
+      article ul {
+        margin: 8px 0;
+      }
+
+      article ul {
+        padding-left: 24px;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0;
+        color: var(--muted);
+        background: var(--panel);
+      }
+
+      @media (max-width: 720px) {
+        .top {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        nav a {
+          flex: 1 1 auto;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap top">
+        <h1 class="brand">SpecFly</h1>
+        <nav aria-label="Language">
+          <a href="#english">English</a>
+          <a href="#russian">Русский</a>
+          <a href="#spanish">Español</a>
+          <a href="#chinese">中文</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="intro">
+        <h2>Multilingual specifications as an executable contract</h2>
+        <p>SpecFly keeps human and agent views aligned while preserving the user's language as the primary language of work.</p>
+      </div>
+
+      <section id="english" lang="en">
+        <h2>English</h2>
+        <article>
+          <p>SpecFly is a multilingual specification system where the user's language is the primary language of interaction with the system and with agents, not a translation layer on top of an English-first model.</p>
+
+          <h3>1. User-First Language</h3>
+          <p>Specifications are created in the language that is convenient for the user. Working with the system must be transparent and predictable.</p>
+
+          <h3>2. Shared Vocabulary</h3>
+          <p>The project glossary is part of the system. All domain terms are recorded and used consistently.</p>
+
+          <h3>3. Dual Representation</h3>
+          <p>Each specification exists in two representations:</p>
+          <ul>
+            <li>Human view: for people</li>
+            <li>Agent view: for agents</li>
+          </ul>
+          <p>These are two projections of the same specification, not two independent documents.</p>
+
+          <h3>4. Change-First Workflow</h3>
+          <p>A new feature, fix, or improvement first exists as a change. After implementation and verification, the change is integrated into the current specification.</p>
+
+          <h3>5. Task Derivation</h3>
+          <p>Tasks must be derivable from the specification. If a specification cannot produce a clear work plan, the specification is not good enough.</p>
+
+          <h3>6. Validatable Specs</h3>
+          <p>A specification must be machine-validatable. Structure, links, required sections, conflicts, and tasks must be validated.</p>
+
+          <h3>7. Explicit Decisions</h3>
+          <p>Agents must not silently make important decisions. Architecture, UX, data, and security decisions must be recorded explicitly.</p>
+
+          <h3>8. Executable Contract</h3>
+          <p>A specification is an executable contract. If implementation or verification requires tools, those tools are part of the system.</p>
+
+          <h3>9. AI-Optional</h3>
+          <p>The system works with AI. The system works without AI.</p>
+        </article>
+      </section>
+
+      <section id="russian" lang="ru">
+        <h2>Русский</h2>
+        <article>
+          <p>SpecFly — мультиязычная спецификационная система, где язык пользователя является первым языком взаимодействия с системой и агентом, а не переводом поверх английской модели.</p>
+
+          <h3>1. User-first language</h3>
+          <p>Спецификации создаются на языке, удобном пользователю. Работа с системой должна быть прозрачной и предсказуемой.</p>
+
+          <h3>2. Shared vocabulary</h3>
+          <p>Проектный глоссарий — часть системы. Все доменные термины фиксируются и используются последовательно.</p>
+
+          <h3>3. Dual representation</h3>
+          <p>Каждая спецификация существует в двух представлениях:</p>
+          <ul>
+            <li>Human view — для человека</li>
+            <li>Agent view — для агента</li>
+          </ul>
+          <p>Это две проекции одной спецификации, а не два независимых документа.</p>
+
+          <h3>4. Change-first workflow</h3>
+          <p>Новая фича, исправление или улучшение сначала живут как изменение. После реализации и проверки изменение интегрируется в актуальную спецификацию.</p>
+
+          <h3>5. Task derivation</h3>
+          <p>Задачи должны выводиться из спецификации. Если из спеки нельзя получить понятный план работ, значит она недостаточно качественная.</p>
+
+          <h3>6. Validatable specs</h3>
+          <p>Спецификация должна быть машинно проверяемой. Структура, ссылки, обязательные секции, конфликты и задачи должны валидироваться.</p>
+
+          <h3>7. Explicit decisions</h3>
+          <p>Агент не должен молча принимать важные решения. Архитектурные, UX, data и security-решения должны фиксироваться явно.</p>
+
+          <h3>8. Executable contract</h3>
+          <p>Спецификация — это исполняемый контракт. Если для реализации или проверки нужны инструменты, они являются частью системы.</p>
+
+          <h3>9. AI-optional</h3>
+          <p>Система работает с AI. Система работает без AI.</p>
+        </article>
+      </section>
+
+      <section id="spanish" lang="es">
+        <h2>Español</h2>
+        <article>
+          <p>SpecFly es un sistema de especificaciones multilingue donde el idioma del usuario es el idioma principal de interaccion con el sistema y con los agentes, no una capa de traduccion sobre un modelo centrado en ingles.</p>
+
+          <h3>1. Idioma Primero Para El Usuario</h3>
+          <p>Las especificaciones se crean en el idioma que resulte comodo para el usuario. El trabajo con el sistema debe ser transparente y predecible.</p>
+
+          <h3>2. Vocabulario Compartido</h3>
+          <p>El glosario del proyecto forma parte del sistema. Todos los terminos de dominio se registran y se usan de forma consistente.</p>
+
+          <h3>3. Representacion Dual</h3>
+          <p>Cada especificacion existe en dos representaciones:</p>
+          <ul>
+            <li>Human view: para personas</li>
+            <li>Agent view: para agentes</li>
+          </ul>
+          <p>Son dos proyecciones de una misma especificacion, no dos documentos independientes.</p>
+
+          <h3>4. Flujo Basado En Cambios</h3>
+          <p>Una nueva funcionalidad, correccion o mejora primero existe como un cambio. Despues de la implementacion y la verificacion, el cambio se integra en la especificacion vigente.</p>
+
+          <h3>5. Derivacion De Tareas</h3>
+          <p>Las tareas deben poder derivarse de la especificacion. Si una especificacion no permite obtener un plan de trabajo claro, la especificacion no es suficientemente buena.</p>
+
+          <h3>6. Especificaciones Validables</h3>
+          <p>Una especificacion debe poder validarse por maquina. La estructura, los enlaces, las secciones obligatorias, los conflictos y las tareas deben validarse.</p>
+
+          <h3>7. Decisiones Explicitas</h3>
+          <p>Los agentes no deben tomar decisiones importantes en silencio. Las decisiones de arquitectura, UX, datos y seguridad deben registrarse explicitamente.</p>
+
+          <h3>8. Contrato Ejecutable</h3>
+          <p>Una especificacion es un contrato ejecutable. Si la implementacion o la verificacion requieren herramientas, esas herramientas forman parte del sistema.</p>
+
+          <h3>9. AI Opcional</h3>
+          <p>El sistema funciona con AI. El sistema funciona sin AI.</p>
+        </article>
+      </section>
+
+      <section id="chinese" lang="zh-CN">
+        <h2>中文</h2>
+        <article>
+          <p>SpecFly 是一个多语言规格系统。在 SpecFly 中，用户的语言是用户与系统和代理交互的第一语言，而不是建立在英语优先模型之上的翻译层。</p>
+
+          <h3>1. 用户语言优先</h3>
+          <p>规格使用用户方便使用的语言创建。系统的工作方式必须透明且可预测。</p>
+
+          <h3>2. 共享词汇</h3>
+          <p>项目术语表是系统的一部分。所有领域术语都必须被记录，并保持一致使用。</p>
+
+          <h3>3. 双重表示</h3>
+          <p>每份规格都有两种表示：</p>
+          <ul>
+            <li>Human view：面向人</li>
+            <li>Agent view：面向代理</li>
+          </ul>
+          <p>它们是同一份规格的两个投影，而不是两个相互独立的文档。</p>
+
+          <h3>4. 变更优先流程</h3>
+          <p>新的功能、修复或改进首先以变更的形式存在。在实现和验证之后，该变更会被集成到当前规格中。</p>
+
+          <h3>5. 任务推导</h3>
+          <p>任务必须能够从规格中推导出来。如果无法从规格得到清晰的工作计划，说明这份规格还不够好。</p>
+
+          <h3>6. 可验证规格</h3>
+          <p>规格必须可以被机器验证。结构、链接、必需章节、冲突和任务都必须能够被验证。</p>
+
+          <h3>7. 明确决策</h3>
+          <p>代理不能默默做出重要决策。架构、UX、数据和安全决策都必须被明确记录。</p>
+
+          <h3>8. 可执行契约</h3>
+          <p>规格是一份可执行契约。如果实现或验证需要工具，这些工具就是系统的一部分。</p>
+
+          <h3>9. AI 可选</h3>
+          <p>系统可以与 AI 一起工作。系统也可以在没有 AI 的情况下工作。</p>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">SpecFly documentation mirrors the repository README files.</div>
+    </footer>
+  </body>
+</html>
