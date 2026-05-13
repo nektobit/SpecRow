@@ -6,6 +6,7 @@ import { Command } from "commander";
 import { ZodError } from "zod";
 
 import { initSpecRowProject } from "./init.js";
+import { createChange } from "./lifecycle.js";
 import { getSpecRowMessage } from "./templates.js";
 
 export function createProgram(): Command {
@@ -42,6 +43,33 @@ export function createProgram(): Command {
       } catch (error) {
         if (error instanceof ZodError) {
           console.error(`Invalid config: ${error.issues.map((issue) => issue.message).join("; ")}`);
+        } else if (error instanceof Error) {
+          console.error(error.message);
+        } else {
+          console.error(String(error));
+        }
+
+        process.exitCode = 1;
+      }
+    });
+
+  program
+    .command("proposal")
+    .description("Create a SpecRow change proposal directory.")
+    .argument("<change-name>")
+    .option("--review <state>", "Initial review tracking state: required or recommended.", "recommended")
+    .action(async (changeName: string, options: { review: "required" | "recommended" }) => {
+      try {
+        const result = await createChange({
+          changeName,
+          review: options.review
+        });
+
+        console.log(getSpecRowMessage(result.language, "lifecycle.proposed"));
+        console.log(pathForDisplay(result.root));
+      } catch (error) {
+        if (error instanceof ZodError) {
+          console.error(`Invalid status: ${error.issues.map((issue) => issue.message).join("; ")}`);
         } else if (error instanceof Error) {
           console.error(error.message);
         } else {

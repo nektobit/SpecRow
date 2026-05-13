@@ -1,5 +1,7 @@
 import { parse, stringify } from "yaml";
 import { z } from "zod";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 export const SpecRowConfigSchema = z.object({
   version: z.literal(1),
@@ -32,4 +34,8 @@ export function serializeConfig(config: SpecRowConfig): string {
 
 export function parseConfig(source: string): SpecRowConfig {
   return SpecRowConfigSchema.parse(parse(source));
+}
+
+export async function loadSpecRowConfig(cwd = process.cwd()): Promise<SpecRowConfig> {
+  return parseConfig(await readFile(path.join(cwd, ".specrow", "config.yml"), "utf8"));
 }
