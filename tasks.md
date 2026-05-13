@@ -189,16 +189,16 @@ Ownership: CLI commands, command output, validation entrypoints.
 
 Ownership: user-facing command specs and expected agent behavior.
 
-- [ ] Define `/specrow:init` as the user-facing setup command.
-- [ ] Define `/specrow:proposal` as the command for turning user intent into a change proposal.
-- [ ] Define `/specrow:review` as a recommended check before code, required only for risky changes.
-- [ ] Define `/specrow:build` as implementation only; it must not accept, archive, or update specs as final truth.
-- [ ] Define `/specrow:revise` as the path for user-requested changes after build.
-- [ ] Define `/specrow:accept` as the only user-facing command that allows final integration and archive.
-- [ ] Document that users should not need to remember CLI mechanics for normal work.
-- [ ] Document that the agent may call CLI commands as implementation details.
-- [ ] Ensure agent commands respect `.specrow/config.yml` language.
-- [ ] Ensure agent commands stop with a clear error if the requested language resources are missing.
+- [x] Define `/specrow:init` as the user-facing setup command.
+- [x] Define `/specrow:proposal` as the command for turning user intent into a change proposal.
+- [x] Define `/specrow:review` as a recommended check before code, required only for risky changes.
+- [x] Define `/specrow:build` as implementation only; it must not accept, archive, or update specs as final truth.
+- [x] Define `/specrow:revise` as the path for user-requested changes after build.
+- [x] Define `/specrow:accept` as the only user-facing command that allows final integration and archive.
+- [x] Document that users should not need to remember CLI mechanics for normal work.
+- [x] Document that the agent may call CLI commands as implementation details.
+- [x] Ensure agent commands respect `.specrow/config.yml` language.
+- [x] Ensure agent commands stop with a clear error if the requested language resources are missing.
 
 ## Agent 6. Accept Gate and Archive
 
