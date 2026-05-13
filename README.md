@@ -1,6 +1,6 @@
-# SpecFly
+# SpecRow
 
-SpecFly is a multilingual specification system where the user's language is the primary language of interaction with the system and with agents, not a translation layer on top of an English-first model.
+SpecRow is a multilingual specification system where the user's language is the primary language of interaction with the system and with agents, not a translation layer on top of an English-first model.
 
 ## Read This In Your Language
 
@@ -11,7 +11,7 @@ SpecFly is a multilingual specification system where the user's language is the 
 
 ## Documentation Site
 
-GitHub Pages: https://nektobit.github.io/SpecFly/
+GitHub Pages: https://nektobit.github.io/SpecRow/
 
 ## Manifesto
 

@@ -1,0 +1,33 @@
+{
+  "name": "specfly",
+  "version": "0.1.0",
+  "description": "Multilingual specification system for spec-driven development.",
+  "type": "module",
+  "bin": {
+    "specfly": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepack": "pnpm build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "commander": "^14.0.2",
+    "yaml": "^2.8.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
+  },
+  "packageManager": "pnpm@10.5.2",
+  "engines": {
+    "node": ">=20"
+  }
+}

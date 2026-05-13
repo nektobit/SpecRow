@@ -1,6 +1,6 @@
-# SpecFly
+# SpecRow
 
-SpecFly 是一个多语言规格系统。在 SpecFly 中，用户的语言是用户与系统和代理交互的第一语言，而不是建立在英语优先模型之上的翻译层。
+SpecRow 是一个多语言规格系统。在 SpecRow 中，用户的语言是用户与系统和代理交互的第一语言，而不是建立在英语优先模型之上的翻译层。
 
 ## 使用你的语言阅读
 
@@ -11,7 +11,7 @@ SpecFly 是一个多语言规格系统。在 SpecFly 中，用户的语言是用
 
 ## 文档站点
 
-GitHub Pages: https://nektobit.github.io/SpecFly/
+GitHub Pages: https://nektobit.github.io/SpecRow/
 
 ## 宣言
 
