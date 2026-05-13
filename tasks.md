@@ -135,7 +135,7 @@ Minimum `tasks.md` structure:
 
 Ownership: change directories, status model, lifecycle transitions.
 
-- [ ] Add command support for creating a change directory:
+- [x] Add command support for creating a change directory:
 
 ```txt
 .specrow/changes/<change-name>/
@@ -144,8 +144,8 @@ Ownership: change directories, status model, lifecycle transitions.
   status.yml
 ```
 
-- [ ] Add `status.yml` with lifecycle state.
-- [ ] Support lifecycle states:
+- [x] Add `status.yml` with lifecycle state.
+- [x] Support lifecycle states:
 
 ```txt
 proposed
@@ -156,14 +156,14 @@ accepted
 archived
 ```
 
-- [ ] Track whether review is required, recommended, or completed.
-- [ ] Track explicit user acceptance.
-- [ ] Track created and updated timestamps.
-- [ ] Ensure `build` moves a change only to `built`.
-- [ ] Ensure `revise` moves a change to `revision-needed`.
-- [ ] Ensure `accept` requires explicit user acceptance.
-- [ ] Ensure archive is possible only after accept.
-- [ ] Keep multiple active changes visible and warn about likely conflicts.
+- [x] Track whether review is required, recommended, or completed.
+- [x] Track explicit user acceptance.
+- [x] Track created and updated timestamps.
+- [x] Ensure `build` moves a change only to `built`.
+- [x] Ensure `revise` moves a change to `revision-needed`.
+- [x] Ensure `accept` requires explicit user acceptance.
+- [x] Ensure archive is possible only after accept.
+- [x] Keep multiple active changes visible and warn about likely conflicts.
 
 ## Agent 4. CLI Core
 
