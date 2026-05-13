@@ -174,6 +174,13 @@ export const zhCN = {
     "lifecycle.revisionNeeded": "需要修订。",
     "lifecycle.accepted": "变更已验收。",
     "lifecycle.archived": "变更已归档。",
+    "build.started": "可以开始构建变更 {change}。",
+    "validate.ok": "验证已通过。",
+    "validate.failed": "验证失败。",
+    "review.warning": "评审已完成，但有警告。",
+    "status.change": "{change}: {state}; 评审: {review}; 已验收: {accepted}。",
+    "list.empty": "没有活跃变更。",
+    "list.warning": "警告：{warning}",
     "next.acceptOrRevise": "下一步：/specrow:accept 或 /specrow:revise。",
     "error.missingTemplate": "语言 \"{language}\" 缺少 SpecRow 模板 \"{name}\"。",
     "error.missingMessage": "语言 \"{language}\" 缺少 SpecRow 消息 \"{name}\"。"

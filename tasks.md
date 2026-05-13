@@ -169,21 +169,21 @@ archived
 
 Ownership: CLI commands, command output, validation entrypoints.
 
-- [ ] Implement `specrow init`.
-- [ ] Implement `specrow proposal <change-name>`.
-- [ ] Implement `specrow validate [change-name]`.
-- [ ] Implement `specrow review <change-name>`.
-- [ ] Implement `specrow status [change-name]`.
-- [ ] Implement `specrow context [change-name]` for agent-readable context.
-- [ ] Implement `specrow build-start <change-name>`.
-- [ ] Implement `specrow build-finish <change-name>`.
-- [ ] Implement `specrow revise <change-name>`.
-- [ ] Implement `specrow accept <change-name>`.
-- [ ] Implement `specrow archive <change-name>`.
-- [ ] Implement `specrow list`.
-- [ ] Make CLI output clear enough for the agent to decide the next workflow step.
-- [ ] Use project language for built-in status messages.
-- [ ] Fail clearly when the configured language has no required template or message.
+- [x] Implement `specrow init`.
+- [x] Implement `specrow proposal <change-name>`.
+- [x] Implement `specrow validate [change-name]`.
+- [x] Implement `specrow review <change-name>`.
+- [x] Implement `specrow status [change-name]`.
+- [x] Implement `specrow context [change-name]` for agent-readable context.
+- [x] Implement `specrow build-start <change-name>`.
+- [x] Implement `specrow build-finish <change-name>`.
+- [x] Implement `specrow revise <change-name>`.
+- [x] Implement `specrow accept <change-name>`.
+- [x] Implement `specrow archive <change-name>`.
+- [x] Implement `specrow list`.
+- [x] Make CLI output clear enough for the agent to decide the next workflow step.
+- [x] Use project language for built-in status messages.
+- [x] Fail clearly when the configured language has no required template or message.
 
 ## Agent 5. Agent Commands
 

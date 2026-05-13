@@ -174,6 +174,13 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     "lifecycle.revisionNeeded": "Se necesita una revisión.",
     "lifecycle.accepted": "El cambio está aceptado.",
     "lifecycle.archived": "El cambio está archivado.",
+    "build.started": "La construcción puede empezar para {change}.",
+    "validate.ok": "La validación pasó.",
+    "validate.failed": "La validación falló.",
+    "review.warning": "La revisión terminó con advertencias.",
+    "status.change": "{change}: {state}; revisión: {review}; aceptado: {accepted}.",
+    "list.empty": "No hay cambios activos.",
+    "list.warning": "Advertencia: {warning}",
     "next.acceptOrRevise": "Siguiente paso: /specrow:accept o /specrow:revise.",
     "error.missingTemplate": "Falta la plantilla de SpecRow \"{name}\" para el idioma \"{language}\".",
     "error.missingMessage": "Falta el mensaje de SpecRow \"{name}\" para el idioma \"{language}\"."

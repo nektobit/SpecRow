@@ -174,6 +174,13 @@ export const ru = {
     "lifecycle.revisionNeeded": "Требуется доработка.",
     "lifecycle.accepted": "Изменение принято.",
     "lifecycle.archived": "Изменение перенесено в архив.",
+    "build.started": "Можно начинать сборку изменения {change}.",
+    "validate.ok": "Проверка пройдена.",
+    "validate.failed": "Проверка не пройдена.",
+    "review.warning": "Проверка завершена с предупреждениями.",
+    "status.change": "{change}: {state}; проверка: {review}; принято: {accepted}.",
+    "list.empty": "Активных изменений нет.",
+    "list.warning": "Предупреждение: {warning}",
     "next.acceptOrRevise": "Следующий шаг: /specrow:accept или /specrow:revise.",
     "error.missingTemplate": "Отсутствует шаблон SpecRow \"{name}\" для языка \"{language}\".",
     "error.missingMessage": "Отсутствует сообщение SpecRow \"{name}\" для языка \"{language}\"."

@@ -174,6 +174,13 @@ Describe the intended spec changes using this structure when requirements change
     "lifecycle.revisionNeeded": "Revision is needed.",
     "lifecycle.accepted": "Change is accepted.",
     "lifecycle.archived": "Change is archived.",
+    "build.started": "Build can start for {change}.",
+    "validate.ok": "Validation passed.",
+    "validate.failed": "Validation failed.",
+    "review.warning": "Review completed with warnings.",
+    "status.change": "{change}: {state}; review: {review}; accepted: {accepted}.",
+    "list.empty": "No active changes.",
+    "list.warning": "Warning: {warning}",
     "next.acceptOrRevise": "Next step: /specrow:accept or /specrow:revise.",
     "error.missingTemplate": "Missing SpecRow template \"{name}\" for language \"{language}\".",
     "error.missingMessage": "Missing SpecRow message \"{name}\" for language \"{language}\"."

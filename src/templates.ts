@@ -16,6 +16,13 @@ export type MessageName =
   | "lifecycle.revisionNeeded"
   | "lifecycle.accepted"
   | "lifecycle.archived"
+  | "build.started"
+  | "validate.ok"
+  | "validate.failed"
+  | "review.warning"
+  | "status.change"
+  | "list.empty"
+  | "list.warning"
   | "next.acceptOrRevise"
   | "error.missingTemplate"
   | "error.missingMessage";
@@ -38,6 +45,13 @@ export const REQUIRED_MESSAGES: readonly MessageName[] = [
   "lifecycle.revisionNeeded",
   "lifecycle.accepted",
   "lifecycle.archived",
+  "build.started",
+  "validate.ok",
+  "validate.failed",
+  "review.warning",
+  "status.change",
+  "list.empty",
+  "list.warning",
   "next.acceptOrRevise",
   "error.missingTemplate",
   "error.missingMessage"
