@@ -5,6 +5,7 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import githubMarkSvg from '@primer/octicons/build/svg/mark-github-24.svg?raw'
 
 import { defaultLocale, locales, pages, type LocaleCode } from './content'
+import specrowLogoUrl from './assets/specrow-logo.svg'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,8 +51,9 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
 
   <header class="border-b border-[#2e2e32] bg-[#1a1a1a]">
     <div class="mx-auto grid w-[min(1180px,calc(100%-32px))] gap-4 py-4 md:grid-cols-[auto_1fr_auto] md:items-center">
-      <RouterLink class="text-2xl font-bold leading-none text-[#fffff5db] no-underline" :to="`/${activeLocale}/`">
-        SpecRow
+      <RouterLink class="inline-flex items-center gap-2 text-2xl font-bold leading-none text-[#fffff5db] no-underline" :to="`/${activeLocale}/`">
+        <img class="size-8 rounded-md" :src="specrowLogoUrl" alt="" aria-hidden="true">
+        <span>SpecRow</span>
       </RouterLink>
 
       <nav class="flex flex-wrap gap-2 md:justify-center" :aria-label="t('navLabel')">
@@ -60,6 +62,7 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
           :key="page.slug"
           class="rounded-lg px-3 py-2 text-sm font-semibold text-[#ebebf599] no-underline transition hover:bg-[#242424] hover:text-[#fffff5db]"
           active-class="!text-[#42b883]"
+          exact-active-class="bg-[#242424] !text-[#42b883]"
           :to="page.slug === 'manifesto' ? `/${activeLocale}/` : `/${activeLocale}/${page.slug}`"
         >
           {{ t(`nav.${page.slug}`) }}
@@ -77,10 +80,10 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
           <span class="github-mark" aria-hidden="true" v-html="githubMarkSvg" />
         </a>
 
-        <label class="flex items-center gap-2 text-sm font-semibold text-[#ebebf599]">
+        <label class="relative flex items-center gap-2 text-sm font-semibold text-[#ebebf599]">
           <span class="sr-only">{{ t('language') }}</span>
           <select
-            class="h-10 rounded-lg border border-[#2e2e32] bg-[#242424] py-0 pl-4 pr-8 font-semibold text-[#fffff5db] outline-none transition hover:border-[#42b883] focus:border-[#42b883]"
+            class="h-10 appearance-none rounded-lg border border-[#2e2e32] bg-[#242424] py-0 pl-4 pr-10 font-semibold text-[#fffff5db] outline-none transition hover:border-[#42b883] focus:border-[#42b883]"
             :aria-label="t('language')"
             :value="activeLocale"
             @change="switchLocale(($event.target as HTMLSelectElement).value as LocaleCode)"
@@ -89,6 +92,14 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
               {{ item.label }}
             </option>
           </select>
+          <svg
+            class="pointer-events-none absolute right-4 top-1/2 size-3 -translate-y-1/2 text-[#ebebf599]"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+            fill="none"
+          >
+            <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </label>
       </div>
     </div>

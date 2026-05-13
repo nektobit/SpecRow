@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
 import { defaultLocale, docContent, type LocaleCode, type PageSlug, type Paragraph } from '../content'
+import { blockId, readingMinutes, sectionLinks } from '../docs'
 
 const route = useRoute()
+const { t } = useI18n()
 
 const locale = computed<LocaleCode>(() => (route.params.locale as LocaleCode | undefined) ?? defaultLocale)
 const pageSlug = computed<PageSlug>(() => ((route.params.page as PageSlug | undefined) ?? 'manifesto') as PageSlug)
 const page = computed(() => docContent[locale.value][pageSlug.value])
+const minutes = computed(() => readingMinutes(page.value))
+const links = computed(() => sectionLinks(page.value))
 
 function paragraphParts(paragraph: Paragraph) {
   return Array.isArray(paragraph) ? paragraph : [paragraph]
@@ -33,10 +38,10 @@ function linkTo(page: PageSlug): string {
       </div>
     </section>
 
-    <div class="mx-auto w-[min(860px,calc(100%-32px))] py-8">
+    <div class="mx-auto grid w-[min(1180px,calc(100%-32px))] gap-8 py-8 lg:grid-cols-[minmax(0,860px)_240px]">
       <article class="content-flow rounded-lg bg-[#242424] p-5 text-base leading-7 text-[#ebebf5db] shadow-xl shadow-black/20 md:p-8 md:text-lg md:leading-8">
         <template v-for="(block, index) in page.blocks" :key="index">
-          <section v-if="block.type === 'section'" class="doc-section">
+          <section v-if="block.type === 'section'" :id="blockId(index)" class="doc-section scroll-mt-24">
             <h2>{{ block.heading }}</h2>
             <p v-for="(paragraph, paragraphIndex) in block.paragraphs" :key="paragraphIndex">
               <template v-for="part in paragraphParts(paragraph)" :key="typeof part === 'string' ? part : part.text">
@@ -48,7 +53,7 @@ function linkTo(page: PageSlug): string {
             </p>
           </section>
 
-          <section v-else-if="block.type === 'list-section'" class="doc-section">
+          <section v-else-if="block.type === 'list-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
             <h2>{{ block.heading }}</h2>
             <p>{{ block.intro }}</p>
             <ul>
@@ -69,6 +74,20 @@ function linkTo(page: PageSlug): string {
           </div>
         </template>
       </article>
+
+      <aside class="article-aside">
+        <section class="article-aside-card">
+          <h2>{{ t('readingTime') }}</h2>
+          <p>{{ minutes }} {{ t('minutes') }}</p>
+        </section>
+
+        <nav class="article-aside-card" :aria-label="t('onThisPage')">
+          <h2>{{ t('onThisPage') }}</h2>
+          <a v-for="link in links" :key="link.id" :href="`#${link.id}`">
+            {{ link.label }}
+          </a>
+        </nav>
+      </aside>
     </div>
   </main>
 </template>

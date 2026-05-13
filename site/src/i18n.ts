@@ -8,6 +8,9 @@ type ShellMessages = {
   language: string
   footer: string
   repository: string
+  readingTime: string
+  minutes: string
+  onThisPage: string
   nav: Record<string, string>
 }
 
@@ -18,6 +21,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     language: 'Language',
     footer: 'SpecRow documentation.',
     repository: 'Repository',
+    readingTime: 'Reading time',
+    minutes: 'min read',
+    onThisPage: 'On this page',
     nav: {
       manifesto: 'Manifesto',
       instructions: 'Instructions',
@@ -30,6 +36,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     language: 'Язык',
     footer: 'Документация SpecRow.',
     repository: 'Репозиторий',
+    readingTime: 'Время на чтение',
+    minutes: 'мин чтения',
+    onThisPage: 'На этой странице',
     nav: {
       manifesto: 'Манифест',
       instructions: 'Инструкция',
@@ -42,6 +51,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     language: 'Idioma',
     footer: 'Documentación de SpecRow.',
     repository: 'Repositorio',
+    readingTime: 'Tiempo de lectura',
+    minutes: 'min de lectura',
+    onThisPage: 'En esta página',
     nav: {
       manifesto: 'Manifiesto',
       instructions: 'Instrucciones',
@@ -54,6 +66,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     language: '语言',
     footer: 'SpecRow 文档。',
     repository: '代码库',
+    readingTime: '阅读时间',
+    minutes: '分钟阅读',
+    onThisPage: '本页内容',
     nav: {
       manifesto: '宣言',
       instructions: '使用说明',
