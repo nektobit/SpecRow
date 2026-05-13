@@ -204,14 +204,14 @@ Ownership: user-facing command specs and expected agent behavior.
 
 Ownership: acceptance rules, spec integration rules, archive safety.
 
-- [ ] Prevent `build-finish` from updating specs as final truth.
-- [ ] Prevent archive while the change is not accepted.
-- [ ] Prevent accept unless the change is in `built` or `revision-needed` with completed follow-up work.
-- [ ] Record explicit acceptance in `status.yml`.
-- [ ] Update specs and archive the change only through the accept path.
-- [ ] Make CLI output clearly tell the agent/user whether the next step is `/specrow:accept` or `/specrow:revise`.
-- [ ] Keep accepted changes auditable after archive.
-- [ ] Avoid destructive overwrite when archiving an existing change name.
+- [x] Prevent `build-finish` from updating specs as final truth.
+- [x] Prevent archive while the change is not accepted.
+- [x] Prevent accept unless the change is in `built` or `revision-needed` with completed follow-up work.
+- [x] Record explicit acceptance in `status.yml`.
+- [x] Update specs and archive the change only through the accept path.
+- [x] Make CLI output clearly tell the agent/user whether the next step is `/specrow:accept` or `/specrow:revise`.
+- [x] Keep accepted changes auditable after archive.
+- [x] Avoid destructive overwrite when archiving an existing change name.
 
 ## Agent 7. Documentation
 

@@ -1,5 +1,5 @@
 import { constants } from "node:fs";
-import { access, mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { parse, stringify } from "yaml";
@@ -169,11 +169,17 @@ export async function archiveChange(cwd: string, changeName: string, now?: Date)
     throw new Error(`Change "${status.change}" must be accepted before archive.`);
   }
 
+  if (status.acceptance.explicit !== true || status.acceptance.acceptedAt === undefined) {
+    throw new Error(`Change "${status.change}" must have explicit acceptance recorded before archive.`);
+  }
+
   const archiveRoot = path.join(root, SPECROW_DIR, "archive", status.change);
 
   if (await pathExists(archiveRoot)) {
     throw new Error(`Archived change "${status.change}" already exists.`);
   }
+
+  await integrateSpecUpdates(root, status.change);
 
   const archivedStatus = updateTimestamp(
     {
@@ -248,6 +254,33 @@ function activeChangePath(cwd: string, changeName: string): string {
 
 function renderChangeTemplate(template: string, changeName: string): string {
   return template.replace(/<[^>\n]*>/, changeName);
+}
+
+async function integrateSpecUpdates(root: string, changeName: string): Promise<void> {
+  const stagedSpecsRoot = path.join(activeChangePath(root, changeName), "specs");
+
+  if (!(await pathExists(stagedSpecsRoot))) {
+    return;
+  }
+
+  await copyDirectoryContents(stagedSpecsRoot, path.join(root, SPECROW_DIR, "specs"));
+}
+
+async function copyDirectoryContents(sourceRoot: string, targetRoot: string): Promise<void> {
+  const entries = await readdir(sourceRoot, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const sourcePath = path.join(sourceRoot, entry.name);
+    const targetPath = path.join(targetRoot, entry.name);
+
+    if (entry.isDirectory()) {
+      await mkdir(targetPath, { recursive: true });
+      await copyDirectoryContents(sourcePath, targetPath);
+    } else if (entry.isFile()) {
+      await mkdir(path.dirname(targetPath), { recursive: true });
+      await copyFile(sourcePath, targetPath);
+    }
+  }
 }
 
 async function writeChangeStatus(cwd: string, status: LifecycleStatus): Promise<LifecycleStatus> {
