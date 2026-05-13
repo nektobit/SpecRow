@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SpecRow Knowledge Base</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap header-grid">
+        <a class="brand" href="../">SpecRow</a>
+        <nav class="primary-nav" aria-label="Documentation">
+          <a href="./">Manifesto</a>
+          <a href="instructions.html">Instructions</a>
+          <a href="knowledge-base.html" aria-current="page">Knowledge Base</a>
+        </nav>
+        <nav class="language-switcher" aria-label="Language">
+          <a href="../en/knowledge-base.html" hreflang="en" aria-current="page">English</a>
+          <a href="../ru/knowledge-base.html" hreflang="ru">Русский</a>
+          <a href="../es/knowledge-base.html" hreflang="es">Español</a>
+          <a href="../zh-CN/knowledge-base.html" hreflang="zh-CN">中文</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="content" class="wrap">
+      <section class="hero">
+        <p class="eyebrow">Knowledge Base</p>
+        <h1>SpecRow Concepts</h1>
+        <p>Core ideas for working with specifications, changes, and SDD.</p>
+      </section>
+
+      <article class="content">
+        <h2>What is SpecRow?</h2>
+        <p>It is a set of conventions for working with specifications: how to describe features, where to store changes, and how to pass context to a person or an AI agent. SpecRow is needed to make this process more convenient and stable.</p>
+
+        <h2>What is a specification?</h2>
+        <p>A spec, or specification, is a description of a feature, a change, or a separate part of a system. It usually includes the domain description, goal, expected behavior, important constraints, and readiness criteria.</p>
+
+        <h2>What is a domain?</h2>
+        <p>A domain is everything that describes the problem being solved in business language, without tying it to technologies. This includes key concepts: entities, actions, and states such as "Order", "Place order", and "Paid"; and the business rules that govern them.</p>
+
+        <h2>What advantages does this give compared with prompts and vibe coding?</h2>
+        <p>A prompt often lives only in the moment. You write a request, get an answer, clarify it, then revise it again. After several iterations, it becomes hard to remember which requirements were most important, what changed, and why.</p>
+        <p>SDD makes the work more stable. Instead of a long conversation, you get a separate spec that collects the goal, requirements, constraints, and decisions. You can reread it, update it, send it to another person, or give it to an AI agent again as context.</p>
+
+        <h2>What is SDD?</h2>
+        <p>SDD is spec-driven development. First we describe what should be built, why it is needed, and how to verify the result. Only then do we move to implementation: by ourselves, with a team, or with an AI agent. The philosophy of SDD is: "If it is not written in the documentation, it does not exist." Documentation is the single source of truth.</p>
+
+        <h2>What is a "source of truth"?</h2>
+        <p>A source of truth is the place we trust when we need to understand how the system should work. In SDD, the spec becomes that place. This does not mean the spec never changes. But changes are recorded explicitly instead of being lost somewhere in a chat thread, a developer's memory, or a prompt history.</p>
+
+        <h2>Are these strict rules or a general idea of how SDD should work?</h2>
+        <p>This is not a rigid rulebook. SpecRow offers a working flow: how to describe changes, where to store specs, how to connect them with tasks, and how to use all of this in development.</p>
+        <p>You can adapt it to your needs. In a small project, short texts and a simple folder structure may be enough. In a team, you may need more formality: statuses, change history, acceptance criteria, and links to tasks.</p>
+        <p>The main point is not to serve the format for its own sake. Specs should help people think, agree, and make the result clearer. If some part of the process gets in the way, it can be simplified.</p>
+
+        <h2>How do I start working with SpecRow?</h2>
+        <p>Start with the <a href="instructions.html">instructions</a>.</p>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">SpecRow documentation.</div>
+    </footer>
+  </body>
+</html>
