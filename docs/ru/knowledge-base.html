@@ -16,12 +16,23 @@
           <a href="instructions.html">Инструкция</a>
           <a href="knowledge-base.html" aria-current="page">База знаний</a>
         </nav>
-        <nav class="language-switcher" aria-label="Язык">
+        <details class="language-menu">
+          <summary aria-label="Language menu" title="Language">
+            <svg class="language-icon" aria-hidden="true" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M2 12h20"></path>
+              <path d="M12 2a15.3 15.3 0 0 1 0 20"></path>
+              <path d="M12 2a15.3 15.3 0 0 0 0 20"></path>
+            </svg>
+            <span class="visually-hidden">Language</span>
+          </summary>
+          <nav class="language-switcher" aria-label="Язык">
           <a href="../en/knowledge-base.html" hreflang="en">English</a>
           <a href="../ru/knowledge-base.html" hreflang="ru" aria-current="page">Русский</a>
           <a href="../es/knowledge-base.html" hreflang="es">Español</a>
           <a href="../zh-CN/knowledge-base.html" hreflang="zh-CN">中文</a>
         </nav>
+        </details>
       </div>
     </header>
 
