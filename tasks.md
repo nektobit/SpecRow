@@ -8,28 +8,28 @@ SpecRow must be agent-first: the user works with intentions through the agent, w
 
 ## Core Principles
 
-- [ ] Remove all remaining old project-name references from code, tests, package metadata, docs, and generated artifacts.
-- [ ] Standardize the CLI binary, docs, and internal naming around `specrow`.
-- [ ] Standardize the project workspace directory as `.specrow`.
-- [ ] Keep the first implementation small: no full OpenSpec clone, no complex delta engine, no automatic conflict resolver.
-- [ ] Treat agent commands as the primary UX.
-- [ ] Treat CLI commands as the technical core used by agents, CI, automation, and manual fallback.
-- [ ] Require explicit user acceptance before specs become final truth and before archive.
+- [x] Remove all remaining old project-name references from code, tests, package metadata, docs, and generated artifacts.
+- [x] Standardize the CLI binary, docs, and internal naming around `specrow`.
+- [x] Standardize the project workspace directory as `.specrow`.
+- [x] Keep the first implementation small: no full OpenSpec clone, no complex delta engine, no automatic conflict resolver.
+- [x] Treat agent commands as the primary UX.
+- [x] Treat CLI commands as the technical core used by agents, CI, automation, and manual fallback.
+- [x] Require explicit user acceptance before specs become final truth and before archive.
 
 ## Language Rule
 
-- [ ] SpecRow determines the template language from `.specrow/config.yml`.
-- [ ] The `language` field defines the working language of the project.
-- [ ] The CLI uses `language` when generating built-in files:
+- [x] SpecRow determines the template language from `.specrow/config.yml`.
+- [x] The `language` field defines the working language of the project.
+- [x] The CLI uses `language` when generating built-in files:
   - `project.md`;
   - specs;
   - proposals;
   - tasks;
   - lifecycle/status messages.
-- [ ] Agent commands use `language` when creating or revising built-in files.
-- [ ] If the requested language template is missing, SpecRow stops with a clear error.
-- [ ] SpecRow must not silently fall back to English.
-- [ ] Full multilingual localization of built-in templates is part of MVP.
+- [x] Agent commands use `language` when creating or revising built-in files.
+- [x] If the requested language template is missing, SpecRow stops with a clear error.
+- [x] SpecRow must not silently fall back to English.
+- [x] Full multilingual localization of built-in templates is part of MVP.
 
 ## Agent 1. Naming and Project Foundation
 
@@ -217,52 +217,52 @@ Ownership: acceptance rules, spec integration rules, archive safety.
 
 Ownership: README files, documentation site content, workflow docs.
 
-- [ ] Rewrite getting-started documentation around agent commands, not CLI memorization.
-- [ ] Add a workflow page for `proposal -> review -> build -> revise -> accept`.
-- [ ] Add an agent command reference.
-- [ ] Add a CLI reference that frames CLI as the technical core.
-- [ ] Add a templates page for `project.md`, specs, `proposal.md`, and `tasks.md`.
-- [ ] Add a localization page explaining `.specrow/config.yml` language behavior.
-- [ ] Add a validation and lifecycle page.
-- [ ] Explain how SpecRow differs from OpenSpec:
+- [x] Rewrite getting-started documentation around agent commands, not CLI memorization.
+- [x] Add a workflow page for `proposal -> review -> build -> revise -> accept`.
+- [x] Add an agent command reference.
+- [x] Add a CLI reference that frames CLI as the technical core.
+- [x] Add a templates page for `project.md`, specs, `proposal.md`, and `tasks.md`.
+- [x] Add a localization page explaining `.specrow/config.yml` language behavior.
+- [x] Add a validation and lifecycle page.
+- [x] Explain how SpecRow differs from OpenSpec:
   - agent-first user experience;
   - user intent before CLI mechanics;
   - explicit accept gate;
   - project-native working language;
   - fully localized built-in templates;
   - smaller MVP surface.
-- [ ] Document that missing language templates are errors, not fallback cases.
+- [x] Document that missing language templates are errors, not fallback cases.
 
 ## Agent 8. Tests
 
 Ownership: unit tests, integration tests, lifecycle regression tests.
 
-- [ ] Test init creates `.specrow`, not any legacy directory.
-- [ ] Test init creates `config.yml`, `project.md`, `specs/`, `changes/`, and `archive/`.
-- [ ] Test proposal creates `proposal.md`, `tasks.md`, and `status.yml`.
-- [ ] Test templates use the configured project language.
-- [ ] Test every built-in template exists for every supported language.
-- [ ] Test missing language template fails with a clear error.
-- [ ] Test missing language template does not fall back to English.
-- [ ] Test localized status messages use the configured project language.
-- [ ] Test validate fails on missing required change files.
-- [ ] Test validate fails on missing required sections.
-- [ ] Test review reports empty or weak acceptance criteria.
-- [ ] Test build-finish does not archive and does not update specs as accepted truth.
-- [ ] Test accept requires explicit user acceptance state.
-- [ ] Test archive is blocked before accept.
-- [ ] Test multiple active changes are listed and potential spec conflicts are reported as warnings.
+- [x] Test init creates `.specrow`, not any legacy directory.
+- [x] Test init creates `config.yml`, `project.md`, `specs/`, `changes/`, and `archive/`.
+- [x] Test proposal creates `proposal.md`, `tasks.md`, and `status.yml`.
+- [x] Test templates use the configured project language.
+- [x] Test every built-in template exists for every supported language.
+- [x] Test missing language template fails with a clear error.
+- [x] Test missing language template does not fall back to English.
+- [x] Test localized status messages use the configured project language.
+- [x] Test validate fails on missing required change files.
+- [x] Test validate fails on missing required sections.
+- [x] Test review reports empty or weak acceptance criteria.
+- [x] Test build-finish does not archive and does not update specs as accepted truth.
+- [x] Test accept requires explicit user acceptance state.
+- [x] Test archive is blocked before accept.
+- [x] Test multiple active changes are listed and potential spec conflicts are reported as warnings.
 
 ## MVP Definition
 
-- [ ] A user can initialize a project through `/specrow:init`.
-- [ ] A user can describe an intended change through `/specrow:proposal`.
-- [ ] The agent can use CLI context and validation without exposing CLI mechanics as the main UX.
-- [ ] The agent can implement through `/specrow:build`.
-- [ ] Build stops with the change waiting for `/specrow:accept` or `/specrow:revise`.
-- [ ] Specs and archive are updated only after `/specrow:accept`.
-- [ ] All built-in templates are fully localized for supported languages.
-- [ ] Missing language resources stop the workflow with a clear error.
+- [x] A user can initialize a project through `/specrow:init`.
+- [x] A user can describe an intended change through `/specrow:proposal`.
+- [x] The agent can use CLI context and validation without exposing CLI mechanics as the main UX.
+- [x] The agent can implement through `/specrow:build`.
+- [x] Build stops with the change waiting for `/specrow:accept` or `/specrow:revise`.
+- [x] Specs and archive are updated only after `/specrow:accept`.
+- [x] All built-in templates are fully localized for supported languages.
+- [x] Missing language resources stop the workflow with a clear error.
 
 ## Deferred
 

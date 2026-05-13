@@ -88,7 +88,8 @@ a {
 }
 
 .content-flow p,
-.content-flow ul {
+.content-flow ul,
+.content-flow pre {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
 }
@@ -100,6 +101,25 @@ a {
 
 .content-flow li {
     margin-top: 0.25rem;
+}
+
+.content-flow pre {
+    overflow-x: auto;
+    border: 1px solid #2e2e32;
+    border-radius: 8px;
+    background: #1a1a1a;
+    padding: 0.875rem 1rem;
+}
+
+.content-flow code {
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    white-space: pre;
 }
 
 .content-flow a {

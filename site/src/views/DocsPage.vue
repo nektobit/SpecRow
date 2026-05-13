@@ -62,6 +62,13 @@ function linkTo(page: PageSlug): string {
             <p>{{ block.outro }}</p>
           </section>
 
+          <section v-else-if="block.type === 'code-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
+            <h2>{{ block.heading }}</h2>
+            <p>{{ block.intro }}</p>
+            <pre><code>{{ block.code }}</code></pre>
+            <p>{{ block.outro }}</p>
+          </section>
+
           <div v-else class="rounded-lg border border-[#2e2e32] bg-[#2a2a2a] p-5">
             <p v-for="(paragraph, paragraphIndex) in block.paragraphs" :key="paragraphIndex">
               <template v-for="part in paragraphParts(paragraph)" :key="typeof part === 'string' ? part : part.text">

@@ -1,65 +1,60 @@
 # SpecRow
 
-SpecRow es un sistema de especificaciones multilingue donde el idioma del usuario es el idioma principal de interaccion con el sistema y con los agentes, no una capa de traduccion sobre un modelo centrado en ingles.
+SpecRow es un flujo de especificaciones agent-first. Los usuarios describen intención con comandos `/specrow:*`, mientras que la CLI `specrow` sigue siendo el núcleo técnico para agentes, CI, automatización y fallback manual.
 
-## Leer En Tu Idioma
+## Leer en tu idioma
 
 - [English](README.md)
 - [Русский](README.ru.md)
 - [Español](README.es.md)
 - [中文](README.zh-CN.md)
 
-## Sitio De Documentacion
+## Documentación
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
-## Manifiesto
+El sitio cubre el flujo MVP completo: primeros pasos, de proposal a accept, comandos de agente, CLI core, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
 
-### 1. Idioma Primero Para El Usuario
+## Inicio rápido
 
-Las especificaciones se crean en el idioma que resulte comodo para el usuario.
-El trabajo con el sistema debe ser transparente y predecible.
+Empieza con comandos de agente:
 
-### 2. Vocabulario Compartido
+```txt
+/specrow:init language=es
+/specrow:proposal Describe el cambio previsto
+/specrow:review
+/specrow:build
+/specrow:accept
+```
 
-El glosario del proyecto forma parte del sistema.
-Todos los terminos de dominio se registran y se usan de forma consistente.
+El agente puede llamar a `specrow init`, `specrow proposal`, `specrow validate`, `specrow context` y `specrow build-finish` como detalles de implementación.
 
-### 3. Representacion Dual
+## Workspace
 
-Cada especificacion existe en dos representaciones:
+`/specrow:init` crea:
 
-- Human view: para personas
-- Agent view: para agentes
+```txt
+.specrow/
+  config.yml
+  project.md
+  specs/
+  changes/
+  archive/
+```
 
-Son dos proyecciones de una misma especificacion, no dos documentos independientes.
+`config.yml` se mantiene mínimo:
 
-### 4. Flujo Basado En Cambios
+```yml
+version: 1
+language: es
+```
 
-Una nueva funcionalidad, correccion o mejora primero existe como un cambio.
-Despues de la implementacion y la verificacion, el cambio se integra en la especificacion vigente.
+El idioma configurado controla plantillas integradas y mensajes lifecycle/status. Los recursos de idioma ausentes son errores. SpecRow no hace fallback silencioso a inglés.
 
-### 5. Derivacion De Tareas
+## Accept Gate
 
-Las tareas deben poder derivarse de la especificacion.
-Si una especificacion no permite obtener un plan de trabajo claro, la especificacion no es suficientemente buena.
+Build no actualiza specs como verdad final y no archiva un cambio. Las specs y el archivo se actualizan solo después de aceptación explícita del usuario mediante `/specrow:accept`.
 
-### 6. Especificaciones Validables
+## Migration Notes
 
-Una especificacion debe poder validarse por maquina.
-La estructura, los enlaces, las secciones obligatorias, los conflictos y las tareas deben validarse.
-
-### 7. Decisiones Explicitas
-
-Los agentes no deben tomar decisiones importantes en silencio.
-Las decisiones de arquitectura, UX, datos y seguridad deben registrarse explicitamente.
-
-### 8. Contrato Ejecutable
-
-Una especificacion es un contrato ejecutable.
-Si la implementacion o la verificacion requieren herramientas, esas herramientas forman parte del sistema.
-
-### 9. AI Opcional
-
-El sistema funciona con AI.
-El sistema funciona sin AI.
+Prototipos locales antiguos pueden haber usado la CLI `specfly` o el directorio `.specfly`. Los proyectos nuevos usan el binario `specrow` y `.specrow/`. Mueve los archivos específicos del proyecto que aún necesites a las ubicaciones equivalentes dentro de `.specrow/`.

@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow is a multilingual specification system where the user's language is the primary language of interaction with the system and with agents, not a translation layer on top of an English-first model.
+SpecRow is an agent-first specification workflow. Users describe intent through `/specrow:*` commands, while the `specrow` CLI remains the technical core for agents, CI, automation, and manual fallback.
 
 ## Read This In Your Language
 
@@ -9,61 +9,52 @@ SpecRow is a multilingual specification system where the user's language is the 
 - [Español](README.es.md)
 - [中文](README.zh-CN.md)
 
-## Documentation Site
+## Documentation
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
+The site covers the full MVP workflow: getting started, proposal to accept, agent commands, CLI core, templates, localization, validation, lifecycle rules, and differences from OpenSpec.
+
+## Quick Start
+
+Use the agent commands first:
+
+```txt
+/specrow:init language=en
+/specrow:proposal Describe the intended change
+/specrow:review
+/specrow:build
+/specrow:accept
+```
+
+The agent may call CLI commands such as `specrow init`, `specrow proposal`, `specrow validate`, `specrow context`, and `specrow build-finish` as implementation details.
+
+## Workspace
+
+`/specrow:init` creates:
+
+```txt
+.specrow/
+  config.yml
+  project.md
+  specs/
+  changes/
+  archive/
+```
+
+`config.yml` stays minimal:
+
+```yml
+version: 1
+language: en
+```
+
+The configured language controls built-in templates and lifecycle/status messages. Missing language resources are errors. SpecRow does not silently fall back to English.
+
+## Accept Gate
+
+Build does not update specs as final truth and does not archive a change. Specs and archive are updated only after explicit user acceptance through `/specrow:accept`.
+
 ## Migration Notes
 
-Older local prototypes may have used the `specfly` CLI name or a `.specfly` workspace directory. For SpecRow, use the `specrow` CLI binary and keep project workflow files under `.specrow/`. If you have an older `.specfly` directory, move any project-specific files you still need into the matching `.specrow/` locations before continuing.
-
-## Manifesto
-
-### 1. User-First Language
-
-Specifications are created in the language that is convenient for the user.
-Working with the system must be transparent and predictable.
-
-### 2. Shared Vocabulary
-
-The project glossary is part of the system.
-All domain terms are recorded and used consistently.
-
-### 3. Dual Representation
-
-Each specification exists in two representations:
-
-- Human view: for people
-- Agent view: for agents
-
-These are two projections of the same specification, not two independent documents.
-
-### 4. Change-First Workflow
-
-A new feature, fix, or improvement first exists as a change.
-After implementation and verification, the change is integrated into the current specification.
-
-### 5. Task Derivation
-
-Tasks must be derivable from the specification.
-If a specification cannot produce a clear work plan, the specification is not good enough.
-
-### 6. Validatable Specs
-
-A specification must be machine-validatable.
-Structure, links, required sections, conflicts, and tasks must be validated.
-
-### 7. Explicit Decisions
-
-Agents must not silently make important decisions.
-Architecture, UX, data, and security decisions must be recorded explicitly.
-
-### 8. Executable Contract
-
-A specification is an executable contract.
-If implementation or verification requires tools, those tools are part of the system.
-
-### 9. AI-Optional
-
-The system works with AI.
-The system works without AI.
+Older local prototypes may have used the `specfly` CLI name or a `.specfly` workspace directory. New projects use the `specrow` binary and `.specrow/`. Move any project-specific files you still need into the matching `.specrow/` locations.

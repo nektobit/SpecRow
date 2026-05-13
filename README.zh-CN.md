@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow 是一个多语言规格系统。在 SpecRow 中，用户的语言是用户与系统和代理交互的第一语言，而不是建立在英语优先模型之上的翻译层。
+SpecRow 是 agent-first 的规格工作流。用户通过 `/specrow:*` 命令描述意图，而 `specrow` CLI 仍然是代理、CI、自动化和手动 fallback 的技术核心。
 
 ## 使用你的语言阅读
 
@@ -9,57 +9,52 @@ SpecRow 是一个多语言规格系统。在 SpecRow 中，用户的语言是用
 - [Español](README.es.md)
 - [中文](README.zh-CN.md)
 
-## 文档站点
+## 文档
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
-## 宣言
+站点覆盖完整 MVP 流程：开始使用、从 proposal 到 accept、代理命令、CLI core、模板、本地化、验证、生命周期规则，以及与 OpenSpec 的区别。
 
-### 1. 用户语言优先
+## 快速开始
 
-规格使用用户方便使用的语言创建。
-系统的工作方式必须透明且可预测。
+优先使用代理命令：
 
-### 2. 共享词汇
+```txt
+/specrow:init language=zh-CN
+/specrow:proposal 描述预期变更
+/specrow:review
+/specrow:build
+/specrow:accept
+```
 
-项目术语表是系统的一部分。
-所有领域术语都必须被记录，并保持一致使用。
+代理可以把 `specrow init`、`specrow proposal`、`specrow validate`、`specrow context` 和 `specrow build-finish` 作为实现细节调用。
 
-### 3. 双重表示
+## Workspace
 
-每份规格都有两种表示：
+`/specrow:init` 创建：
 
-- Human view：面向人
-- Agent view：面向代理
+```txt
+.specrow/
+  config.yml
+  project.md
+  specs/
+  changes/
+  archive/
+```
 
-它们是同一份规格的两个投影，而不是两个相互独立的文档。
+`config.yml` 保持最小：
 
-### 4. 变更优先流程
+```yml
+version: 1
+language: zh-CN
+```
 
-新的功能、修复或改进首先以变更的形式存在。
-在实现和验证之后，该变更会被集成到当前规格中。
+配置语言控制内置模板和 lifecycle/status 消息。缺少语言资源是错误。SpecRow 不会静默回退到英文。
 
-### 5. 任务推导
+## Accept Gate
 
-任务必须能够从规格中推导出来。
-如果无法从规格得到清晰的工作计划，说明这份规格还不够好。
+Build 不会把 specs 更新为最终事实，也不会归档变更。只有用户通过 `/specrow:accept` 明确验收后，specs 和 archive 才会更新。
 
-### 6. 可验证规格
+## Migration Notes
 
-规格必须可以被机器验证。
-结构、链接、必需章节、冲突和任务都必须能够被验证。
-
-### 7. 明确决策
-
-代理不能默默做出重要决策。
-架构、UX、数据和安全决策都必须被明确记录。
-
-### 8. 可执行契约
-
-规格是一份可执行契约。
-如果实现或验证需要工具，这些工具就是系统的一部分。
-
-### 9. AI 可选
-
-系统可以与 AI 一起工作。
-系统也可以在没有 AI 的情况下工作。
+旧本地原型可能使用过 `specfly` CLI 或 `.specfly` 目录。新项目使用 `specrow` 二进制和 `.specrow/`。把仍然需要的项目文件移动到 `.specrow/` 中对应的位置。
