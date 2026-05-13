@@ -1,7 +1,7 @@
 import { parse, stringify } from "yaml";
 import { z } from "zod";
 
-export const SpecFlyConfigSchema = z.object({
+export const SpecRowConfigSchema = z.object({
   version: z.literal(1),
   language: z
     .string()
@@ -10,26 +10,26 @@ export const SpecFlyConfigSchema = z.object({
     .regex(/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/, "Use a language code like ru, en, es, or zh-CN.")
 });
 
-export type SpecFlyConfig = z.infer<typeof SpecFlyConfigSchema>;
+export type SpecRowConfig = z.infer<typeof SpecRowConfigSchema>;
 
-export const DEFAULT_CONFIG: SpecFlyConfig = {
+export const DEFAULT_CONFIG: SpecRowConfig = {
   version: 1,
   language: "en"
 };
 
-export function createDefaultConfig(language = DEFAULT_CONFIG.language): SpecFlyConfig {
-  return SpecFlyConfigSchema.parse({
+export function createDefaultConfig(language = DEFAULT_CONFIG.language): SpecRowConfig {
+  return SpecRowConfigSchema.parse({
     ...DEFAULT_CONFIG,
     language
   });
 }
 
-export function serializeConfig(config: SpecFlyConfig): string {
-  return stringify(SpecFlyConfigSchema.parse(config), {
+export function serializeConfig(config: SpecRowConfig): string {
+  return stringify(SpecRowConfigSchema.parse(config), {
     sortMapEntries: false
   });
 }
 
-export function parseConfig(source: string): SpecFlyConfig {
-  return SpecFlyConfigSchema.parse(parse(source));
+export function parseConfig(source: string): SpecRowConfig {
+  return SpecRowConfigSchema.parse(parse(source));
 }

@@ -26,13 +26,13 @@ function linkTo(page: PageSlug): string {
 
 <template>
   <main id="content">
-    <section class="border-b border-[#2e2e32] bg-[#1a1a1a]">
-      <div class="mx-auto w-[min(1180px,calc(100%-32px))] py-12 md:py-16">
+    <section class="docs-hero border-b border-[#2e2e32]">
+      <div class="docs-hero-inner mx-auto w-[min(1180px,calc(100%-32px))] py-12 md:py-16">
         <p class="mb-3 text-sm font-bold uppercase tracking-[0.08em] text-[#42b883]">{{ page.eyebrow }}</p>
         <h1 class="mb-4 max-w-4xl text-5xl font-bold leading-none tracking-normal text-[#fffff5db] md:text-7xl">
         {{ page.title }}
         </h1>
-        <p class="max-w-3xl text-lg font-medium leading-8 text-[#ebebf599] md:text-xl">
+        <p class="max-w-3xl text-lg font-medium leading-8 text-[#ebebf5d4] md:text-xl">
           {{ page.description }}
         </p>
       </div>

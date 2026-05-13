@@ -1,10 +1,10 @@
 {
-  "name": "specfly",
+  "name": "specrow",
   "version": "0.1.0",
   "description": "Multilingual specification system for spec-driven development.",
   "type": "module",
   "bin": {
-    "specfly": "./dist/cli.js"
+    "specrow": "./dist/cli.js"
   },
   "files": [
     "dist"

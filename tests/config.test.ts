@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { parseConfig, serializeConfig } from "../src/config.js";
 
-describe("SpecFly config", () => {
+describe("SpecRow config", () => {
   it("serializes the MVP config shape", () => {
     expect(serializeConfig({ version: 1, language: "en" })).toBe("version: 1\nlanguage: en\n");
   });

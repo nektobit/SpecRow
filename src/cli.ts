@@ -5,24 +5,25 @@ import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { ZodError } from "zod";
 
-import { initSpecFlyProject } from "./init.js";
+import { initSpecRowProject } from "./init.js";
+import { getSpecRowMessage } from "./templates.js";
 
 export function createProgram(): Command {
   const program = new Command();
 
   program
-    .name("specfly")
-    .description("SpecFly CLI")
+    .name("specrow")
+    .description("SpecRow CLI")
     .version("0.1.0");
 
   program
     .command("init")
-    .description("Create the .specfly project structure.")
+    .description("Create the .specrow project structure.")
     .option("-l, --language <code>", "Project language code.", "en")
-    .option("-f, --force", "Overwrite .specfly/config.yml if it already exists.", false)
+    .option("-f, --force", "Overwrite .specrow/config.yml if it already exists.", false)
     .action(async (options: { language: string; force: boolean }) => {
       try {
-        const result = await initSpecFlyProject({
+        const result = await initSpecRowProject({
           language: options.language,
           force: options.force
         });
@@ -30,14 +31,14 @@ export function createProgram(): Command {
         const relativeConfigPath = pathForDisplay(result.configPath);
 
         if (result.configCreated) {
-          console.log(`Created ${relativeConfigPath}`);
+          console.log(getSpecRowMessage(result.language, "init.config.created", { path: relativeConfigPath }));
         } else if (result.configOverwritten) {
-          console.log(`Overwrote ${relativeConfigPath}`);
+          console.log(getSpecRowMessage(result.language, "init.config.overwritten", { path: relativeConfigPath }));
         } else {
-          console.log(`Kept existing ${relativeConfigPath}`);
+          console.log(getSpecRowMessage(result.language, "init.config.kept", { path: relativeConfigPath }));
         }
 
-        console.log(`Ready ${pathForDisplay(result.root)}`);
+        console.log(getSpecRowMessage(result.language, "init.ready", { path: pathForDisplay(result.root) }));
       } catch (error) {
         if (error instanceof ZodError) {
           console.error(`Invalid config: ${error.issues.map((issue) => issue.message).join("; ")}`);

@@ -13,6 +13,10 @@ SpecRow is a multilingual specification system where the user's language is the 
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
+## Migration Notes
+
+Older local prototypes may have used the `specfly` CLI name or a `.specfly` workspace directory. For SpecRow, use the `specrow` CLI binary and keep project workflow files under `.specrow/`. If you have an older `.specfly` directory, move any project-specific files you still need into the matching `.specrow/` locations before continuing.
+
 ## Manifesto
 
 ### 1. User-First Language

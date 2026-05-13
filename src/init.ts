@@ -1,8 +1,9 @@
 import { constants } from "node:fs";
-import { access, mkdir, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { createDefaultConfig, serializeConfig } from "./config.js";
+import { createDefaultConfig, parseConfig, serializeConfig } from "./config.js";
+import { getSpecRowTemplate } from "./templates.js";
 
 export interface InitOptions {
   cwd?: string;
@@ -13,13 +14,16 @@ export interface InitOptions {
 export interface InitResult {
   root: string;
   configPath: string;
+  projectPath: string;
   configCreated: boolean;
   configOverwritten: boolean;
+  projectCreated: boolean;
   directories: string[];
+  language: string;
 }
 
-const SPECFLY_DIR = ".specfly";
-const SPECFLY_SUBDIRECTORIES = ["specs", "changes", "archive"] as const;
+const SPECROW_DIR = ".specrow";
+const SPECROW_SUBDIRECTORIES = ["specs", "changes", "archive"] as const;
 
 async function pathExists(targetPath: string): Promise<boolean> {
   try {
@@ -34,31 +38,42 @@ async function pathExists(targetPath: string): Promise<boolean> {
   }
 }
 
-export async function initSpecFlyProject(options: InitOptions = {}): Promise<InitResult> {
+export async function initSpecRowProject(options: InitOptions = {}): Promise<InitResult> {
   const root = path.resolve(options.cwd ?? process.cwd());
-  const specflyRoot = path.join(root, SPECFLY_DIR);
-  const directories = SPECFLY_SUBDIRECTORIES.map((directory) => path.join(specflyRoot, directory));
-  const configPath = path.join(specflyRoot, "config.yml");
-  const config = createDefaultConfig(options.language);
+  const specrowRoot = path.join(root, SPECROW_DIR);
+  const directories = SPECROW_SUBDIRECTORIES.map((directory) => path.join(specrowRoot, directory));
+  const configPath = path.join(specrowRoot, "config.yml");
+  const projectPath = path.join(specrowRoot, "project.md");
 
-  await mkdir(specflyRoot, { recursive: true });
+  await mkdir(specrowRoot, { recursive: true });
+
+  const configExists = await pathExists(configPath);
+  const shouldWriteConfig = options.force === true || !configExists;
+  const config = shouldWriteConfig ? createDefaultConfig(options.language) : parseConfig(await readFile(configPath, "utf8"));
+  const projectTemplate = getSpecRowTemplate(config.language, "project");
 
   for (const directory of directories) {
     await mkdir(directory, { recursive: true });
   }
 
-  const configExists = await pathExists(configPath);
-  const shouldWriteConfig = options.force === true || !configExists;
-
   if (shouldWriteConfig) {
     await writeFile(configPath, serializeConfig(config), "utf8");
   }
 
+  const projectExists = await pathExists(projectPath);
+
+  if (!projectExists) {
+    await writeFile(projectPath, projectTemplate, "utf8");
+  }
+
   return {
-    root: specflyRoot,
+    root: specrowRoot,
     configPath,
+    projectPath,
     configCreated: !configExists,
     configOverwritten: configExists && options.force === true,
-    directories
+    projectCreated: !projectExists,
+    directories,
+    language: config.language
   };
 }
