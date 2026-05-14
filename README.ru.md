@@ -17,6 +17,19 @@ GitHub Pages: https://nektobit.github.io/SpecRow/
 
 ## Быстрый старт
 
+Установите CLI глобально:
+
+```bash
+npm i -g specrow
+```
+
+Проверьте установку:
+
+```bash
+specrow --version
+specrow --help
+```
+
 Начинайте с команд агента:
 
 ```txt

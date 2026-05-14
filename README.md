@@ -17,6 +17,19 @@ The site covers the full MVP workflow: getting started, proposal to accept, agen
 
 ## Quick Start
 
+Install the CLI globally:
+
+```bash
+npm i -g specrow
+```
+
+Check the installation:
+
+```bash
+specrow --version
+specrow --help
+```
+
 Use the agent commands first:
 
 ```txt

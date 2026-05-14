@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import path from "node:path";
 import { readFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
 
 import { Command } from "commander";
 import { ZodError } from "zod";
@@ -22,13 +21,15 @@ import {
 import { getSpecRowMessage } from "./templates.js";
 import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
 
+const SPECROW_VERSION = "0.1.2";
+
 export function createProgram(): Command {
   const program = new Command();
 
   program
     .name("specrow")
     .description("SpecRow CLI")
-    .version("0.1.0");
+    .version(SPECROW_VERSION);
 
   program
     .command("init")
@@ -340,8 +341,4 @@ function handleCommandError(error: unknown): void {
   }
 
   process.exitCode = 1;
-}
-
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  await createProgram().parseAsync();
 }

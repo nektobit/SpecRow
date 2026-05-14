@@ -1,10 +1,10 @@
 {
   "name": "specrow",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Multilingual specification system for spec-driven development.",
   "type": "module",
   "bin": {
-    "specrow": "./dist/cli.js"
+    "specrow": "dist/bin.js"
   },
   "files": [
     "dist"

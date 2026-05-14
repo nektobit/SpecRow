@@ -180,6 +180,7 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
       title: 'Начало работы',
       description: 'Используйте SpecRow в первую очередь через команды агента. CLI нужен для автоматизации и ручного fallback.',
       blocks: [
+        { type: 'section', heading: 'Установка CLI', paragraphs: ['Установите пакет глобально через npm. После установки команда specrow должна быть доступна из терминала.'], commands: ['npm i -g specrow', 'specrow --version', 'specrow --help'] },
         { type: 'section', heading: 'Обычная работа', paragraphs: ['В обычной работе формулируйте задачу агенту через команды SpecRow. Агент может вызывать CLI, читать файлы .specrow, запускать валидацию и готовить контекст, но пользователю не нужно запоминать CLI.'] },
         { type: 'code-section', heading: 'Инициализация проекта', intro: 'Попросите агента настроить SpecRow и выбрать рабочий язык проекта.', code: '/specrow:init language=ru', outro: 'Результат: .specrow/config.yml, project.md, specs/, changes/ и archive/. Поле language задает язык встроенных файлов и lifecycle-вывода.' },
         { type: 'code-section', heading: 'Первое изменение', intro: 'Описывайте желаемый результат, а не CLI-механику.', code: '/specrow:proposal Добавить вход без пароля', outro: 'Агент создает .specrow/changes/<change-name>/proposal.md, tasks.md и status.yml, затем валидирует изменение до реализации.' },
