@@ -5,6 +5,8 @@ import { defaultLocale, type LocaleCode } from './content'
 type ShellMessages = {
   skip: string
   navLabel: string
+  openMenu: string
+  closeMenu: string
   language: string
   footer: string
   repository: string
@@ -21,6 +23,8 @@ const messages: Record<LocaleCode, ShellMessages> = {
   en: {
     skip: 'Skip to content',
     navLabel: 'Documentation',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
     language: 'Language',
     footer: 'SpecRow documentation.',
     repository: 'Repository',
@@ -45,6 +49,8 @@ const messages: Record<LocaleCode, ShellMessages> = {
   ru: {
     skip: 'Перейти к содержимому',
     navLabel: 'Документация',
+    openMenu: 'Открыть меню',
+    closeMenu: 'Закрыть меню',
     language: 'Язык',
     footer: 'Документация SpecRow.',
     repository: 'Репозиторий',
@@ -69,6 +75,8 @@ const messages: Record<LocaleCode, ShellMessages> = {
   es: {
     skip: 'Saltar al contenido',
     navLabel: 'Documentación',
+    openMenu: 'Abrir menú',
+    closeMenu: 'Cerrar menú',
     language: 'Idioma',
     footer: 'Documentación de SpecRow.',
     repository: 'Repositorio',
@@ -93,6 +101,8 @@ const messages: Record<LocaleCode, ShellMessages> = {
   'zh-CN': {
     skip: '跳到内容',
     navLabel: '文档',
+    openMenu: '打开菜单',
+    closeMenu: '关闭菜单',
     language: '语言',
     footer: 'SpecRow 文档。',
     repository: '代码库',

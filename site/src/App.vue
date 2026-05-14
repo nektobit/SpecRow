@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import githubMarkSvg from '@primer/octicons/build/svg/mark-github-24.svg?raw'
@@ -13,6 +13,7 @@ const asidePages = new Set(['knowledge-base', 'manifesto'])
 const route = useRoute()
 const router = useRouter()
 const { locale, t } = useI18n()
+const isMobileMenuOpen = ref(false)
 
 const activeLocale = computed<LocaleCode>(() => {
   const value = route.params.locale
@@ -32,6 +33,13 @@ watch(
     document.documentElement.lang = nextLocale
   },
   { immediate: true },
+)
+
+watch(
+  () => route.fullPath,
+  () => {
+    isMobileMenuOpen.value = false
+  },
 )
 
 function localizedPath(localeCode: LocaleCode): string {
@@ -54,13 +62,18 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
   </a>
 
   <header class="border-b border-[#2e2e32] bg-[#1a1a1a]">
-    <div class="mx-auto grid w-[min(1180px,calc(100%-32px))] gap-4 py-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+    <div class="mx-auto grid w-[min(1180px,calc(100%-32px))] grid-cols-[1fr_auto] items-center gap-4 py-4 md:grid-cols-[auto_1fr_auto]">
       <RouterLink class="inline-flex items-center gap-2 text-2xl font-bold leading-none text-[#fffff5db] no-underline" :to="`/${activeLocale}/`">
         <img class="size-8 rounded-md" :src="specrowLogoUrl" alt="" aria-hidden="true">
         <span>SpecRow</span>
       </RouterLink>
 
-      <nav class="flex flex-wrap gap-2 md:justify-center" :aria-label="t('navLabel')">
+      <nav
+        id="site-navigation"
+        class="order-3 col-span-2 flex-col gap-1 border-t border-[#2e2e32] pt-3 md:order-none md:col-span-1 md:flex md:flex-row md:flex-wrap md:justify-center md:border-t-0 md:pt-0"
+        :class="isMobileMenuOpen ? 'flex' : 'hidden'"
+        :aria-label="t('navLabel')"
+      >
         <RouterLink
           v-for="page in headerPages"
           :key="page.slug"
@@ -73,7 +86,7 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
         </RouterLink>
       </nav>
 
-      <div class="flex items-center gap-2 md:justify-self-end">
+      <div class="flex items-center gap-2 justify-self-end">
         <a
           class="inline-flex size-10 items-center justify-center rounded-lg bg-[#242424] text-[#ebebf599] transition hover:bg-[#2e2e32] hover:text-[#42b883] focus:bg-[#2e2e32] focus:text-[#42b883] focus:outline-none"
           href="https://github.com/nektobit/SpecRow"
@@ -105,6 +118,22 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
             <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </label>
+
+        <button
+          class="inline-flex size-10 items-center justify-center rounded-lg bg-[#242424] text-[#ebebf599] transition hover:bg-[#2e2e32] hover:text-[#42b883] focus:bg-[#2e2e32] focus:text-[#42b883] focus:outline-none md:hidden"
+          type="button"
+          :aria-controls="'site-navigation'"
+          :aria-expanded="isMobileMenuOpen"
+          :aria-label="isMobileMenuOpen ? t('closeMenu') : t('openMenu')"
+          @click="isMobileMenuOpen = !isMobileMenuOpen"
+        >
+          <svg v-if="!isMobileMenuOpen" class="size-5" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <svg v-else class="size-5" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
       </div>
     </div>
   </header>
