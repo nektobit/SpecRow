@@ -14,9 +14,13 @@ Use the explicit `language=<language-code>` argument from the user's apply comma
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru
 ```
 
+When an explicit `language=<language-code>` argument is present, immediately switch your own replies, status updates, questions, and final installation report to that language before continuing with the rest of this install flow. Use the same language for any SpecRow files you create or revise. Do not wait until after `specrow init` to change language.
+
 If `.specrow/config.yml` already exists, read its `language` field and keep that language unless the user explicitly asks to change it.
 
-If neither source is available, ask the user which working language to use before running `specrow init`. Supported built-in languages are `en`, `ru`, `es`, and `zh-CN`. Do not silently choose English for a new project when the language is ambiguous.
+If `.specrow/config.yml` provides the language and no explicit apply argument overrides it, immediately use that configured language for your replies, status updates, questions, final installation report, and any SpecRow files you create or revise.
+
+If neither source is available, ask the user which working language to use before running `specrow init`. Ask that question in the user's current conversation language. Supported built-in languages are `en`, `ru`, `es`, and `zh-CN`. Do not silently choose English for a new project when the language is ambiguous.
 
 2. Check whether the SpecRow CLI is available.
 
