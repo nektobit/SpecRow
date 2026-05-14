@@ -3,13 +3,32 @@ import { z } from "zod";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+export const INTEGRATION_TOOLS = ["codex", "claude", "cursor", "windsurf", "generic"] as const;
+
+export const IntegrationToolSchema = z.enum(INTEGRATION_TOOLS);
+
+export type IntegrationTool = z.infer<typeof IntegrationToolSchema>;
+
+const ManagedIntegrationFileSchema = z.object({
+  tool: IntegrationToolSchema,
+  path: z.string().min(1),
+  kind: z.enum(["command", "skill", "instructions", "workflow", "prompt", "rule"])
+});
+
+const IntegrationsConfigSchema = z.object({
+  tools: z.array(IntegrationToolSchema),
+  installedAt: z.string().min(1),
+  managedFiles: z.array(ManagedIntegrationFileSchema)
+});
+
 export const SpecRowConfigSchema = z.object({
   version: z.literal(1),
   language: z
     .string()
     .min(2)
     .max(32)
-    .regex(/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/, "Use a language code like ru, en, es, or zh-CN.")
+    .regex(/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/, "Use a language code like ru, en, es, or zh-CN."),
+  integrations: IntegrationsConfigSchema.optional()
 });
 
 export type SpecRowConfig = z.infer<typeof SpecRowConfigSchema>;

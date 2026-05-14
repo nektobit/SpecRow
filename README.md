@@ -42,6 +42,21 @@ Use the agent commands first:
 
 The agent may call CLI commands such as `specrow init`, `specrow proposal`, `specrow validate`, `specrow context`, and `specrow build-finish` as implementation details.
 
+Install agent integrations when you want SpecRow to create command, prompt, skill, rule, workflow, or fallback instruction files for supported tools:
+
+```bash
+specrow init --tools codex,claude,cursor,windsurf,generic
+specrow integrate --detect
+specrow update
+specrow integrations status
+```
+
+Without `--tools`, `specrow init` only creates the `.specrow` workspace. For agent-driven setup, use:
+
+```txt
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
+```
+
 ## Workspace
 
 `/specrow:init` creates:
@@ -61,6 +76,8 @@ The agent may call CLI commands such as `specrow init`, `specrow proposal`, `spe
 version: 1
 language: en
 ```
+
+When integrations are installed, `config.yml` also records the selected tools and managed files so `specrow update` can regenerate them.
 
 The configured language controls built-in templates and lifecycle/status messages. Missing language resources are errors. SpecRow does not silently fall back to English.
 

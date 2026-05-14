@@ -42,6 +42,21 @@ specrow --help
 
 Агент может вызывать `specrow init`, `specrow proposal`, `specrow validate`, `specrow context` и `specrow build-finish` как детали реализации.
 
+Установите интеграции агентов, если хотите, чтобы SpecRow создал command, prompt, skill, rule, workflow или fallback instruction files для поддерживаемых tools:
+
+```bash
+specrow init --tools codex,claude,cursor,windsurf,generic
+specrow integrate --detect
+specrow update
+specrow integrations status
+```
+
+Без `--tools` команда `specrow init` создает только workspace `.specrow`. Для установки через агента используйте:
+
+```txt
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
+```
+
 ## Workspace
 
 `/specrow:init` создает:
@@ -61,6 +76,8 @@ specrow --help
 version: 1
 language: ru
 ```
+
+Когда интеграции установлены, `config.yml` также хранит выбранные tools и managed files, чтобы `specrow update` мог их регенерировать.
 
 Настроенный язык управляет встроенными шаблонами и lifecycle/status-сообщениями. Отсутствующие языковые ресурсы являются ошибкой. SpecRow не делает silent fallback на английский.
 

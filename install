@@ -1,0 +1,69 @@
+# SpecRow Agent Install Instructions
+
+Use this file when the user asks an agent to apply SpecRow from:
+
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
+
+Follow these steps in the current project root.
+
+1. Check whether the SpecRow CLI is available.
+
+```bash
+specrow --version
+```
+
+2. If the command is missing, install SpecRow.
+
+Prefer the user's existing Node.js package manager if the project makes it obvious. Otherwise use npm:
+
+```bash
+npm i -g specrow
+```
+
+If package installation requires approval, ask the user before installing.
+
+3. Initialize the SpecRow workspace if `.specrow/config.yml` does not exist.
+
+```bash
+specrow init
+```
+
+If the user specified a project language, pass it explicitly:
+
+```bash
+specrow init --language <language-code>
+```
+
+4. Install agent integrations.
+
+If you can identify your agent environment, pass the matching tool name:
+
+```bash
+specrow integrate --tools codex
+specrow integrate --tools claude
+specrow integrate --tools cursor
+specrow integrate --tools windsurf
+```
+
+If you cannot identify the current agent reliably, let SpecRow detect it:
+
+```bash
+specrow integrate --detect
+```
+
+For a portable fallback that any agent can read, install generic instructions:
+
+```bash
+specrow integrate --tools generic
+```
+
+5. Validate the workspace and report what changed.
+
+```bash
+specrow validate
+specrow integrations status
+```
+
+Tell the user which integrations were installed and whether their IDE or agent needs to be restarted before new commands, prompts, skills, rules, or workflows appear.
+
+Do not implement project code as part of this install flow unless the user separately asks for a SpecRow change workflow such as `/specrow:proposal` or `/specrow:build`.

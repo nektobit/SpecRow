@@ -5,6 +5,12 @@ import { readFile } from "node:fs/promises";
 import { Command } from "commander";
 import { ZodError } from "zod";
 
+import {
+  getIntegrationStatus,
+  installSpecRowIntegrations,
+  updateSpecRowIntegrations,
+  type IntegrationInstallResult
+} from "./integrations.js";
 import { loadSpecRowConfig } from "./config.js";
 import { initSpecRowProject } from "./init.js";
 import {
@@ -36,7 +42,10 @@ export function createProgram(): Command {
     .description("Create the .specrow project structure.")
     .option("-l, --language <code>", "Project language code.", "en")
     .option("-f, --force", "Overwrite .specrow/config.yml if it already exists.", false)
-    .action(async (options: { language: string; force: boolean }) => {
+    .option("--tools <list>", "Install agent integrations: codex,claude,cursor,windsurf,generic,all,none.")
+    .option("--detect", "Detect agent integrations to install.", false)
+    .option("--dry-run", "Show integration files without writing them.", false)
+    .action(async (options: { language: string; force: boolean; tools?: string; detect: boolean; dryRun: boolean }) => {
       try {
         const result = await initSpecRowProject({
           language: options.language,
@@ -54,6 +63,17 @@ export function createProgram(): Command {
         }
 
         console.log(getSpecRowMessage(result.language, "init.ready", { path: pathForDisplay(result.root) }));
+
+        if (options.tools !== undefined || options.detect) {
+          printIntegrationResult(
+            await installSpecRowIntegrations({
+              tools: options.tools,
+              detect: options.detect,
+              force: options.force,
+              dryRun: options.dryRun
+            })
+          );
+        }
       } catch (error) {
         if (error instanceof ZodError) {
           console.error(`Invalid config: ${error.issues.map((issue) => issue.message).join("; ")}`);
@@ -64,6 +84,70 @@ export function createProgram(): Command {
         }
 
         process.exitCode = 1;
+      }
+    });
+
+  program
+    .command("integrate")
+    .description("Install SpecRow agent integrations for the current project.")
+    .option("--tools <list>", "Agent integrations: codex,claude,cursor,windsurf,generic,all,none. Defaults to detection.")
+    .option("--detect", "Detect agent integrations to install.", false)
+    .option("-f, --force", "Overwrite existing unmarked integration files.", false)
+    .option("--dry-run", "Show integration files without writing them.", false)
+    .action(async (options: { tools?: string; detect: boolean; force: boolean; dryRun: boolean }) => {
+      try {
+        printIntegrationResult(
+          await installSpecRowIntegrations({
+            tools: options.tools,
+            detect: options.detect || options.tools === undefined,
+            force: options.force,
+            dryRun: options.dryRun
+          })
+        );
+      } catch (error) {
+        handleCommandError(error);
+      }
+    });
+
+  program
+    .command("update")
+    .description("Regenerate installed SpecRow agent integrations.")
+    .option("--tools <list>", "Override configured integrations: codex,claude,cursor,windsurf,generic,all,none.")
+    .option("-f, --force", "Overwrite existing unmarked integration files.", false)
+    .option("--dry-run", "Show integration files without writing them.", false)
+    .action(async (options: { tools?: string; force: boolean; dryRun: boolean }) => {
+      try {
+        printIntegrationResult(
+          await updateSpecRowIntegrations({
+            tools: options.tools,
+            force: options.force,
+            dryRun: options.dryRun
+          })
+        );
+      } catch (error) {
+        handleCommandError(error);
+      }
+    });
+
+  const integrations = program.command("integrations").description("Inspect SpecRow agent integrations.");
+
+  integrations
+    .command("status")
+    .description("Show installed SpecRow agent integration files.")
+    .action(async () => {
+      try {
+        const files = await getIntegrationStatus(process.cwd());
+
+        if (files.length === 0) {
+          console.log("No SpecRow integrations are configured.");
+          return;
+        }
+
+        for (const file of files) {
+          console.log(`${file.tool} ${file.kind} ${file.path}: ${file.reason}`);
+        }
+      } catch (error) {
+        handleCommandError(error);
       }
     });
 
@@ -329,6 +413,24 @@ function printStatusLine(language: string, status: LifecycleStatus): void {
       accepted: String(status.acceptance.explicit)
     })
   );
+}
+
+function printIntegrationResult(result: IntegrationInstallResult): void {
+  if (result.detectedTools.length > 0) {
+    console.log(`Detected integrations: ${result.detectedTools.join(", ")}`);
+  }
+
+  if (result.tools.length === 0) {
+    console.log("No SpecRow integrations selected.");
+    return;
+  }
+
+  console.log(`${result.dryRun ? "Planned" : "Installed"} integrations: ${result.tools.join(", ")}`);
+
+  for (const file of result.files) {
+    const reason = file.reason === undefined ? "" : ` (${file.reason})`;
+    console.log(`${file.action} ${file.tool} ${file.kind} ${file.path}${reason}`);
+  }
 }
 
 function handleCommandError(error: unknown): void {
