@@ -5,12 +5,16 @@ import { RouterLink, useRoute } from 'vue-router'
 
 import { defaultLocale, docContent, type LocaleCode, type PageSlug, type Paragraph } from '../content'
 import { blockId, readingMinutes, sectionLinks } from '../docs'
+import ConsoleBlock from '../components/ConsoleBlock.vue'
+
+const homePage: PageSlug = 'instructions'
+const extraInfoPages: PageSlug[] = ['manifesto', 'knowledge-base']
 
 const route = useRoute()
 const { t } = useI18n()
 
 const locale = computed<LocaleCode>(() => (route.params.locale as LocaleCode | undefined) ?? defaultLocale)
-const pageSlug = computed<PageSlug>(() => ((route.params.page as PageSlug | undefined) ?? 'manifesto') as PageSlug)
+const pageSlug = computed<PageSlug>(() => ((route.params.page as PageSlug | undefined) ?? homePage) as PageSlug)
 const page = computed(() => docContent[locale.value][pageSlug.value])
 const minutes = computed(() => readingMinutes(page.value))
 const links = computed(() => sectionLinks(page.value))
@@ -20,7 +24,24 @@ function paragraphParts(paragraph: Paragraph) {
 }
 
 function linkTo(page: PageSlug): string {
-  return page === 'manifesto' ? `/${locale.value}/` : `/${locale.value}/${page}`
+  return page === homePage ? `/${locale.value}/` : `/${locale.value}/${page}`
+}
+
+function commandLines(code: string): string[] {
+  return code.split(/\r?\n/).filter((line) => line.trim().length > 0)
+}
+
+function isCommandSnippet(code: string): boolean {
+  const lines = commandLines(code)
+  return lines.length > 0 && lines.every(isCommandLine)
+}
+
+function isCommandLine(line: string): boolean {
+  return /^(?:\/specrow:[\w-]+|specrow\b|npm\b|pnpm\b|npx\b)/.test(line.trim())
+}
+
+function sectionCommands(block: { heading: string; commands?: string[] }): string[] {
+  return block.commands ?? (isCommandLine(block.heading) ? [block.heading] : [])
 }
 </script>
 
@@ -51,6 +72,7 @@ function linkTo(page: PageSlug): string {
                 <template v-else>{{ part }}</template>
               </template>
             </p>
+            <ConsoleBlock v-if="sectionCommands(block).length > 0" :commands="sectionCommands(block)" />
           </section>
 
           <section v-else-if="block.type === 'list-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
@@ -65,7 +87,15 @@ function linkTo(page: PageSlug): string {
           <section v-else-if="block.type === 'code-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
             <h2>{{ block.heading }}</h2>
             <p>{{ block.intro }}</p>
-            <pre><code>{{ block.code }}</code></pre>
+            <ConsoleBlock v-if="isCommandSnippet(block.code)" :commands="commandLines(block.code)" />
+            <pre v-else><code>{{ block.code }}</code></pre>
+            <p>{{ block.outro }}</p>
+          </section>
+
+          <section v-else-if="block.type === 'command-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
+            <h2>{{ block.heading }}</h2>
+            <p>{{ block.intro }}</p>
+            <ConsoleBlock :commands="block.commands" />
             <p>{{ block.outro }}</p>
           </section>
 
@@ -87,6 +117,18 @@ function linkTo(page: PageSlug): string {
           <h2>{{ t('readingTime') }}</h2>
           <p>{{ minutes }} {{ t('minutes') }}</p>
         </section>
+
+        <nav class="article-aside-card" :aria-label="t('navLabel')">
+          <h2>{{ t('extraInfo') }}</h2>
+          <RouterLink
+            v-for="extraPage in extraInfoPages"
+            :key="extraPage"
+            :to="linkTo(extraPage)"
+            exact-active-class="article-aside-link-active"
+          >
+            {{ t(`nav.${extraPage}`) }}
+          </RouterLink>
+        </nav>
 
         <nav class="article-aside-card" :aria-label="t('onThisPage')">
           <h2>{{ t('onThisPage') }}</h2>

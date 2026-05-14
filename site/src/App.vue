@@ -7,6 +7,9 @@ import githubMarkSvg from '@primer/octicons/build/svg/mark-github-24.svg?raw'
 import { defaultLocale, locales, pages, type LocaleCode } from './content'
 import specrowLogoUrl from './assets/specrow-logo.svg'
 
+const homePage = 'instructions'
+const asidePages = new Set(['knowledge-base', 'manifesto'])
+
 const route = useRoute()
 const router = useRouter()
 const { locale, t } = useI18n()
@@ -18,8 +21,9 @@ const activeLocale = computed<LocaleCode>(() => {
 
 const activePage = computed(() => {
   const value = route.params.page
-  return pages.some((page) => page.slug === value) ? String(value) : 'manifesto'
+  return pages.some((page) => page.slug === value) ? String(value) : homePage
 })
+const headerPages = pages.filter((page) => !asidePages.has(page.slug))
 
 watch(
   activeLocale,
@@ -31,7 +35,7 @@ watch(
 )
 
 function localizedPath(localeCode: LocaleCode): string {
-  return activePage.value === 'manifesto'
+  return activePage.value === homePage
     ? `/${localeCode}/`
     : `/${localeCode}/${activePage.value}`
 }
@@ -58,12 +62,12 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
 
       <nav class="flex flex-wrap gap-2 md:justify-center" :aria-label="t('navLabel')">
         <RouterLink
-          v-for="page in pages"
+          v-for="page in headerPages"
           :key="page.slug"
           class="rounded-lg px-3 py-2 text-sm font-semibold text-[#ebebf599] no-underline transition hover:bg-[#242424] hover:text-[#fffff5db]"
           active-class="!text-[#42b883]"
           exact-active-class="bg-[#242424] !text-[#42b883]"
-          :to="page.slug === 'manifesto' ? `/${activeLocale}/` : `/${activeLocale}/${page.slug}`"
+          :to="page.slug === homePage ? `/${activeLocale}/` : `/${activeLocale}/${page.slug}`"
         >
           {{ t(`nav.${page.slug}`) }}
         </RouterLink>

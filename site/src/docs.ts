@@ -31,12 +31,16 @@ function blockText(block: Block): string {
     return [block.heading, block.intro, ...block.items, block.outro].join(' ')
   }
 
+  if (block.type === 'command-section') {
+    return [block.heading, block.intro, ...block.commands, block.outro].join(' ')
+  }
+
   if (block.type === 'code-section') {
     return [block.heading, block.intro, block.code, block.outro].join(' ')
   }
 
   if (block.type === 'section') {
-    return [block.heading, ...block.paragraphs.map(paragraphText)].join(' ')
+    return [block.heading, ...block.paragraphs.map(paragraphText), ...(block.commands ?? [])].join(' ')
   }
 
   return block.paragraphs.map(paragraphText).join(' ')

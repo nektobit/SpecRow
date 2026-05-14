@@ -11,6 +11,9 @@ type ShellMessages = {
   readingTime: string
   minutes: string
   onThisPage: string
+  extraInfo: string
+  copyCommand: string
+  commandCopied: string
   nav: Record<string, string>
 }
 
@@ -24,6 +27,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     readingTime: 'Reading time',
     minutes: 'min read',
     onThisPage: 'On this page',
+    extraInfo: 'More Info',
+    copyCommand: 'Copy command',
+    commandCopied: 'Copied',
     nav: {
       manifesto: 'Manifesto',
       instructions: 'Start',
@@ -45,6 +51,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     readingTime: 'Время на чтение',
     minutes: 'мин чтения',
     onThisPage: 'На этой странице',
+    extraInfo: 'Доп. информация',
+    copyCommand: 'Скопировать команду',
+    commandCopied: 'Скопировано',
     nav: {
       manifesto: 'Манифест',
       instructions: 'Старт',
@@ -66,6 +75,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     readingTime: 'Tiempo de lectura',
     minutes: 'min de lectura',
     onThisPage: 'En esta página',
+    extraInfo: 'Más información',
+    copyCommand: 'Copiar comando',
+    commandCopied: 'Copiado',
     nav: {
       manifesto: 'Manifiesto',
       instructions: 'Inicio',
@@ -87,6 +99,9 @@ const messages: Record<LocaleCode, ShellMessages> = {
     readingTime: '阅读时间',
     minutes: '分钟阅读',
     onThisPage: '本页内容',
+    extraInfo: '更多信息',
+    copyCommand: '复制命令',
+    commandCopied: '已复制',
     nav: {
       manifesto: '宣言',
       instructions: '开始',
