@@ -17,45 +17,34 @@ GitHub Pages: https://nektobit.github.io/SpecRow/
 
 ## Быстрый старт
 
-Установите CLI глобально:
-
-```bash
-npm i -g specrow
-```
-
-Проверьте установку:
-
-```bash
-specrow --version
-specrow --help
-```
-
-Начинайте с команд агента:
+Начинайте с agent installer. Язык проекта передается явно:
 
 ```txt
-/specrow:init language=ru
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru
+```
+
+Агент проверит или установит CLI, инициализирует `.specrow` с этим языком, установит интеграции агентов, запустит валидацию и сообщит, нужно ли перезапустить IDE или агента.
+
+Затем используйте команды SpecRow:
+
+```txt
 /specrow:proposal Опишите нужное изменение
 /specrow:review
 /specrow:build
 /specrow:accept
 ```
 
-Агент может вызывать `specrow init`, `specrow proposal`, `specrow validate`, `specrow context` и `specrow build-finish` как детали реализации.
-
-Установите интеграции агентов, если хотите, чтобы SpecRow создал command, prompt, skill, rule, workflow или fallback instruction files для поддерживаемых tools:
+Ручной CLI fallback:
 
 ```bash
-specrow init --tools codex,claude,cursor,windsurf,generic
+npm i -g specrow
+specrow init --language ru --tools codex,claude,cursor,windsurf,generic
 specrow integrate --detect
 specrow update
 specrow integrations status
 ```
 
-Без `--tools` команда `specrow init` создает только workspace `.specrow`. Для установки через агента используйте:
-
-```txt
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
-```
+Без `--tools` команда `specrow init` создает только workspace `.specrow`.
 
 ## Workspace
 

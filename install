@@ -2,17 +2,29 @@
 
 Use this file when the user asks an agent to apply SpecRow from:
 
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=<language-code>
 
 Follow these steps in the current project root.
 
-1. Check whether the SpecRow CLI is available.
+1. Determine the project language.
+
+Use the explicit `language=<language-code>` argument from the user's apply command when present:
+
+```txt
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru
+```
+
+If `.specrow/config.yml` already exists, read its `language` field and keep that language unless the user explicitly asks to change it.
+
+If neither source is available, ask the user which working language to use before running `specrow init`. Supported built-in languages are `en`, `ru`, `es`, and `zh-CN`. Do not silently choose English for a new project when the language is ambiguous.
+
+2. Check whether the SpecRow CLI is available.
 
 ```bash
 specrow --version
 ```
 
-2. If the command is missing, install SpecRow.
+3. If the command is missing, install SpecRow.
 
 Prefer the user's existing Node.js package manager if the project makes it obvious. Otherwise use npm:
 
@@ -22,19 +34,15 @@ npm i -g specrow
 
 If package installation requires approval, ask the user before installing.
 
-3. Initialize the SpecRow workspace if `.specrow/config.yml` does not exist.
+4. Initialize the SpecRow workspace if `.specrow/config.yml` does not exist.
 
-```bash
-specrow init
-```
-
-If the user specified a project language, pass it explicitly:
+Pass the determined language explicitly:
 
 ```bash
 specrow init --language <language-code>
 ```
 
-4. Install agent integrations.
+5. Install agent integrations.
 
 If you can identify your agent environment, pass the matching tool name:
 
@@ -57,7 +65,7 @@ For a portable fallback that any agent can read, install generic instructions:
 specrow integrate --tools generic
 ```
 
-5. Validate the workspace and report what changed.
+6. Validate the workspace and report what changed.
 
 ```bash
 specrow validate

@@ -27,7 +27,7 @@ import {
 import { getSpecRowMessage } from "./templates.js";
 import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
 
-const SPECROW_VERSION = "0.1.2";
+const SPECROW_VERSION = "0.1.3";
 
 export function createProgram(): Command {
   const program = new Command();

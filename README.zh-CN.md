@@ -17,17 +17,34 @@ GitHub Pages: https://nektobit.github.io/SpecRow/
 
 ## 快速开始
 
-优先使用代理命令：
+优先使用 agent installer。请显式传入项目工作语言：
 
 ```txt
-/specrow:init language=zh-CN
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=zh-CN
+```
+
+代理会检查或安装 CLI，使用该语言初始化 `.specrow`，安装代理集成，验证 workspace，并报告 IDE 或代理是否需要重启。
+
+然后使用 SpecRow 代理命令：
+
+```txt
 /specrow:proposal 描述预期变更
 /specrow:review
 /specrow:build
 /specrow:accept
 ```
 
-代理可以把 `specrow init`、`specrow proposal`、`specrow validate`、`specrow context` 和 `specrow build-finish` 作为实现细节调用。
+手动 CLI fallback：
+
+```bash
+npm i -g specrow
+specrow init --language zh-CN --tools codex,claude,cursor,windsurf,generic
+specrow integrate --detect
+specrow update
+specrow integrations status
+```
+
+没有 `--tools` 时，`specrow init` 只创建 `.specrow` workspace。
 
 ## Workspace
 
@@ -48,6 +65,8 @@ GitHub Pages: https://nektobit.github.io/SpecRow/
 version: 1
 language: zh-CN
 ```
+
+安装集成后，`config.yml` 还会记录已选择的 tools 和 managed files，以便 `specrow update` 重新生成它们。
 
 配置语言控制内置模板和 lifecycle/status 消息。缺少语言资源是错误。SpecRow 不会静默回退到英文。
 

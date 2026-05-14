@@ -1,13 +1,14 @@
 {
   "name": "specrow",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Multilingual specification system for spec-driven development.",
   "type": "module",
   "bin": {
     "specrow": "dist/bin.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "install"
   ],
   "scripts": {
     "build": "tsup",

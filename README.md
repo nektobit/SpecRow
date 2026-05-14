@@ -17,45 +17,34 @@ The site covers the full MVP workflow: getting started, proposal to accept, agen
 
 ## Quick Start
 
-Install the CLI globally:
-
-```bash
-npm i -g specrow
-```
-
-Check the installation:
-
-```bash
-specrow --version
-specrow --help
-```
-
-Use the agent commands first:
+Use the agent installer first. Pass the project working language explicitly:
 
 ```txt
-/specrow:init language=en
+apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=en
+```
+
+The agent checks or installs the CLI, initializes `.specrow` with that language, installs agent integrations, validates the workspace, and reports whether the IDE or agent needs a restart.
+
+Then use the SpecRow agent commands:
+
+```txt
 /specrow:proposal Describe the intended change
 /specrow:review
 /specrow:build
 /specrow:accept
 ```
 
-The agent may call CLI commands such as `specrow init`, `specrow proposal`, `specrow validate`, `specrow context`, and `specrow build-finish` as implementation details.
-
-Install agent integrations when you want SpecRow to create command, prompt, skill, rule, workflow, or fallback instruction files for supported tools:
+Manual CLI fallback:
 
 ```bash
-specrow init --tools codex,claude,cursor,windsurf,generic
+npm i -g specrow
+specrow init --language en --tools codex,claude,cursor,windsurf,generic
 specrow integrate --detect
 specrow update
 specrow integrations status
 ```
 
-Without `--tools`, `specrow init` only creates the `.specrow` workspace. For agent-driven setup, use:
-
-```txt
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
-```
+Without `--tools`, `specrow init` only creates the `.specrow` workspace.
 
 ## Workspace
 
