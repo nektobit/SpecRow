@@ -55,6 +55,13 @@ describe("SpecRow agent commands", () => {
     );
   });
 
+  it("returns localized command text for the requested language", () => {
+    const review = getAgentCommandSpec("/specrow:review", "ru");
+
+    expect(review.userIntent).toContain("Проверить готовность");
+    expect(review.languageRules).toEqual(expect.arrayContaining(["Не выполнять скрытый fallback на английский."]));
+  });
+
   it("keeps build implementation-only", () => {
     const build = getAgentCommandSpec("/specrow:build", "en");
 

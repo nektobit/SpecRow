@@ -13,6 +13,7 @@ import {
 } from "./integrations.js";
 import { loadSpecRowConfig } from "./config.js";
 import { initSpecRowProject } from "./init.js";
+import { validateLocaleContract } from "./localeContract.js";
 import {
   acceptChange,
   archiveChange,
@@ -145,6 +146,32 @@ export function createProgram(): Command {
 
         for (const file of files) {
           console.log(`${file.tool} ${file.kind} ${file.path}: ${file.reason}`);
+        }
+      } catch (error) {
+        handleCommandError(error);
+      }
+    });
+
+  const locales = program.command("locales").description("Inspect SpecRow localization coverage.");
+
+  locales
+    .command("validate")
+    .description("Validate runtime and documentation locale coverage.")
+    .action(async () => {
+      try {
+        const issues = await validateLocaleContract(process.cwd());
+
+        if (issues.length === 0) {
+          console.log("Locale validation passed.");
+          return;
+        }
+
+        for (const issue of issues) {
+          console.log(`${issue.severity.toUpperCase()} ${issue.path}: ${issue.message}`);
+        }
+
+        if (issues.some((issue) => issue.severity === "error")) {
+          process.exitCode = 1;
         }
       } catch (error) {
         handleCommandError(error);

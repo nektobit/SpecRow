@@ -5,6 +5,14 @@ import { zhCN } from "./locales/zh-CN.js";
 
 export type TemplateName = "project" | "spec" | "proposal" | "tasks";
 
+export type AgentCommandName =
+  | "/specrow:init"
+  | "/specrow:proposal"
+  | "/specrow:review"
+  | "/specrow:build"
+  | "/specrow:revise"
+  | "/specrow:accept";
+
 export type MessageName =
   | "init.config.created"
   | "init.config.overwritten"
@@ -30,9 +38,49 @@ export type MessageName =
 export interface LanguageResources {
   templates: Record<TemplateName, string>;
   messages: Record<MessageName, string>;
+  agentCommands: Record<AgentCommandName, AgentCommandText>;
+  integration: IntegrationTextResources;
 }
 
 export const REQUIRED_TEMPLATES: readonly TemplateName[] = ["project", "spec", "proposal", "tasks"];
+
+export interface AgentCommandText {
+  userIntent: string;
+  agentBehavior: readonly string[];
+  forbiddenActions: readonly string[];
+  languageRules: readonly string[];
+  stopConditions: readonly string[];
+  reviewPolicyRequiredWhen?: readonly string[];
+}
+
+export interface IntegrationTextResources {
+  managedHeader: string;
+  commandSections: {
+    invocation: string;
+    userIntent: string;
+    cliCore: string;
+    agentBehavior: string;
+    forbiddenActions: string;
+    languageRules: string;
+    stopConditions: string;
+    nextCommands: string;
+    none: string;
+  };
+  invocationTemplate: string;
+  agentInstructions: {
+    title: string;
+    overview: string;
+    languageRule: string;
+    cliCore: string;
+    forbidden: string;
+  };
+  skill: {
+    description: string;
+    whenToUse: string;
+    instructions: string;
+    triggers: readonly string[];
+  };
+}
 
 export const REQUIRED_MESSAGES: readonly MessageName[] = [
   "init.config.created",
@@ -55,6 +103,15 @@ export const REQUIRED_MESSAGES: readonly MessageName[] = [
   "next.acceptOrRevise",
   "error.missingTemplate",
   "error.missingMessage"
+];
+
+export const REQUIRED_AGENT_COMMANDS: readonly AgentCommandName[] = [
+  "/specrow:init",
+  "/specrow:proposal",
+  "/specrow:review",
+  "/specrow:build",
+  "/specrow:revise",
+  "/specrow:accept"
 ];
 
 export class MissingLanguageResourceError extends Error {
@@ -110,6 +167,20 @@ export function getSpecRowMessage(language: string, name: MessageName, values: R
   }
 
   return renderMessage(message, values);
+}
+
+export function getSpecRowAgentCommandText(language: string, name: AgentCommandName): AgentCommandText {
+  const command = getLanguageResources(language).agentCommands[name];
+
+  if (command === undefined) {
+    throw new MissingLanguageResourceError(language, "message", `agentCommands.${name}`);
+  }
+
+  return command;
+}
+
+export function getSpecRowIntegrationText(language: string): IntegrationTextResources {
+  return getLanguageResources(language).integration;
 }
 
 function renderMessage(message: string, values: Record<string, string>): string {

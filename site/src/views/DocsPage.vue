@@ -8,7 +8,7 @@ import { blockId, readingMinutes, sectionLinks } from '../docs'
 import ConsoleBlock from '../components/ConsoleBlock.vue'
 
 const homePage: PageSlug = 'instructions'
-const extraInfoPages: PageSlug[] = ['manifesto', 'knowledge-base']
+const extraInfoPages: PageSlug[] = ['manifesto', 'localization', 'knowledge-base']
 
 const route = useRoute()
 const { t } = useI18n()

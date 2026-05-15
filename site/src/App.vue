@@ -8,7 +8,7 @@ import { defaultLocale, locales, pages, type LocaleCode } from './content'
 import specrowLogoUrl from './assets/specrow-logo.svg'
 
 const homePage = 'instructions'
-const asidePages = new Set(['knowledge-base', 'manifesto'])
+const asidePages = new Set(['knowledge-base', 'manifesto', 'localization'])
 
 const route = useRoute()
 const router = useRouter()

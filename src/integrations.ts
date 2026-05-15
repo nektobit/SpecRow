@@ -11,7 +11,8 @@ import {
   type IntegrationTool,
   type SpecRowConfig
 } from "./config.js";
-import { AGENT_COMMAND_SPECS, type AgentCommandSpec } from "./agentCommands.js";
+import { listAgentCommandSpecs, type AgentCommandSpec } from "./agentCommands.js";
+import { getSpecRowIntegrationText, type IntegrationTextResources } from "./templates.js";
 
 export type ManagedFileKind = "command" | "skill" | "instructions" | "workflow" | "prompt" | "rule";
 
@@ -49,15 +50,12 @@ interface IntegrationArtifact {
   path: string;
   kind: ManagedFileKind;
   content: string;
+  integrationText: IntegrationTextResources;
   mergeBlock?: boolean;
 }
 
 const MANAGED_START = "<!-- SPECROW:MANAGED:START -->";
 const MANAGED_END = "<!-- SPECROW:MANAGED:END -->";
-const GENERATED_HEADER = `${MANAGED_START}
-This file or section is managed by SpecRow. Regenerate it with:
-specrow update
-${MANAGED_END}`;
 
 export function parseIntegrationTools(input: string | readonly IntegrationTool[] | undefined): IntegrationTool[] {
   if (input === undefined) {
@@ -137,9 +135,10 @@ export async function installSpecRowIntegrations(options: IntegrationInstallOpti
   const detectedTools = options.detect === true || options.tools === undefined ? await detectIntegrationTools(options) : [];
   const selectedTools = parseIntegrationTools(options.tools).concat(options.tools === undefined || options.detect === true ? detectedTools : []);
   const tools = dedupeTools(selectedTools);
+  const language = config.language;
 
   const artifacts = tools.flatMap((tool) =>
-    createArtifactsForTool(tool, cwd, options.homeDir ?? os.homedir(), options.env ?? process.env)
+    createArtifactsForTool(tool, cwd, options.homeDir ?? os.homedir(), options.env ?? process.env, language)
   );
   const files: IntegrationWriteResult[] = [];
 
@@ -193,9 +192,12 @@ function createArtifactsForTool(
   tool: IntegrationTool,
   cwd: string,
   homeDir: string,
-  env: NodeJS.ProcessEnv
+  env: NodeJS.ProcessEnv,
+  language: string
 ): IntegrationArtifact[] {
-  const commandArtifacts = AGENT_COMMAND_SPECS.map((command) => createCommandArtifact(tool, command, cwd, homeDir, env)).filter(
+  const commands = listAgentCommandSpecs(language);
+  const integrationText = getSpecRowIntegrationText(language);
+  const commandArtifacts = commands.map((command) => createCommandArtifact(tool, command, cwd, homeDir, env, integrationText)).filter(
     (artifact): artifact is IntegrationArtifact => artifact !== undefined
   );
 
@@ -207,7 +209,8 @@ function createArtifactsForTool(
           tool,
           path: path.join(codexHome(homeDir, env), "skills", "specrow", "SKILL.md"),
           kind: "skill",
-          content: renderSkill("SpecRow", "Use SpecRow workflows when the user mentions SpecRow or /specrow:* commands.")
+          content: renderSkill("SpecRow", commands, integrationText),
+          integrationText
         }
       ];
     case "claude":
@@ -217,13 +220,15 @@ function createArtifactsForTool(
           tool,
           path: path.join(cwd, ".claude", "skills", "specrow", "SKILL.md"),
           kind: "skill",
-          content: renderSkill("SpecRow", "Use SpecRow workflows when the user asks for specification-led implementation.")
+          content: renderSkill("SpecRow", commands, integrationText),
+          integrationText
         },
         {
           tool,
           path: path.join(cwd, "CLAUDE.md"),
           kind: "instructions",
-          content: renderAgentInstructions(),
+          content: renderAgentInstructions(commands, integrationText),
+          integrationText,
           mergeBlock: true
         }
       ];
@@ -234,7 +239,8 @@ function createArtifactsForTool(
           tool,
           path: path.join(cwd, ".cursor", "rules", "specrow.mdc"),
           kind: "rule",
-          content: renderAgentInstructions()
+          content: renderAgentInstructions(commands, integrationText),
+          integrationText
         }
       ];
     case "windsurf":
@@ -244,7 +250,8 @@ function createArtifactsForTool(
           tool,
           path: path.join(cwd, ".windsurf", "rules", "specrow.md"),
           kind: "rule",
-          content: renderAgentInstructions()
+          content: renderAgentInstructions(commands, integrationText),
+          integrationText
         }
       ];
     case "generic":
@@ -253,7 +260,8 @@ function createArtifactsForTool(
           tool,
           path: path.join(cwd, "AGENTS.md"),
           kind: "instructions",
-          content: renderAgentInstructions(),
+          content: renderAgentInstructions(commands, integrationText),
+          integrationText,
           mergeBlock: true
         }
       ];
@@ -265,11 +273,12 @@ function createCommandArtifact(
   command: AgentCommandSpec,
   cwd: string,
   homeDir: string,
-  env: NodeJS.ProcessEnv
+  env: NodeJS.ProcessEnv,
+  integrationText: IntegrationTextResources
 ): IntegrationArtifact | undefined {
   const id = command.name.replace("/specrow:", "");
   const fileName = `specrow-${id}.md`;
-  const content = renderCommand(command);
+  const content = renderCommand(command, integrationText);
 
   switch (tool) {
     case "codex":
@@ -277,28 +286,32 @@ function createCommandArtifact(
         tool,
         path: path.join(codexHome(homeDir, env), "prompts", fileName),
         kind: "prompt",
-        content
+        content,
+        integrationText
       };
     case "claude":
       return {
         tool,
         path: path.join(cwd, ".claude", "commands", "specrow", `${id}.md`),
         kind: "command",
-        content
+        content,
+        integrationText
       };
     case "cursor":
       return {
         tool,
         path: path.join(cwd, ".cursor", "commands", fileName),
         kind: "command",
-        content
+        content,
+        integrationText
       };
     case "windsurf":
       return {
         tool,
         path: path.join(cwd, ".windsurf", "workflows", fileName),
         kind: "workflow",
-        content
+        content,
+        integrationText
       };
     case "generic":
       return undefined;
@@ -349,7 +362,7 @@ async function writeIntegrationArtifact(
     }
   }
 
-  await writeFile(artifact.path, withManagedHeader(artifact.content), "utf8");
+  await writeFile(artifact.path, withManagedHeader(artifact.content, artifact.integrationText), "utf8");
   return {
     ...baseResult,
     action
@@ -389,66 +402,66 @@ async function saveIntegrationConfig(
   await writeFile(path.join(cwd, ".specrow", "config.yml"), serializeConfig(nextConfig), "utf8");
 }
 
-function renderCommand(command: AgentCommandSpec): string {
+function renderCommand(command: AgentCommandSpec, integrationText: IntegrationTextResources): string {
+  const sections = integrationText.commandSections;
   return `# ${command.name}
 
-## Invocation
-Use this workflow when the user writes \`${command.name}\` or asks for the same intent.
+## ${sections.invocation}
+${integrationText.invocationTemplate.replace("{command}", command.name)}
 
-## User Intent
+## ${sections.userIntent}
 ${command.userIntent}
 
-## CLI Core
+## ${sections.cliCore}
 ${command.cliCore.map((line) => `- \`${line}\``).join("\n")}
 
-## Agent Behavior
+## ${sections.agentBehavior}
 ${command.agentBehavior.map((line) => `- ${line}`).join("\n")}
 
-## Forbidden Actions
+## ${sections.forbiddenActions}
 ${command.forbiddenActions.map((line) => `- ${line}`).join("\n")}
 
-## Language Rules
+## ${sections.languageRules}
 ${command.languageRules.map((line) => `- ${line}`).join("\n")}
 
-## Stop Conditions
+## ${sections.stopConditions}
 ${command.stopConditions.map((line) => `- ${line}`).join("\n")}
 
-## Next Commands
-${command.nextCommands.length === 0 ? "- None." : command.nextCommands.map((line) => `- \`${line}\``).join("\n")}
+## ${sections.nextCommands}
+${command.nextCommands.length === 0 ? `- ${sections.none}` : command.nextCommands.map((line) => `- \`${line}\``).join("\n")}
 `;
 }
 
-function renderAgentInstructions(): string {
-  return `# SpecRow Agent Instructions
+function renderAgentInstructions(commands: readonly AgentCommandSpec[], integrationText: IntegrationTextResources): string {
+  return `# ${integrationText.agentInstructions.title}
 
-SpecRow is an agent-first specification workflow. Treat \`/specrow:*\` user messages as workflow intentions and use the \`specrow\` CLI as the implementation detail.
+${integrationText.agentInstructions.overview}
 
-Before creating or revising built-in SpecRow files, read \`.specrow/config.yml\` and use its configured \`language\`. Do not silently fall back to English.
+${integrationText.agentInstructions.languageRule}
 
-${AGENT_COMMAND_SPECS.map(
+${commands.map(
   (command) => `## ${command.name}
 ${command.userIntent}
 
-CLI core:
+${integrationText.agentInstructions.cliCore}
 ${command.cliCore.map((line) => `- \`${line}\``).join("\n")}
 
-Forbidden:
+${integrationText.agentInstructions.forbidden}
 ${command.forbiddenActions.map((line) => `- ${line}`).join("\n")}`
 ).join("\n\n")}
 `;
 }
 
-function renderSkill(name: string, description: string): string {
+function renderSkill(name: string, commands: readonly AgentCommandSpec[], integrationText: IntegrationTextResources): string {
   return `# ${name}
 
-${description}
+${integrationText.skill.description}
 
-## When to Use
-- The user invokes a \`/specrow:*\` command.
-- The user asks to initialize SpecRow, create a proposal, review, build, revise, or accept a SpecRow change.
+## ${integrationText.skill.whenToUse}
+${integrationText.skill.triggers.map((trigger) => `- ${trigger}`).join("\n")}
 
-## Instructions
-${renderAgentInstructions()}
+## ${integrationText.skill.instructions}
+${renderAgentInstructions(commands, integrationText)}
 `;
 }
 
@@ -465,8 +478,10 @@ ${MANAGED_END}`;
   return `${existing.trimEnd()}${existing.trim().length > 0 ? "\n\n" : ""}${block}\n`;
 }
 
-function withManagedHeader(content: string): string {
-  return `${GENERATED_HEADER}
+function withManagedHeader(content: string, integrationText: IntegrationTextResources): string {
+  return `${MANAGED_START}
+${integrationText.managedHeader}
+${MANAGED_END}
 
 ${content.trim()}
 `;

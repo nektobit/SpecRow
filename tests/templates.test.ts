@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   getSpecRowMessage,
+  getSpecRowAgentCommandText,
+  getSpecRowIntegrationText,
   getSpecRowTemplate,
   MissingLanguageResourceError,
+  REQUIRED_AGENT_COMMANDS,
   REQUIRED_MESSAGES,
   REQUIRED_TEMPLATES,
   SUPPORTED_LANGUAGES,
@@ -24,6 +27,16 @@ describe("SpecRow templates", () => {
       for (const messageName of REQUIRED_MESSAGES) {
         expect(TEMPLATE_REGISTRY[language].messages[messageName], `${language}.${messageName}`).toBeTruthy();
       }
+    }
+  });
+
+  it("has every required agent command and integration text for every supported language", () => {
+    for (const language of SUPPORTED_LANGUAGES) {
+      for (const commandName of REQUIRED_AGENT_COMMANDS) {
+        expect(getSpecRowAgentCommandText(language, commandName).userIntent, `${language}.${commandName}`).toBeTruthy();
+      }
+
+      expect(getSpecRowIntegrationText(language).managedHeader, `${language}.integration.managedHeader`).toContain("specrow update");
     }
   });
 

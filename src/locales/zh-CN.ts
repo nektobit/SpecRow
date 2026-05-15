@@ -184,5 +184,146 @@ export const zhCN = {
     "next.acceptOrRevise": "下一步：/specrow:accept 或 /specrow:revise。",
     "error.missingTemplate": "语言 \"{language}\" 缺少 SpecRow 模板 \"{name}\"。",
     "error.missingMessage": "语言 \"{language}\" 缺少 SpecRow 消息 \"{name}\"。"
+  },
+  agentCommands: {
+    "/specrow:init": {
+      userIntent: "为当前项目设置 SpecRow，用户无需记住 CLI 参数或文件。",
+      agentBehavior: [
+        "从用户意图确定项目工作语言，存在歧义时询问。",
+        "将 CLI init 命令作为实现细节执行。",
+        "确认 .specrow/config.yml、project.md、specs/、changes/ 和 archive/ 已存在。"
+      ],
+      forbiddenActions: ["不要创建旧版工作目录。", "请求语言资源缺失时不要继续。"],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: ["请求语言缺少模板或消息资源。"]
+    },
+    "/specrow:proposal": {
+      userIntent: "将用户意图转为具体变更提案和任务骨架。",
+      agentBehavior: [
+        "根据用户意图选择稳定的变更名称。",
+        "通过 CLI core 创建 proposal.md、tasks.md 和 status.yml。",
+        "使用配置的项目语言填写提案和任务内容。",
+        "验证变更，并在开始实现前暴露阻塞问题。"
+      ],
+      forbiddenActions: ["创建提案时不要实现代码。", "不要接受、归档或将规格更新为最终事实。"],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: ["项目未初始化。", "配置语言缺少模板或生命周期消息。", "无法生成必需的提案或任务章节。"]
+    },
+    "/specrow:review": {
+      userIntent: "在编写代码前检查提案准备度；默认建议使用，仅对高风险变更强制。",
+      agentBehavior: [
+        "检查问题表述、范围、风险、决策、验收标准和语言一致性。",
+        "将 review 视为高风险变更的必需步骤、普通变更的建议步骤。",
+        "当 review 发现阻塞性歧义时，询问用户或修订提案。"
+      ],
+      forbiddenActions: ["review 期间不要实现代码。", "不要将 review 当作验收。"],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: [
+        "缺少验收标准或验收标准过弱。",
+        "高风险变更缺少关于风险、迁移、安全、数据或兼容性的明确决策。",
+        "配置语言缺少模板或生命周期消息。"
+      ],
+      reviewPolicyRequiredWhen: [
+        "安全、隐私或权限行为变更。",
+        "数据模型、迁移、持久化或破坏性操作变更。",
+        "公共 API、CLI 契约、自动化或 CI 行为变更。",
+        "架构、跨模块 workflow、本地化或用户可见生命周期变更。"
+      ]
+    },
+    "/specrow:build": {
+      userIntent: "实现并验证已批准的变更，但不将其变成最终事实。",
+      agentBehavior: [
+        "使用 CLI context 加载提案、任务、状态和活跃变更警告。",
+        "只实现变更描述的工作。",
+        "运行相关验证，并在适当时用实现证据更新变更任务。",
+        "结束时让变更等待 /specrow:accept 或 /specrow:revise。"
+      ],
+      forbiddenActions: ["不要执行验收。", "不要归档变更。", "不要将规格更新为最终事实。"],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: ["实现前验证失败。", "提案过于含糊，无法安全实现。", "配置语言缺少模板或生命周期消息。"]
+    },
+    "/specrow:revise": {
+      userIntent: "在 build 后处理用户请求的修改，不接受也不归档变更。",
+      agentBehavior: [
+        "将变更标记为需要修订。",
+        "按需将用户请求的后续修改应用到提案、任务、实现或验证证据。",
+        "重新运行相关验证，并让变更准备好等待用户下一次决定。"
+      ],
+      forbiddenActions: ["不要将修订视为验收。", "不要归档变更。", "不要将规格更新为最终事实。"],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: ["请求的修订与提案范围冲突，需要新的用户决策。", "配置语言缺少模板或生命周期消息。"]
+    },
+    "/specrow:accept": {
+      userIntent: "记录用户明确验收，并允许最终规格集成和归档。",
+      agentBehavior: [
+        "仅当用户明确接受已构建或已完成修订的工作时继续。",
+        "通过 CLI core 记录明确验收。",
+        "将此路径作为规格成为最终事实和归档的唯一用户授权。"
+      ],
+      forbiddenActions: ["不要从沉默、测试成功或实现完成推断验收。", "不要接受尚未构建或修订未完成的变更。"],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: ["用户尚未明确接受变更。", "变更未构建或修订未完成。", "配置语言缺少模板或生命周期消息。"]
+    }
+  },
+  integration: {
+    managedHeader: "此文件或章节由 SpecRow 管理。请使用以下命令重新生成：\nspecrow update",
+    commandSections: {
+      invocation: "调用",
+      userIntent: "用户意图",
+      cliCore: "CLI Core",
+      agentBehavior: "代理行为",
+      forbiddenActions: "禁止操作",
+      languageRules: "语言规则",
+      stopConditions: "停止条件",
+      nextCommands: "下一步命令",
+      none: "无。"
+    },
+    invocationTemplate: "当用户写入 `{command}` 或表达相同意图时，使用此 workflow。",
+    agentInstructions: {
+      title: "SpecRow 代理说明",
+      overview: "SpecRow 是 agent-first 的规格 workflow。将用户的 `/specrow:*` 消息视为 workflow 意图，并把 `specrow` CLI 作为实现细节使用。",
+      languageRule: "创建或修改内置 SpecRow 文件前，读取 `.specrow/config.yml` 并使用其中配置的 `language`。不要静默 fallback 到英文。",
+      cliCore: "CLI core:",
+      forbidden: "禁止："
+    },
+    skill: {
+      description: "当用户提到 SpecRow 或 /specrow:* 命令时，使用 SpecRow workflow。",
+      whenToUse: "何时使用",
+      instructions: "说明",
+      triggers: [
+        "用户调用 `/specrow:*` 命令。",
+        "用户要求初始化 SpecRow、创建提案、review、build、revise 或 accept 一个 SpecRow 变更。"
+      ]
+    }
   }
 } satisfies LanguageResources;

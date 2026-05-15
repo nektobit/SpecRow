@@ -1,6 +1,8 @@
 import {
   getSpecRowMessage,
+  getSpecRowAgentCommandText,
   getSpecRowTemplate,
+  REQUIRED_AGENT_COMMANDS,
   REQUIRED_MESSAGES,
   REQUIRED_TEMPLATES
 } from "./templates.js";
@@ -209,7 +211,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
 
 export function listAgentCommandSpecs(language: string): readonly AgentCommandSpec[] {
   assertAgentCommandLanguageResources(language);
-  return AGENT_COMMAND_SPECS;
+  return AGENT_COMMAND_SPECS.map((command) => localizeAgentCommandSpec(command, language));
 }
 
 export function getAgentCommandSpec(name: AgentCommandName, language: string): AgentCommandSpec {
@@ -220,7 +222,7 @@ export function getAgentCommandSpec(name: AgentCommandName, language: string): A
     throw new Error(`Unknown SpecRow agent command "${name}".`);
   }
 
-  return command;
+  return localizeAgentCommandSpec(command, language);
 }
 
 export function assertAgentCommandLanguageResources(language: string): void {
@@ -231,4 +233,28 @@ export function assertAgentCommandLanguageResources(language: string): void {
   for (const messageName of REQUIRED_MESSAGES) {
     getSpecRowMessage(language, messageName);
   }
+
+  for (const commandName of REQUIRED_AGENT_COMMANDS) {
+    getSpecRowAgentCommandText(language, commandName);
+  }
+}
+
+function localizeAgentCommandSpec(command: AgentCommandSpec, language: string): AgentCommandSpec {
+  const localized = getSpecRowAgentCommandText(language, command.name);
+
+  return {
+    ...command,
+    userIntent: localized.userIntent,
+    agentBehavior: localized.agentBehavior,
+    forbiddenActions: localized.forbiddenActions,
+    languageRules: localized.languageRules,
+    stopConditions: localized.stopConditions,
+    reviewPolicy:
+      command.reviewPolicy === undefined
+        ? undefined
+        : {
+            ...command.reviewPolicy,
+            requiredWhen: localized.reviewPolicyRequiredWhen ?? command.reviewPolicy.requiredWhen
+          }
+  };
 }

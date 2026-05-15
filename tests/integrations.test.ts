@@ -74,6 +74,27 @@ describe("SpecRow integrations", () => {
     );
   });
 
+  it("uses the configured language for managed Codex prompts and generic instructions", async () => {
+    const cwd = await mkdtemp(path.join(os.tmpdir(), "specrow-ru-integrations-test-"));
+    tempDirs.push(cwd);
+    await initSpecRowProject({ cwd, language: "ru" });
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-ru-home-"));
+    tempDirs.push(homeDir);
+
+    await installSpecRowIntegrations({ cwd, homeDir, tools: "codex,generic" });
+
+    const reviewPrompt = await readFile(path.join(homeDir, ".codex", "prompts", "specrow-review.md"), "utf8");
+    const agents = await readFile(path.join(cwd, "AGENTS.md"), "utf8");
+
+    expect(reviewPrompt).toContain("Этот файл или раздел управляется SpecRow");
+    expect(reviewPrompt).toContain("## Намерение пользователя");
+    expect(reviewPrompt).toContain("Проверить готовность предложения до кода");
+    expect(reviewPrompt).not.toContain("Use this workflow");
+    expect(reviewPrompt).not.toContain("## User Intent");
+    expect(agents).toContain("Инструкции агента SpecRow");
+    expect(agents).not.toContain("SpecRow Agent Instructions");
+  });
+
   it("detects project-local agent folders and falls back to generic", async () => {
     const cwd = await createTempProject();
     await mkdir(path.join(cwd, ".cursor"), { recursive: true });
