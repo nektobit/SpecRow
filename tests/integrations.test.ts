@@ -113,7 +113,28 @@ describe("SpecRow integrations", () => {
     expect(config.mcpServers.other).toEqual({ command: "other" });
     expect(config.mcpServers.specrow).toEqual({
       command: "npx",
-      args: ["-y", "specrow@latest", "mcp", cwd]
+      args: ["-y", "specrow@latest", "mcp"]
+    });
+  });
+
+  it("migrates legacy pinned JSON SpecRow MCP config to workspace-aware config", async () => {
+    const cwd = await createTempProject();
+    const cursorConfig = path.join(cwd, ".cursor", "mcp.json");
+    await mkdir(path.dirname(cursorConfig), { recursive: true });
+    await writeFile(
+      cursorConfig,
+      JSON.stringify({ mcpServers: { specrow: { command: "npx", args: ["-y", "specrow@latest", "mcp", cwd] } } }, null, 2),
+      "utf8"
+    );
+
+    await installSpecRowIntegrations({ cwd, tools: "cursor" });
+
+    const config = JSON.parse(await readFile(cursorConfig, "utf8")) as {
+      mcpServers: Record<string, { command: string; args?: string[] }>;
+    };
+    expect(config.mcpServers.specrow).toEqual({
+      command: "npx",
+      args: ["-y", "specrow@latest", "mcp"]
     });
   });
 

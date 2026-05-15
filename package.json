@@ -1,6 +1,6 @@
 {
   "name": "specrow",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Multilingual specification system for spec-driven development.",
   "type": "module",
   "license": "MIT",

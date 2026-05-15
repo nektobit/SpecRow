@@ -292,7 +292,7 @@ function createMcpArtifactsForTool(
   env: NodeJS.ProcessEnv,
   integrationText: IntegrationTextResources
 ): IntegrationArtifact[] {
-  const server = renderJsonMcpServer(cwd);
+  const server = renderJsonMcpServer();
 
   switch (tool) {
     case "codex":
@@ -352,10 +352,10 @@ args = ["-y", "specrow@latest", "mcp"]
 `;
 }
 
-function renderJsonMcpServer(projectPath: string): Record<string, unknown> {
+function renderJsonMcpServer(): Record<string, unknown> {
   return {
     command: "npx",
-    args: ["-y", "specrow@latest", "mcp", projectPath]
+    args: ["-y", "specrow@latest", "mcp"]
   };
 }
 
@@ -631,11 +631,10 @@ function isCanonicalSpecrowServer(value: unknown): boolean {
     isRecord(value) &&
     value.command === "npx" &&
     Array.isArray(value.args) &&
-    value.args.length === 4 &&
     value.args[0] === "-y" &&
     value.args[1] === "specrow@latest" &&
     value.args[2] === "mcp" &&
-    typeof value.args[3] === "string"
+    (value.args.length === 3 || (value.args.length === 4 && typeof value.args[3] === "string"))
   );
 }
 

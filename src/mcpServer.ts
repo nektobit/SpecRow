@@ -29,7 +29,7 @@ import {
 } from "./templates.js";
 import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
 
-const SPECROW_VERSION = "0.1.6";
+const SPECROW_VERSION = "0.1.7";
 const SPECROW_DIR = ".specrow";
 
 const EmptySchema = z.object({}).optional();

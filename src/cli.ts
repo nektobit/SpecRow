@@ -29,7 +29,7 @@ import { getSpecRowMessage } from "./templates.js";
 import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
 import { startSpecRowMcpServer } from "./mcpServer.js";
 
-const SPECROW_VERSION = "0.1.6";
+const SPECROW_VERSION = "0.1.7";
 
 export function createProgram(): Command {
   const program = new Command();
