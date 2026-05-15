@@ -301,7 +301,7 @@ function createMcpArtifactsForTool(
           tool,
           path: path.join(codexHome(homeDir, env), "config.toml"),
           kind: "mcp-config",
-          content: renderCodexMcpConfig(cwd),
+          content: renderCodexMcpConfig(),
           integrationText,
           mcpConfig: true
         }
@@ -344,11 +344,11 @@ function createMcpArtifactsForTool(
   }
 }
 
-export function renderCodexMcpConfig(projectPath: string): string {
+export function renderCodexMcpConfig(): string {
   return `${MCP_MANAGED_MARKER}
 [mcp_servers.specrow]
 command = "npx"
-args = ["-y", "specrow@latest", "mcp", ${JSON.stringify(projectPath)}]
+args = ["-y", "specrow@latest", "mcp"]
 `;
 }
 

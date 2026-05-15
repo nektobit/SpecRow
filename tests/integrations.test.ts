@@ -74,17 +74,14 @@ describe("SpecRow integrations", () => {
       "SpecRow Agent Instructions"
     );
     await expect(readFile(path.join(homeDir, ".codex", "config.toml"), "utf8")).resolves.toContain(
-      '[mcp_servers.specrow]\ncommand = "npx"\nargs = ["-y", "specrow@latest", "mcp",'
+      '[mcp_servers.specrow]\ncommand = "npx"\nargs = ["-y", "specrow@latest", "mcp"]'
     );
   });
 
-  it("renders canonical Codex MCP config snippets for POSIX and Windows paths", () => {
-    expect(renderCodexMcpConfig("/work/project")).toContain(
-      'args = ["-y", "specrow@latest", "mcp", "/work/project"]'
-    );
-    expect(renderCodexMcpConfig("C:\\Work\\Project")).toContain(
-      'args = ["-y", "specrow@latest", "mcp", "C:\\\\Work\\\\Project"]'
-    );
+  it("renders global Codex MCP config without binding it to one project path", () => {
+    expect(renderCodexMcpConfig()).toContain('args = ["-y", "specrow@latest", "mcp"]');
+    expect(renderCodexMcpConfig()).not.toContain("/work/project");
+    expect(renderCodexMcpConfig()).not.toContain("C:\\\\Work\\\\Project");
   });
 
   it("preserves unrelated Codex MCP servers when installing managed SpecRow config", async () => {

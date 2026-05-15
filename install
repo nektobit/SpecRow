@@ -49,6 +49,14 @@ First check whether the SpecRow MCP server command is available:
 specrow-mcp --help
 ```
 
+If `specrow-mcp` is not on `PATH`, do not treat that alone as a permanent MCP
+failure. A global agent MCP configuration can run SpecRow through `npx` without
+a globally installed `specrow-mcp` binary:
+
+```bash
+npx -y specrow@latest mcp --help
+```
+
 If `specrow-mcp` is missing, check whether the SpecRow CLI is available:
 
 ```bash
@@ -102,6 +110,37 @@ If `specrow-mcp` is unavailable but the CLI exists, try this command instead:
 ```bash
 specrow mcp
 ```
+
+For Codex, the MCP server entry is stored globally in the Codex config. It must
+not be bound to the project where `specrow integrate` happened to run. Use a
+workspace-agnostic entry:
+
+```toml
+[mcp_servers.specrow]
+command = "npx"
+args = ["-y", "specrow@latest", "mcp"]
+```
+
+Do not write a Codex MCP entry like this, because it pins every future workspace
+to one project:
+
+```toml
+args = ["-y", "specrow@latest", "mcp", "/path/to/one/project"]
+```
+
+If an existing Codex MCP server named `specrow` points at a different workspace,
+refresh the integration. If the entry is SpecRow-managed, `specrow integrate`
+may update it; otherwise use `--force` only after confirming the entry should be
+owned by SpecRow:
+
+```bash
+specrow integrate --tools codex --force
+```
+
+If the current agent session still sees the old MCP server after refreshing the
+config, continue with CLI fallback for this install, report that MCP was
+refreshed, and tell the user to restart Codex before expecting MCP tools to use
+the new workspace.
 
 Generated `/specrow:*` commands, prompts, skills, rules, and workflows remain the user-facing trigger layer. They should tell the agent to use MCP tools first, with CLI commands as fallback.
 
