@@ -10,7 +10,7 @@ Follow these steps in the current project root.
 
 ## 1. Determine the working language
 
-Determine the working language before running `specrow init`.
+Determine the working language before initializing SpecRow.
 
 Priority:
 
@@ -24,11 +24,11 @@ Once the language is determined, use it for all replies, status updates, questio
 
 Do not silently choose English for a new project when the language is ambiguous.
 
-## 2. Use MCP first, CLI as fallback
+## 2. Use MCP only
 
 MCP is the default way for agents to work with SpecRow.
 
-Before using shell commands, check whether the current agent already has an MCP server named `specrow` available.
+Before changing the workspace, check whether the current agent already has an MCP server named `specrow` available.
 
 When the `specrow` MCP server is available, use its MCP tools for SpecRow work:
 
@@ -37,9 +37,9 @@ When the `specrow` MCP server is available, use its MCP tools for SpecRow work:
 - `specrow_integration_status`
 - other `specrow_*` tools for proposal, review, build, revise, accept, archive, status, context, and template workflows
 
-Use the `specrow` MCP server before the CLI whenever both are available.
+Temporarily do not use CLI fallback for this install flow.
 
-Use CLI commands only if MCP is unavailable, cannot be registered, or fails in a way the CLI can reasonably handle.
+If the `specrow` MCP server is unavailable, cannot be registered, fails, points at a different workspace, or does not create the expected files, stop the install process and report the exact blocker to the user. Do not run `specrow init`, `specrow integrate`, `specrow validate`, or any other SpecRow CLI command as a fallback.
 
 ## 3. Ensure SpecRow is installed
 
@@ -57,13 +57,7 @@ a globally installed `specrow-mcp` binary:
 npx -y specrow@latest mcp --help
 ```
 
-If `specrow-mcp` is missing, check whether the SpecRow CLI is available:
-
-```bash
-specrow --version
-```
-
-If both commands are missing, install SpecRow.
+If `specrow-mcp` and `npx -y specrow@latest mcp --help` are both unavailable, stop and report that SpecRow MCP is not installed or cannot be started.
 
 Prefer the user's existing Node.js package manager if the project makes it obvious. Otherwise use npm:
 
@@ -71,44 +65,19 @@ Prefer the user's existing Node.js package manager if the project makes it obvio
 npm i -g specrow
 ```
 
-If package installation requires approval, ask the user before installing.
+If package installation requires approval, ask the user before installing. After installation, the agent session may need to be restarted before MCP tools appear. If MCP tools are still unavailable after installation, stop and report that restart/configuration is required.
 
-## 4. Install or refresh agent integrations
+## 4. Verify agent MCP integration
 
-After SpecRow is available, register or refresh the agent integration so the agent can connect to the MCP server named `specrow`.
+After SpecRow is available, verify that the current agent can connect to the MCP server named `specrow`.
 
-If you can identify the current agent environment, pass the matching tool name:
-
-```bash
-specrow integrate --tools codex
-specrow integrate --tools claude
-specrow integrate --tools cursor
-specrow integrate --tools windsurf
-```
-
-If you cannot identify the current agent reliably, let SpecRow detect it:
-
-```bash
-specrow integrate --detect
-```
-
-For a portable fallback that any agent can read, install generic instructions:
-
-```bash
-specrow integrate --tools generic
-```
+Temporarily do not install or refresh agent integrations through the SpecRow CLI during this install flow. If the MCP server is missing or stale, stop and report the required MCP configuration to the user.
 
 If manual MCP configuration is required, use:
 
 ```txt
 server name: specrow
 command: specrow-mcp
-```
-
-If `specrow-mcp` is unavailable but the CLI exists, try this command instead:
-
-```bash
-specrow mcp
 ```
 
 For Codex, the MCP server entry is stored globally in the Codex config. It must
@@ -129,20 +98,14 @@ args = ["-y", "specrow@latest", "mcp", "/path/to/one/project"]
 ```
 
 If an existing Codex MCP server named `specrow` points at a different workspace,
-refresh the integration. If the entry is SpecRow-managed, `specrow integrate`
-may update it; otherwise use `--force` only after confirming the entry should be
-owned by SpecRow:
-
-```bash
-specrow integrate --tools codex --force
-```
+stop and report that the user must refresh the global MCP entry before this
+install flow can continue.
 
 If the current agent session still sees the old MCP server after refreshing the
-config, continue with CLI fallback for this install, report that MCP was
-refreshed, and tell the user to restart Codex before expecting MCP tools to use
-the new workspace.
+config, stop the install, report that MCP was refreshed, and tell the user to
+restart Codex before expecting MCP tools to use the new workspace.
 
-Generated `/specrow:*` commands, prompts, skills, rules, and workflows remain the user-facing trigger layer. They should tell the agent to use MCP tools first, with CLI commands as fallback.
+Generated `/specrow:*` commands, prompts, skills, rules, and workflows remain the user-facing trigger layer. During this temporary install flow, they should tell the agent to use MCP tools only and stop if MCP is unavailable or misconfigured.
 
 Use `--no-mcp` only when the user explicitly needs legacy command, skill, rule, or prompt guidance without MCP configuration.
 
@@ -152,7 +115,7 @@ If `.specrow/config.yml` already exists, do not reinitialize the workspace unles
 
 If `.specrow/config.yml` does not exist, initialize the workspace with the determined language.
 
-Prefer MCP:
+Use MCP:
 
 ```txt
 specrow_init
@@ -164,29 +127,24 @@ Pass the language explicitly:
 { "language": "<language-code>" }
 ```
 
-CLI fallback:
+After `specrow_init`, verify the MCP result and the current shell workspace before continuing:
 
-```bash
-specrow init --language <language-code>
-```
+1. Read the `projectRoot` field returned by MCP and report it to the user.
+2. Check that `.specrow/config.yml` exists in the current shell workspace.
+3. If `projectRoot` does not match the current shell workspace, or `.specrow/config.yml` is missing, stop immediately and report that MCP is pointed at the wrong workspace or failed to create files. Do not use CLI fallback.
 
 ## 6. Validate and report
 
 After installation or initialization, validate the workspace and check integration status.
 
-Prefer MCP:
+Use MCP:
 
 ```txt
 specrow_validate
 specrow_integration_status
 ```
 
-CLI fallback:
-
-```bash
-specrow validate
-specrow integrations status
-```
+If either MCP validation or MCP integration status fails, stop and report the MCP error. Do not use CLI fallback.
 
 Tell the user:
 

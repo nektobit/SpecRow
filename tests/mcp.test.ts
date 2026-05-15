@@ -48,8 +48,11 @@ describe("SpecRow MCP runtime", () => {
 
     await expect(runtime.callTool("specrow_init", { language: "ru" })).resolves.toMatchObject({
       success: true,
+      projectRoot: path.resolve(cwd),
       configPath: path.join(".specrow", "config.yml"),
+      absoluteConfigPath: path.join(path.resolve(cwd), ".specrow", "config.yml"),
       projectPath: path.join(".specrow", "project.md"),
+      absoluteProjectPath: path.join(path.resolve(cwd), ".specrow", "project.md"),
       language: "ru"
     });
     await expect(readFile(path.join(cwd, ".specrow", "config.yml"), "utf8")).resolves.toContain("language: ru");

@@ -179,13 +179,18 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
   return {
     specrow_init: tool(InitSchema, async (input) => {
       const result = await initSpecRowProject({ cwd: projectRoot, language: input.language, force: input.force });
+      await assertSpecRowInitCreatedFiles(projectRoot);
+
       return success({
         message: getSpecRowMessage(result.language, result.configCreated ? "init.config.created" : "init.config.kept", {
           path: relative(projectRoot, result.configPath)
         }),
+        projectRoot,
         root: relative(projectRoot, result.root),
         configPath: relative(projectRoot, result.configPath),
+        absoluteConfigPath: result.configPath,
         projectPath: relative(projectRoot, result.projectPath),
+        absoluteProjectPath: result.projectPath,
         configCreated: result.configCreated,
         configOverwritten: result.configOverwritten,
         projectCreated: result.projectCreated,
@@ -361,6 +366,21 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       });
     })
   };
+}
+
+async function assertSpecRowInitCreatedFiles(projectRoot: string): Promise<void> {
+  const requiredFiles = [
+    path.join(projectRoot, SPECROW_DIR, "config.yml"),
+    path.join(projectRoot, SPECROW_DIR, "project.md")
+  ];
+
+  for (const filePath of requiredFiles) {
+    try {
+      await access(filePath, constants.F_OK);
+    } catch {
+      throw new Error(`SpecRow MCP init did not create expected file "${filePath}".`);
+    }
+  }
 }
 
 function createToolRegistrations(handlers: Record<string, ToolHandler>): Record<string, {
