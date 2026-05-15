@@ -27,8 +27,9 @@ import {
 } from "./lifecycle.js";
 import { getSpecRowMessage } from "./templates.js";
 import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
+import { startSpecRowMcpServer } from "./mcpServer.js";
 
-const SPECROW_VERSION = "0.1.4";
+const SPECROW_VERSION = "0.1.5";
 
 export function createProgram(): Command {
   const program = new Command();
@@ -45,8 +46,10 @@ export function createProgram(): Command {
     .option("-f, --force", "Overwrite .specrow/config.yml if it already exists.", false)
     .option("--tools <list>", "Install agent integrations: codex,claude,cursor,windsurf,generic,all,none.")
     .option("--detect", "Detect agent integrations to install.", false)
+    .option("--mcp", "Install MCP configuration for supported agent integrations.", true)
+    .option("--no-mcp", "Skip MCP configuration and install only command, skill, rule, or prompt guidance.")
     .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { language: string; force: boolean; tools?: string; detect: boolean; dryRun: boolean }) => {
+    .action(async (options: { language: string; force: boolean; tools?: string; detect: boolean; mcp: boolean; dryRun: boolean }) => {
       try {
         const result = await initSpecRowProject({
           language: options.language,
@@ -71,6 +74,7 @@ export function createProgram(): Command {
               tools: options.tools,
               detect: options.detect,
               force: options.force,
+              mcp: options.mcp,
               dryRun: options.dryRun
             })
           );
@@ -93,15 +97,18 @@ export function createProgram(): Command {
     .description("Install SpecRow agent integrations for the current project.")
     .option("--tools <list>", "Agent integrations: codex,claude,cursor,windsurf,generic,all,none. Defaults to detection.")
     .option("--detect", "Detect agent integrations to install.", false)
+    .option("--mcp", "Install MCP configuration for supported agent integrations.", true)
+    .option("--no-mcp", "Skip MCP configuration and install only command, skill, rule, or prompt guidance.")
     .option("-f, --force", "Overwrite existing unmarked integration files.", false)
     .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { tools?: string; detect: boolean; force: boolean; dryRun: boolean }) => {
+    .action(async (options: { tools?: string; detect: boolean; mcp: boolean; force: boolean; dryRun: boolean }) => {
       try {
         printIntegrationResult(
           await installSpecRowIntegrations({
             tools: options.tools,
             detect: options.detect || options.tools === undefined,
             force: options.force,
+            mcp: options.mcp,
             dryRun: options.dryRun
           })
         );
@@ -114,14 +121,17 @@ export function createProgram(): Command {
     .command("update")
     .description("Regenerate installed SpecRow agent integrations.")
     .option("--tools <list>", "Override configured integrations: codex,claude,cursor,windsurf,generic,all,none.")
+    .option("--mcp", "Regenerate MCP configuration for supported agent integrations.", true)
+    .option("--no-mcp", "Skip MCP configuration and regenerate only command, skill, rule, or prompt guidance.")
     .option("-f, --force", "Overwrite existing unmarked integration files.", false)
     .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { tools?: string; force: boolean; dryRun: boolean }) => {
+    .action(async (options: { tools?: string; mcp: boolean; force: boolean; dryRun: boolean }) => {
       try {
         printIntegrationResult(
           await updateSpecRowIntegrations({
             tools: options.tools,
             force: options.force,
+            mcp: options.mcp,
             dryRun: options.dryRun
           })
         );
@@ -173,6 +183,18 @@ export function createProgram(): Command {
         if (issues.some((issue) => issue.severity === "error")) {
           process.exitCode = 1;
         }
+      } catch (error) {
+        handleCommandError(error);
+      }
+    });
+
+  program
+    .command("mcp")
+    .description("Run the local SpecRow MCP stdio server for agents.")
+    .argument("[project-path]")
+    .action(async (projectPath?: string) => {
+      try {
+        await startSpecRowMcpServer({ projectRoot: projectPath });
       } catch (error) {
         handleCommandError(error);
       }

@@ -17,9 +17,17 @@ describe("SpecRow agent commands", () => {
   it("keeps CLI mechanics as implementation details", () => {
     for (const command of AGENT_COMMAND_SPECS) {
       expect(command.userIntent.length).toBeGreaterThan(0);
+      expect(command.toolCore.length).toBeGreaterThan(0);
       expect(command.cliCore.length).toBeGreaterThan(0);
       expect(command.agentBehavior.length).toBeGreaterThan(0);
     }
+  });
+
+  it("prefers MCP tools before CLI fallback in generated command specs", () => {
+    const proposal = getAgentCommandSpec("/specrow:proposal", "en");
+
+    expect(proposal.toolCore).toEqual(["specrow_create_proposal", "specrow_validate", "specrow_context"]);
+    expect(proposal.cliCore).toEqual(["specrow proposal <change-name>", "specrow validate <change-name>", "specrow context <change-name>"]);
   });
 
   it("requires configured language resources without falling back to English", () => {

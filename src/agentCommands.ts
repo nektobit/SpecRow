@@ -29,6 +29,7 @@ export interface AgentCommandSpec {
   name: AgentCommandName;
   phase: AgentCommandPhase;
   userIntent: string;
+  toolCore: readonly string[];
   cliCore: readonly string[];
   agentBehavior: readonly string[];
   forbiddenActions: readonly string[];
@@ -53,6 +54,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     name: "/specrow:init",
     phase: "setup",
     userIntent: "Set up SpecRow for the current project without requiring the user to know CLI flags or files.",
+    toolCore: ["specrow_init"],
     cliCore: ["specrow init --language <language>"],
     agentBehavior: [
       "Determine the intended project language from the user or ask for it when it is ambiguous.",
@@ -74,6 +76,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     name: "/specrow:proposal",
     phase: "proposal",
     userIntent: "Turn the user's intent into a concrete change proposal and task skeleton.",
+    toolCore: ["specrow_create_proposal", "specrow_validate", "specrow_context"],
     cliCore: ["specrow proposal <change-name>", "specrow validate <change-name>", "specrow context <change-name>"],
     agentBehavior: [
       "Choose a stable change name from the user's intent.",
@@ -100,6 +103,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     name: "/specrow:review",
     phase: "review",
     userIntent: "Check proposal readiness before code; recommended by default and required only for risky changes.",
+    toolCore: ["specrow_review", "specrow_validate"],
     cliCore: ["specrow review <change-name>", "specrow validate <change-name>"],
     agentBehavior: [
       "Review problem framing, scope, risks, decisions, acceptance criteria, and language consistency.",
@@ -134,6 +138,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     name: "/specrow:build",
     phase: "implementation",
     userIntent: "Implement and verify an approved change without turning it into final truth.",
+    toolCore: ["specrow_context", "specrow_build_start", "specrow_build_finish"],
     cliCore: ["specrow context <change-name>", "specrow build-start <change-name>", "specrow build-finish <change-name>"],
     agentBehavior: [
       "Use CLI context to load the proposal, tasks, status, and active-change warnings.",
@@ -161,6 +166,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     name: "/specrow:revise",
     phase: "revision",
     userIntent: "Handle user-requested changes after build without accepting or archiving the change.",
+    toolCore: ["specrow_revise", "specrow_context", "specrow_validate"],
     cliCore: ["specrow revise <change-name>", "specrow context <change-name>", "specrow validate <change-name>"],
     agentBehavior: [
       "Mark the change as needing revision.",
@@ -186,6 +192,7 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     name: "/specrow:accept",
     phase: "acceptance",
     userIntent: "Record explicit user acceptance and allow final spec integration and archive.",
+    toolCore: ["specrow_accept", "specrow_archive"],
     cliCore: ["specrow accept <change-name> --yes", "specrow archive <change-name>"],
     agentBehavior: [
       "Proceed only when the user clearly accepts the built or completed revision work.",

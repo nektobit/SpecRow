@@ -1,10 +1,40 @@
 {
   "name": "specrow",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Multilingual specification system for spec-driven development.",
   "type": "module",
+  "license": "MIT",
+  "author": "nektobit",
+  "homepage": "https://nektobit.github.io/SpecRow/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nektobit/SpecRow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nektobit/SpecRow/issues"
+  },
+  "keywords": [
+    "specifications",
+    "spec-driven-development",
+    "agents",
+    "cli",
+    "workflow"
+  ],
+  "main": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    },
+    "./agent-commands": {
+      "types": "./dist/agentCommands.d.ts",
+      "import": "./dist/agentCommands.js"
+    }
+  },
   "bin": {
-    "specrow": "dist/bin.js"
+    "specrow": "dist/bin.js",
+    "specrow-mcp": "dist/mcpBin.js"
   },
   "files": [
     "dist",
@@ -13,11 +43,13 @@
   "scripts": {
     "build": "tsup",
     "prepack": "pnpm build",
+    "prepublishOnly": "pnpm test && pnpm typecheck && pnpm locale:validate",
     "test": "vitest run",
     "locale:validate": "npm run build --silent && node dist/bin.js locales validate",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "commander": "^14.0.2",
     "yaml": "^2.8.2",
     "zod": "^4.1.12"
@@ -31,5 +63,8 @@
   "packageManager": "pnpm@10.5.2",
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -10,6 +10,7 @@ import {
   getIntegrationStatus,
   installSpecRowIntegrations,
   parseIntegrationTools,
+  renderCodexMcpConfig,
   updateSpecRowIntegrations
 } from "../src/integrations.js";
 import { parseConfig } from "../src/config.js";
@@ -72,6 +73,136 @@ describe("SpecRow integrations", () => {
     await expect(readFile(path.join(homeDir, ".codex", "skills", "specrow", "SKILL.md"), "utf8")).resolves.toContain(
       "SpecRow Agent Instructions"
     );
+    await expect(readFile(path.join(homeDir, ".codex", "config.toml"), "utf8")).resolves.toContain(
+      '[mcp_servers.specrow]\ncommand = "npx"\nargs = ["-y", "specrow@latest", "mcp",'
+    );
+  });
+
+  it("renders canonical Codex MCP config snippets for POSIX and Windows paths", () => {
+    expect(renderCodexMcpConfig("/work/project")).toContain(
+      'args = ["-y", "specrow@latest", "mcp", "/work/project"]'
+    );
+    expect(renderCodexMcpConfig("C:\\Work\\Project")).toContain(
+      'args = ["-y", "specrow@latest", "mcp", "C:\\\\Work\\\\Project"]'
+    );
+  });
+
+  it("preserves unrelated Codex MCP servers when installing managed SpecRow config", async () => {
+    const cwd = await createTempProject();
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-home-"));
+    tempDirs.push(homeDir);
+    const codexConfig = path.join(homeDir, ".codex", "config.toml");
+    await mkdir(path.dirname(codexConfig), { recursive: true });
+    await writeFile(codexConfig, '[mcp_servers.other]\ncommand = "other"\n', "utf8");
+
+    await installSpecRowIntegrations({ cwd, homeDir, tools: "codex" });
+
+    const config = await readFile(codexConfig, "utf8");
+    expect(config).toContain('[mcp_servers.other]\ncommand = "other"');
+    expect(config).toContain("[mcp_servers.specrow]");
+  });
+
+  it("preserves unrelated JSON MCP servers for Cursor config", async () => {
+    const cwd = await createTempProject();
+    const cursorConfig = path.join(cwd, ".cursor", "mcp.json");
+    await mkdir(path.dirname(cursorConfig), { recursive: true });
+    await writeFile(cursorConfig, JSON.stringify({ mcpServers: { other: { command: "other" } } }, null, 2), "utf8");
+
+    await installSpecRowIntegrations({ cwd, tools: "cursor" });
+
+    const config = JSON.parse(await readFile(cursorConfig, "utf8")) as {
+      mcpServers: Record<string, { command: string; args?: string[] }>;
+    };
+    expect(config.mcpServers.other).toEqual({ command: "other" });
+    expect(config.mcpServers.specrow).toEqual({
+      command: "npx",
+      args: ["-y", "specrow@latest", "mcp", cwd]
+    });
+  });
+
+  it("does not overwrite custom JSON SpecRow MCP config without force", async () => {
+    const cwd = await createTempProject();
+    const cursorConfig = path.join(cwd, ".cursor", "mcp.json");
+    await mkdir(path.dirname(cursorConfig), { recursive: true });
+    await writeFile(cursorConfig, JSON.stringify({ mcpServers: { specrow: { command: "custom" } } }, null, 2), "utf8");
+
+    const result = await installSpecRowIntegrations({ cwd, tools: "cursor" });
+
+    expect(result.files).toContainEqual(
+      expect.objectContaining({
+        tool: "cursor",
+        kind: "mcp-config",
+        action: "skipped"
+      })
+    );
+    const config = JSON.parse(await readFile(cursorConfig, "utf8")) as { mcpServers: { specrow: { command: string } } };
+    expect(config.mcpServers.specrow.command).toBe("custom");
+  });
+
+  it("updates only the managed Codex SpecRow MCP entry", async () => {
+    const cwd = await createTempProject();
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-home-"));
+    tempDirs.push(homeDir);
+    const codexConfig = path.join(homeDir, ".codex", "config.toml");
+    await mkdir(path.dirname(codexConfig), { recursive: true });
+    await writeFile(
+      codexConfig,
+      '# SPECROW:MANAGED:mcp-config\n[mcp_servers.specrow]\ncommand = "old"\n\n[mcp_servers.other]\ncommand = "other"\n',
+      "utf8"
+    );
+
+    await installSpecRowIntegrations({ cwd, homeDir, tools: "codex" });
+
+    const config = await readFile(codexConfig, "utf8");
+    expect(config).toContain('command = "npx"');
+    expect(config).not.toContain('command = "old"');
+    expect(config).toContain('[mcp_servers.other]\ncommand = "other"');
+  });
+
+  it("does not overwrite unmarked Codex SpecRow MCP config without force", async () => {
+    const cwd = await createTempProject();
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-home-"));
+    tempDirs.push(homeDir);
+    const codexConfig = path.join(homeDir, ".codex", "config.toml");
+    await mkdir(path.dirname(codexConfig), { recursive: true });
+    await writeFile(codexConfig, '[mcp_servers.specrow]\ncommand = "custom"\n', "utf8");
+
+    const result = await installSpecRowIntegrations({ cwd, homeDir, tools: "codex" });
+
+    expect(result.files).toContainEqual(
+      expect.objectContaining({
+        tool: "codex",
+        kind: "mcp-config",
+        action: "skipped"
+      })
+    );
+    await expect(readFile(codexConfig, "utf8")).resolves.toBe('[mcp_servers.specrow]\ncommand = "custom"\n');
+  });
+
+  it("overwrites unmarked Codex SpecRow MCP config with force", async () => {
+    const cwd = await createTempProject();
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-home-"));
+    tempDirs.push(homeDir);
+    const codexConfig = path.join(homeDir, ".codex", "config.toml");
+    await mkdir(path.dirname(codexConfig), { recursive: true });
+    await writeFile(codexConfig, '[mcp_servers.specrow]\ncommand = "custom"\n', "utf8");
+
+    await installSpecRowIntegrations({ cwd, homeDir, tools: "codex", force: true });
+
+    const config = await readFile(codexConfig, "utf8");
+    expect(config).toContain('command = "npx"');
+    expect(config).not.toContain('command = "custom"');
+  });
+
+  it("supports opt-out from MCP config for MCP-capable integrations", async () => {
+    const cwd = await createTempProject();
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-home-"));
+    tempDirs.push(homeDir);
+
+    const result = await installSpecRowIntegrations({ cwd, homeDir, tools: "codex", mcp: false });
+
+    expect(result.files.some((file) => file.kind === "mcp-config")).toBe(false);
+    await expect(stat(path.join(homeDir, ".codex", "config.toml"))).rejects.toThrow();
   });
 
   it("uses the configured language for managed Codex prompts and generic instructions", async () => {
@@ -148,5 +279,22 @@ describe("SpecRow integrations", () => {
         reason: "present"
       })
     ]);
+  });
+
+  it("reports MCP-managed files in integration status", async () => {
+    const cwd = await createTempProject();
+    const homeDir = await mkdtemp(path.join(os.tmpdir(), "specrow-home-"));
+    tempDirs.push(homeDir);
+
+    await installSpecRowIntegrations({ cwd, homeDir, tools: "codex" });
+    const status = await getIntegrationStatus(cwd);
+
+    expect(status).toContainEqual(
+      expect.objectContaining({
+        tool: "codex",
+        kind: "mcp-config",
+        reason: "present; restart agent if this was newly installed"
+      })
+    );
   });
 });

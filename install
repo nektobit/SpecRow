@@ -48,6 +48,11 @@ specrow init --language <language-code>
 
 5. Install agent integrations.
 
+SpecRow configures MCP by default for supported agents. The generated
+`/specrow:*` commands, prompts, skills, rules, and workflows stay as the
+user-facing trigger layer and should tell the agent to use MCP tools first,
+with CLI commands as fallback.
+
 If you can identify your agent environment, pass the matching tool name:
 
 ```bash
@@ -69,6 +74,9 @@ For a portable fallback that any agent can read, install generic instructions:
 specrow integrate --tools generic
 ```
 
+Use `--no-mcp` only when the user explicitly needs legacy command, skill,
+rule, or prompt guidance without MCP configuration.
+
 6. Validate the workspace and report what changed.
 
 ```bash
@@ -76,6 +84,8 @@ specrow validate
 specrow integrations status
 ```
 
-Tell the user which integrations were installed and whether their IDE or agent needs to be restarted before new commands, prompts, skills, rules, or workflows appear.
+Tell the user which integrations were installed and whether their IDE or agent
+needs to be restarted before the MCP server configuration or new commands,
+prompts, skills, rules, or workflows appear.
 
 Do not implement project code as part of this install flow unless the user separately asks for a SpecRow change workflow such as `/specrow:proposal` or `/specrow:build`.

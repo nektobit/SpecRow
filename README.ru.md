@@ -23,7 +23,7 @@ GitHub Pages: https://nektobit.github.io/SpecRow/
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru
 ```
 
-Агент проверит или установит CLI, инициализирует `.specrow` с этим языком, установит интеграции агентов, запустит валидацию и сообщит, нужно ли перезапустить IDE или агента.
+Агент проверит или установит CLI, инициализирует `.specrow` с этим языком, автоматически настроит MCP-интеграцию по умолчанию, если она поддерживается, установит fallback-инструкции агента при необходимости, запустит валидацию и сообщит, нужно ли перезапустить IDE или агента.
 
 Затем используйте команды SpecRow:
 
@@ -34,7 +34,7 @@ apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
 /specrow:accept
 ```
 
-Ручной CLI fallback:
+CLI остается fallback и ядром автоматизации:
 
 ```bash
 npm i -g specrow

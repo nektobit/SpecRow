@@ -335,7 +335,7 @@ Describe the intended spec changes using this structure when requirements change
     commandSections: {
       invocation: "Invocation",
       userIntent: "User Intent",
-      cliCore: "CLI Core",
+      toolCore: "Tool Core",
       agentBehavior: "Agent Behavior",
       forbiddenActions: "Forbidden Actions",
       languageRules: "Language Rules",
@@ -346,11 +346,12 @@ Describe the intended spec changes using this structure when requirements change
     invocationTemplate: "Use this workflow when the user writes `{command}` or asks for the same intent.",
     agentInstructions: {
       title: "SpecRow Agent Instructions",
-      overview: "SpecRow is an agent-first specification workflow. Treat `/specrow:*` user messages as workflow intentions and use the `specrow` CLI as the implementation detail.",
+      overview: "SpecRow is an agent-first specification workflow. Treat `/specrow:*` user messages as workflow intentions. Use SpecRow MCP tools first when available, and use the `specrow` CLI as the fallback implementation detail.",
       languageRule: "Before creating or revising built-in SpecRow files, read `.specrow/config.yml` and use its configured `language`. Do not silently fall back to English.",
-      cliCore: "CLI core:",
+      toolCore: "Tool core:",
       forbidden: "Forbidden:"
     },
+    toolCoreFallback: "Use SpecRow MCP tools first when they are available. If MCP is unavailable, use these CLI fallback commands:",
     skill: {
       description: "Use SpecRow workflows when the user mentions SpecRow or /specrow:* commands.",
       whenToUse: "When to Use",

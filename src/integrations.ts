@@ -14,7 +14,7 @@ import {
 import { listAgentCommandSpecs, type AgentCommandSpec } from "./agentCommands.js";
 import { getSpecRowIntegrationText, type IntegrationTextResources } from "./templates.js";
 
-export type ManagedFileKind = "command" | "skill" | "instructions" | "workflow" | "prompt" | "rule";
+export type ManagedFileKind = "command" | "skill" | "instructions" | "workflow" | "prompt" | "rule" | "mcp-config";
 
 export interface ManagedIntegrationFile {
   tool: IntegrationTool;
@@ -40,6 +40,7 @@ export interface IntegrationInstallOptions {
   detect?: boolean;
   dryRun?: boolean;
   force?: boolean;
+  mcp?: boolean;
   env?: NodeJS.ProcessEnv;
   homeDir?: string;
   now?: Date;
@@ -52,10 +53,14 @@ interface IntegrationArtifact {
   content: string;
   integrationText: IntegrationTextResources;
   mergeBlock?: boolean;
+  mcpConfig?: boolean;
+  jsonMcpConfig?: boolean;
 }
 
 const MANAGED_START = "<!-- SPECROW:MANAGED:START -->";
 const MANAGED_END = "<!-- SPECROW:MANAGED:END -->";
+const MCP_MANAGED_MARKER = "# SPECROW:MANAGED:mcp-config";
+const MCP_CAPABLE_TOOLS = new Set<IntegrationTool>(["codex", "claude", "cursor", "windsurf"]);
 
 export function parseIntegrationTools(input: string | readonly IntegrationTool[] | undefined): IntegrationTool[] {
   if (input === undefined) {
@@ -136,9 +141,10 @@ export async function installSpecRowIntegrations(options: IntegrationInstallOpti
   const selectedTools = parseIntegrationTools(options.tools).concat(options.tools === undefined || options.detect === true ? detectedTools : []);
   const tools = dedupeTools(selectedTools);
   const language = config.language;
+  const includeMcp = options.mcp !== false;
 
   const artifacts = tools.flatMap((tool) =>
-    createArtifactsForTool(tool, cwd, options.homeDir ?? os.homedir(), options.env ?? process.env, language)
+    createArtifactsForTool(tool, cwd, options.homeDir ?? os.homedir(), options.env ?? process.env, language, includeMcp)
   );
   const files: IntegrationWriteResult[] = [];
 
@@ -180,11 +186,15 @@ export async function getIntegrationStatus(cwd = process.cwd()): Promise<Integra
   const managedFiles = config.integrations?.managedFiles ?? [];
 
   return Promise.all(
-    managedFiles.map(async (file) => ({
-      ...file,
-      action: (await pathExists(resolveStoredPath(file.path, root))) ? "updated" : "skipped",
-      reason: (await pathExists(resolveStoredPath(file.path, root))) ? "present" : "missing"
-    }))
+    managedFiles.map(async (file) => {
+      const exists = await pathExists(resolveStoredPath(file.path, root));
+
+      return {
+        ...file,
+        action: exists ? "updated" : "skipped",
+        reason: exists ? (file.kind === "mcp-config" ? "present; restart agent if this was newly installed" : "present") : "missing"
+      };
+    })
   );
 }
 
@@ -193,10 +203,12 @@ function createArtifactsForTool(
   cwd: string,
   homeDir: string,
   env: NodeJS.ProcessEnv,
-  language: string
+  language: string,
+  includeMcp: boolean
 ): IntegrationArtifact[] {
   const commands = listAgentCommandSpecs(language);
   const integrationText = getSpecRowIntegrationText(language);
+  const mcpArtifacts = includeMcp && MCP_CAPABLE_TOOLS.has(tool) ? createMcpArtifactsForTool(tool, cwd, homeDir, env, integrationText) : [];
   const commandArtifacts = commands.map((command) => createCommandArtifact(tool, command, cwd, homeDir, env, integrationText)).filter(
     (artifact): artifact is IntegrationArtifact => artifact !== undefined
   );
@@ -204,6 +216,7 @@ function createArtifactsForTool(
   switch (tool) {
     case "codex":
       return [
+        ...mcpArtifacts,
         ...commandArtifacts,
         {
           tool,
@@ -215,6 +228,7 @@ function createArtifactsForTool(
       ];
     case "claude":
       return [
+        ...mcpArtifacts,
         ...commandArtifacts,
         {
           tool,
@@ -234,6 +248,7 @@ function createArtifactsForTool(
       ];
     case "cursor":
       return [
+        ...mcpArtifacts,
         ...commandArtifacts,
         {
           tool,
@@ -245,6 +260,7 @@ function createArtifactsForTool(
       ];
     case "windsurf":
       return [
+        ...mcpArtifacts,
         ...commandArtifacts,
         {
           tool,
@@ -256,6 +272,7 @@ function createArtifactsForTool(
       ];
     case "generic":
       return [
+        ...mcpArtifacts,
         {
           tool,
           path: path.join(cwd, "AGENTS.md"),
@@ -266,6 +283,80 @@ function createArtifactsForTool(
         }
       ];
   }
+}
+
+function createMcpArtifactsForTool(
+  tool: IntegrationTool,
+  cwd: string,
+  homeDir: string,
+  env: NodeJS.ProcessEnv,
+  integrationText: IntegrationTextResources
+): IntegrationArtifact[] {
+  const server = renderJsonMcpServer(cwd);
+
+  switch (tool) {
+    case "codex":
+      return [
+        {
+          tool,
+          path: path.join(codexHome(homeDir, env), "config.toml"),
+          kind: "mcp-config",
+          content: renderCodexMcpConfig(cwd),
+          integrationText,
+          mcpConfig: true
+        }
+      ];
+    case "claude":
+      return [
+        {
+          tool,
+          path: path.join(cwd, ".mcp.json"),
+          kind: "mcp-config",
+          content: JSON.stringify({ mcpServers: { specrow: server } }, null, 2),
+          integrationText,
+          jsonMcpConfig: true
+        }
+      ];
+    case "cursor":
+      return [
+        {
+          tool,
+          path: path.join(cwd, ".cursor", "mcp.json"),
+          kind: "mcp-config",
+          content: JSON.stringify({ mcpServers: { specrow: server } }, null, 2),
+          integrationText,
+          jsonMcpConfig: true
+        }
+      ];
+    case "windsurf":
+      return [
+        {
+          tool,
+          path: path.join(cwd, ".windsurf", "mcp_config.json"),
+          kind: "mcp-config",
+          content: JSON.stringify({ mcpServers: { specrow: server } }, null, 2),
+          integrationText,
+          jsonMcpConfig: true
+        }
+      ];
+    case "generic":
+      return [];
+  }
+}
+
+export function renderCodexMcpConfig(projectPath: string): string {
+  return `${MCP_MANAGED_MARKER}
+[mcp_servers.specrow]
+command = "npx"
+args = ["-y", "specrow@latest", "mcp", ${JSON.stringify(projectPath)}]
+`;
+}
+
+function renderJsonMcpServer(projectPath: string): Record<string, unknown> {
+  return {
+    command: "npx",
+    args: ["-y", "specrow@latest", "mcp", projectPath]
+  };
 }
 
 function createCommandArtifact(
@@ -341,6 +432,44 @@ async function writeIntegrationArtifact(
 
   await mkdir(path.dirname(artifact.path), { recursive: true });
 
+  if (artifact.mcpConfig === true) {
+    const existing = exists ? await readFile(artifact.path, "utf8") : "";
+    const merged = mergeCodexMcpConfig(existing, artifact.content, options.force === true);
+
+    if (merged === undefined) {
+      return {
+        ...baseResult,
+        action: "skipped",
+        reason: "existing specrow MCP server is not SpecRow-managed; use --force to overwrite"
+      };
+    }
+
+    await writeFile(artifact.path, merged, "utf8");
+    return {
+      ...baseResult,
+      action
+    };
+  }
+
+  if (artifact.jsonMcpConfig === true) {
+    const existing = exists ? await readFile(artifact.path, "utf8") : "";
+    const merged = mergeJsonMcpConfig(existing, artifact.content, options.force === true);
+
+    if (merged === undefined) {
+      return {
+        ...baseResult,
+        action: "skipped",
+        reason: "existing specrow MCP server is not SpecRow-managed; use --force to overwrite"
+      };
+    }
+
+    await writeFile(artifact.path, merged, "utf8");
+    return {
+      ...baseResult,
+      action
+    };
+  }
+
   if (artifact.mergeBlock === true) {
     const existing = exists ? await readFile(artifact.path, "utf8") : "";
     await writeFile(artifact.path, mergeManagedBlock(existing, artifact.content), "utf8");
@@ -412,7 +541,9 @@ ${integrationText.invocationTemplate.replace("{command}", command.name)}
 ## ${sections.userIntent}
 ${command.userIntent}
 
-## ${sections.cliCore}
+## ${sections.toolCore}
+${command.toolCore.map((line) => `- \`${line}\``).join("\n")}
+${integrationText.toolCoreFallback}
 ${command.cliCore.map((line) => `- \`${line}\``).join("\n")}
 
 ## ${sections.agentBehavior}
@@ -443,13 +574,90 @@ ${commands.map(
   (command) => `## ${command.name}
 ${command.userIntent}
 
-${integrationText.agentInstructions.cliCore}
+${integrationText.agentInstructions.toolCore}
+${command.toolCore.map((line) => `- \`${line}\``).join("\n")}
+${integrationText.toolCoreFallback}
 ${command.cliCore.map((line) => `- \`${line}\``).join("\n")}
 
 ${integrationText.agentInstructions.forbidden}
 ${command.forbiddenActions.map((line) => `- ${line}`).join("\n")}`
 ).join("\n\n")}
 `;
+}
+
+function mergeCodexMcpConfig(existing: string, managedSpecrowConfig: string, force: boolean): string | undefined {
+  const replacement = managedSpecrowConfig.trim();
+  const section = findTomlSection(existing, "mcp_servers.specrow");
+
+  if (section === undefined) {
+    return `${existing.trimEnd()}${existing.trim().length > 0 ? "\n\n" : ""}${replacement}\n`;
+  }
+
+  const currentSection = existing.slice(section.start, section.end);
+  const hasManagedMarker = currentSection.includes(MCP_MANAGED_MARKER) || existing.slice(Math.max(0, section.start - 128), section.start).includes(MCP_MANAGED_MARKER);
+
+  if (!hasManagedMarker && !force) {
+    return undefined;
+  }
+
+  return `${existing.slice(0, section.start).trimEnd()}${section.start > 0 ? "\n\n" : ""}${replacement}${existing.slice(section.end).trimStart().length > 0 ? `\n\n${existing.slice(section.end).trimStart()}` : "\n"}`;
+}
+
+function mergeJsonMcpConfig(existing: string, managedSpecrowConfig: string, force: boolean): string | undefined {
+  const nextServer = JSON.parse(managedSpecrowConfig) as { mcpServers: { specrow: unknown } };
+
+  if (existing.trim().length === 0) {
+    return `${JSON.stringify(nextServer, null, 2)}\n`;
+  }
+
+  const parsed = JSON.parse(existing) as Record<string, unknown>;
+  const mcpServers = isRecord(parsed.mcpServers) ? parsed.mcpServers : {};
+  const currentSpecrow = mcpServers.specrow;
+
+  if (currentSpecrow !== undefined && !force && !isCanonicalSpecrowServer(currentSpecrow)) {
+    return undefined;
+  }
+
+  parsed.mcpServers = {
+    ...mcpServers,
+    specrow: nextServer.mcpServers.specrow
+  };
+
+  return `${JSON.stringify(parsed, null, 2)}\n`;
+}
+
+function isCanonicalSpecrowServer(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    value.command === "npx" &&
+    Array.isArray(value.args) &&
+    value.args.length === 4 &&
+    value.args[0] === "-y" &&
+    value.args[1] === "specrow@latest" &&
+    value.args[2] === "mcp" &&
+    typeof value.args[3] === "string"
+  );
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function findTomlSection(source: string, sectionName: string): { start: number; end: number } | undefined {
+  const headerPattern = new RegExp(`^\\[${escapeRegExp(sectionName)}\\]\\s*$`, "m");
+  const match = headerPattern.exec(source);
+
+  if (match === null || match.index === undefined) {
+    return undefined;
+  }
+
+  const markerStart = source.lastIndexOf(MCP_MANAGED_MARKER, match.index);
+  const sectionStart = markerStart >= 0 && source.slice(markerStart, match.index).trim() === MCP_MANAGED_MARKER ? markerStart : match.index;
+  const rest = source.slice(match.index + match[0].length);
+  const nextHeader = /^\[.+\]\s*$/m.exec(rest);
+  const end = nextHeader === null || nextHeader.index === undefined ? source.length : match.index + match[0].length + nextHeader.index;
+
+  return { start: sectionStart, end };
 }
 
 function renderSkill(name: string, commands: readonly AgentCommandSpec[], integrationText: IntegrationTextResources): string {

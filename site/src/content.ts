@@ -14,6 +14,7 @@ export const pages = [
   { slug: 'instructions' },
   { slug: 'workflow' },
   { slug: 'agent-commands' },
+  { slug: 'mcp-server' },
   { slug: 'cli-reference' },
   { slug: 'templates' },
   { slug: 'localization' },
@@ -98,6 +99,17 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
         { type: 'section', heading: '/specrow:revise', paragraphs: ['Handles requested follow-up work after build. Revision is not acceptance and must not archive the change.'], commands: ['/specrow:revise <change-name>', '// agent will run:', '// specrow revise <change-name>', '// specrow context <change-name>', '// specrow validate <change-name>'] },
         { type: 'section', heading: '/specrow:accept', paragraphs: ['Records explicit user acceptance. This is the only user-facing command that authorizes final spec integration and archive. Silence, passing tests, or completed code are not acceptance.'], commands: ['/specrow:accept <change-name>', '// agent will run:', '// specrow accept <change-name> --yes', '// specrow archive <change-name>'] },
         { type: 'section', heading: 'Installing Commands', paragraphs: ['SpecRow can install tool-specific agent files for Codex, Claude, Cursor, Windsurf, and generic fallback instructions. Native slash-command support depends on the client; unsupported clients still read generated instructions.'], commands: ['specrow integrate --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update'] },
+      ],
+    },
+    'mcp-server': {
+      eyebrow: 'Agent Integration',
+      title: 'MCP Server',
+      description: 'MCP is the default agent integration path, while users continue working through /specrow:* commands.',
+      blocks: [
+        { type: 'section', heading: 'Default Path', paragraphs: ['The agent installer configures the MCP integration automatically when the target agent supports it. This gives the agent a structured way to call SpecRow behavior without making users learn another workflow.'] },
+        { type: 'section', heading: 'User Commands Stay The Same', paragraphs: ['Users still describe intent with /specrow:* commands such as proposal, review, build, revise, and accept. MCP is an agent-facing transport layer behind that user experience, not a new command set for users.'], commands: ['/specrow:proposal Add passwordless sign-in', '/specrow:review', '/specrow:build', '/specrow:accept'] },
+        { type: 'section', heading: 'CLI Fallback', paragraphs: ['The specrow CLI remains the automation core and manual fallback. Agents, CI jobs, scripts, and unsupported clients can still use CLI commands directly when MCP is unavailable or inappropriate.'], commands: ['specrow validate [change-name]', 'specrow context [change-name]', 'specrow integrations status'] },
+        { type: 'section', heading: 'This Phase', paragraphs: ['This phase does not add a dashboard or a VSCode plugin. The supported experience is agent install, MCP where available, generated agent instructions where needed, and the CLI for fallback and automation.'] },
       ],
     },
     'cli-reference': {
@@ -222,6 +234,17 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
         { type: 'section', heading: 'Установка команд', paragraphs: ['SpecRow может установить agent files для Codex, Claude, Cursor, Windsurf и generic fallback instructions. Нативная поддержка slash-команд зависит от клиента; клиенты без нее читают сгенерированные инструкции.'], commands: ['specrow integrate --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update'] },
       ],
     },
+    'mcp-server': {
+      eyebrow: 'Интеграция агента',
+      title: 'MCP Server',
+      description: 'MCP является стандартным путем интеграции агента, а пользователь продолжает работать через команды /specrow:*.',
+      blocks: [
+        { type: 'section', heading: 'Стандартный путь', paragraphs: ['Agent installer автоматически настраивает MCP-интеграцию, когда целевой агент ее поддерживает. Так агент получает структурированный способ вызывать поведение SpecRow, а пользователю не нужно учить отдельный workflow.'] },
+        { type: 'section', heading: 'Команды пользователя не меняются', paragraphs: ['Пользователь по-прежнему описывает намерение через /specrow:* команды: proposal, review, build, revise и accept. MCP — это agent-facing транспортный слой за этим UX, а не новый набор команд для пользователя.'], commands: ['/specrow:proposal Добавить вход без пароля', '/specrow:review', '/specrow:build', '/specrow:accept'] },
+        { type: 'section', heading: 'CLI fallback', paragraphs: ['CLI specrow остается ядром автоматизации и ручным fallback. Агенты, CI-задачи, скрипты и неподдерживаемые клиенты могут напрямую использовать CLI, когда MCP недоступен или не подходит.'], commands: ['specrow validate [change-name]', 'specrow context [change-name]', 'specrow integrations status'] },
+        { type: 'section', heading: 'Текущая фаза', paragraphs: ['В этой фазе не добавляются dashboard или VSCode plugin. Поддерживаемый сценарий: agent install, MCP где доступен, сгенерированные инструкции агента где нужны, и CLI для fallback и автоматизации.'] },
+      ],
+    },
     'cli-reference': {
       eyebrow: 'CLI Core',
       title: 'CLI-справочник',
@@ -344,6 +367,17 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
         { type: 'section', heading: 'Instalar comandos', paragraphs: ['SpecRow puede instalar agent files para Codex, Claude, Cursor, Windsurf y generic fallback instructions. El soporte nativo de slash commands depende del cliente; los clientes sin soporte todavía leen las instrucciones generadas.'], commands: ['specrow integrate --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update'] },
       ],
     },
+    'mcp-server': {
+      eyebrow: 'Integración de agente',
+      title: 'MCP Server',
+      description: 'MCP es la ruta predeterminada de integración con agentes, mientras los usuarios siguen trabajando con comandos /specrow:*.',
+      blocks: [
+        { type: 'section', heading: 'Ruta predeterminada', paragraphs: ['El agent installer configura automáticamente la integración MCP cuando el agente de destino la soporta. Así el agente tiene una forma estructurada de invocar el comportamiento de SpecRow sin que el usuario aprenda otro flujo.'] },
+        { type: 'section', heading: 'Los comandos de usuario no cambian', paragraphs: ['Los usuarios siguen describiendo intención con comandos /specrow:* como proposal, review, build, revise y accept. MCP es una capa de transporte orientada al agente detrás de esa UX, no un nuevo conjunto de comandos para usuarios.'], commands: ['/specrow:proposal Añadir inicio de sesión sin contraseña', '/specrow:review', '/specrow:build', '/specrow:accept'] },
+        { type: 'section', heading: 'Fallback CLI', paragraphs: ['La CLI specrow sigue siendo el núcleo de automatización y el fallback manual. Agentes, jobs de CI, scripts y clientes no compatibles pueden usar comandos CLI directamente cuando MCP no esté disponible o no sea adecuado.'], commands: ['specrow validate [change-name]', 'specrow context [change-name]', 'specrow integrations status'] },
+        { type: 'section', heading: 'Esta fase', paragraphs: ['Esta fase no añade dashboard ni plugin de VSCode. La experiencia soportada es agent install, MCP cuando esté disponible, instrucciones generadas para agentes cuando hagan falta, y CLI para fallback y automatización.'] },
+      ],
+    },
     'cli-reference': {
       eyebrow: 'CLI Core',
       title: 'Referencia CLI',
@@ -464,6 +498,17 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
         { type: 'section', heading: '/specrow:revise', paragraphs: ['处理 build 后请求的后续修改。Revision 不是验收，也不得归档变更。'], commands: ['/specrow:revise <change-name>', '// 代理将执行：', '// specrow revise <change-name>', '// specrow context <change-name>', '// specrow validate <change-name>'] },
         { type: 'section', heading: '/specrow:accept', paragraphs: ['记录用户明确验收。这是唯一允许最终规格集成和 archive 的 user-facing 命令。沉默、测试通过或代码完成都不是验收。'], commands: ['/specrow:accept <change-name>', '// 代理将执行：', '// specrow accept <change-name> --yes', '// specrow archive <change-name>'] },
         { type: 'section', heading: '安装命令', paragraphs: ['SpecRow 可以为 Codex、Claude、Cursor、Windsurf 和 generic fallback instructions 安装 agent files。原生 slash-command 支持取决于客户端；不支持的客户端仍可读取生成的说明。'], commands: ['specrow integrate --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update'] },
+      ],
+    },
+    'mcp-server': {
+      eyebrow: '代理集成',
+      title: 'MCP Server',
+      description: 'MCP 是默认的代理集成路径，而用户仍然通过 /specrow:* 命令工作。',
+      blocks: [
+        { type: 'section', heading: '默认路径', paragraphs: ['当目标代理支持 MCP 时，agent installer 会自动配置 MCP 集成。这样代理可以用结构化方式调用 SpecRow 行为，而用户不需要学习另一套 workflow。'] },
+        { type: 'section', heading: '用户命令保持不变', paragraphs: ['用户仍然用 /specrow:* 命令描述意图，例如 proposal、review、build、revise 和 accept。MCP 是这个用户体验背后的 agent-facing 传输层，不是面向用户的新命令集。'], commands: ['/specrow:proposal 添加无密码登录', '/specrow:review', '/specrow:build', '/specrow:accept'] },
+        { type: 'section', heading: 'CLI fallback', paragraphs: ['specrow CLI 仍然是自动化核心和手动 fallback。代理、CI jobs、脚本以及不支持 MCP 的客户端，在 MCP 不可用或不合适时仍可直接使用 CLI 命令。'], commands: ['specrow validate [change-name]', 'specrow context [change-name]', 'specrow integrations status'] },
+        { type: 'section', heading: '当前阶段', paragraphs: ['当前阶段不添加 dashboard 或 VSCode plugin。支持的体验是 agent install、可用时使用 MCP、需要时使用生成的代理说明，以及用 CLI 做 fallback 和自动化。'] },
       ],
     },
     'cli-reference': {

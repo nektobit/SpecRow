@@ -318,7 +318,7 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     commandSections: {
       invocation: "Invocación",
       userIntent: "Intención del usuario",
-      cliCore: "CLI Core",
+      toolCore: "Nucleo de herramientas",
       agentBehavior: "Comportamiento del agente",
       forbiddenActions: "Acciones prohibidas",
       languageRules: "Reglas de idioma",
@@ -329,11 +329,12 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     invocationTemplate: "Usa este workflow cuando el usuario escriba `{command}` o pida la misma intención.",
     agentInstructions: {
       title: "Instrucciones del agente SpecRow",
-      overview: "SpecRow es un workflow de especificaciones agent-first. Trata los mensajes `/specrow:*` como intenciones de workflow y usa la CLI `specrow` como detalle de implementación.",
+      overview: "SpecRow es un workflow de especificaciones agent-first. Trata los mensajes `/specrow:*` como intenciones de workflow. Usa primero las herramientas MCP de SpecRow cuando esten disponibles y usa la CLI `specrow` como fallback de implementacion.",
       languageRule: "Antes de crear o revisar archivos integrados de SpecRow, lee `.specrow/config.yml` y usa su `language` configurado. No hagas fallback silencioso al inglés.",
-      cliCore: "CLI core:",
+      toolCore: "Nucleo de herramientas:",
       forbidden: "Prohibido:"
     },
+    toolCoreFallback: "Usa primero las herramientas MCP de SpecRow cuando esten disponibles. Si MCP no esta disponible, usa estos comandos CLI de fallback:",
     skill: {
       description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o comandos /specrow:*.",
       whenToUse: "Cuándo usar",

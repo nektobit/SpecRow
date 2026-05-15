@@ -335,7 +335,7 @@ export const ru = {
     commandSections: {
       invocation: "Вызов",
       userIntent: "Намерение пользователя",
-      cliCore: "CLI Core",
+      toolCore: "Ядро инструментов",
       agentBehavior: "Поведение агента",
       forbiddenActions: "Запрещенные действия",
       languageRules: "Правила языка",
@@ -346,11 +346,12 @@ export const ru = {
     invocationTemplate: "Используйте этот workflow, когда пользователь пишет `{command}` или просит то же по смыслу.",
     agentInstructions: {
       title: "Инструкции агента SpecRow",
-      overview: "SpecRow — agent-first workflow спецификаций. Считайте сообщения пользователя `/specrow:*` намерениями workflow и используйте CLI `specrow` как техническую деталь.",
+      overview: "SpecRow — agent-first workflow спецификаций. Считайте сообщения пользователя `/specrow:*` намерениями workflow. Сначала используйте MCP-инструменты SpecRow, если они доступны, а CLI `specrow` — как fallback техническую деталь.",
       languageRule: "Перед созданием или изменением встроенных файлов SpecRow прочитайте `.specrow/config.yml` и используйте настроенный `language`. Не выполняйте скрытый fallback на английский.",
-      cliCore: "CLI core:",
+      toolCore: "Ядро инструментов:",
       forbidden: "Запрещено:"
     },
+    toolCoreFallback: "Сначала используйте MCP-инструменты SpecRow, если они доступны. Если MCP недоступен, используйте fallback-команды CLI:",
     skill: {
       description: "Используйте workflow SpecRow, когда пользователь упоминает SpecRow или команды /specrow:*.",
       whenToUse: "Когда использовать",

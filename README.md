@@ -23,7 +23,7 @@ Use the agent installer first. Pass the project working language explicitly:
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=en
 ```
 
-The agent checks or installs the CLI, initializes `.specrow` with that language, installs agent integrations, validates the workspace, and reports whether the IDE or agent needs a restart.
+The agent checks or installs the CLI, initializes `.specrow` with that language, configures the default MCP integration automatically when supported, installs fallback agent instructions as needed, validates the workspace, and reports whether the IDE or agent needs a restart.
 
 Then use the SpecRow agent commands:
 
@@ -34,7 +34,7 @@ Then use the SpecRow agent commands:
 /specrow:accept
 ```
 
-Manual CLI fallback:
+The CLI remains the fallback and automation core:
 
 ```bash
 npm i -g specrow

@@ -12,7 +12,7 @@ export type IntegrationTool = z.infer<typeof IntegrationToolSchema>;
 const ManagedIntegrationFileSchema = z.object({
   tool: IntegrationToolSchema,
   path: z.string().min(1),
-  kind: z.enum(["command", "skill", "instructions", "workflow", "prompt", "rule"])
+  kind: z.enum(["command", "skill", "instructions", "workflow", "prompt", "rule", "mcp-config"])
 });
 
 const IntegrationsConfigSchema = z.object({

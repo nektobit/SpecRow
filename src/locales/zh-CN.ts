@@ -300,7 +300,7 @@ export const zhCN = {
     commandSections: {
       invocation: "调用",
       userIntent: "用户意图",
-      cliCore: "CLI Core",
+      toolCore: "工具核心",
       agentBehavior: "代理行为",
       forbiddenActions: "禁止操作",
       languageRules: "语言规则",
@@ -311,11 +311,12 @@ export const zhCN = {
     invocationTemplate: "当用户写入 `{command}` 或表达相同意图时，使用此 workflow。",
     agentInstructions: {
       title: "SpecRow 代理说明",
-      overview: "SpecRow 是 agent-first 的规格 workflow。将用户的 `/specrow:*` 消息视为 workflow 意图，并把 `specrow` CLI 作为实现细节使用。",
+      overview: "SpecRow 是 agent-first 的规格 workflow。将用户的 `/specrow:*` 消息视为 workflow 意图。可用时优先使用 SpecRow MCP 工具，并把 `specrow` CLI 作为 fallback 实现细节使用。",
       languageRule: "创建或修改内置 SpecRow 文件前，读取 `.specrow/config.yml` 并使用其中配置的 `language`。不要静默 fallback 到英文。",
-      cliCore: "CLI core:",
+      toolCore: "工具核心：",
       forbidden: "禁止："
     },
+    toolCoreFallback: "可用时优先使用 SpecRow MCP 工具。如果 MCP 不可用，使用以下 CLI fallback 命令：",
     skill: {
       description: "当用户提到 SpecRow 或 /specrow:* 命令时，使用 SpecRow workflow。",
       whenToUse: "何时使用",

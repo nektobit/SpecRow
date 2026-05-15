@@ -58,7 +58,7 @@ export interface IntegrationTextResources {
   commandSections: {
     invocation: string;
     userIntent: string;
-    cliCore: string;
+    toolCore: string;
     agentBehavior: string;
     forbiddenActions: string;
     languageRules: string;
@@ -71,9 +71,10 @@ export interface IntegrationTextResources {
     title: string;
     overview: string;
     languageRule: string;
-    cliCore: string;
+    toolCore: string;
     forbidden: string;
   };
+  toolCoreFallback: string;
   skill: {
     description: string;
     whenToUse: string;

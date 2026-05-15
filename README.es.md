@@ -23,7 +23,7 @@ Empieza con el agent installer. Pasa explícitamente el idioma de trabajo del pr
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=es
 ```
 
-El agente comprueba o instala la CLI, inicializa `.specrow` con ese idioma, instala integraciones de agentes, valida el workspace e informa si el IDE o agente necesita reinicio.
+El agente comprueba o instala la CLI, inicializa `.specrow` con ese idioma, configura automáticamente la integración MCP predeterminada cuando está soportada, instala instrucciones fallback de agente si hacen falta, valida el workspace e informa si el IDE o agente necesita reinicio.
 
 Luego usa los comandos SpecRow:
 
@@ -34,7 +34,7 @@ Luego usa los comandos SpecRow:
 /specrow:accept
 ```
 
-Fallback manual con CLI:
+La CLI sigue siendo el fallback y el núcleo de automatización:
 
 ```bash
 npm i -g specrow

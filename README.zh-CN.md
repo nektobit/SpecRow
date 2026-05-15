@@ -23,7 +23,7 @@ GitHub Pages: https://nektobit.github.io/SpecRow/
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=zh-CN
 ```
 
-代理会检查或安装 CLI，使用该语言初始化 `.specrow`，安装代理集成，验证 workspace，并报告 IDE 或代理是否需要重启。
+代理会检查或安装 CLI，使用该语言初始化 `.specrow`，在支持时自动配置默认 MCP 集成，按需安装 fallback 代理说明，验证 workspace，并报告 IDE 或代理是否需要重启。
 
 然后使用 SpecRow 代理命令：
 
@@ -34,7 +34,7 @@ apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
 /specrow:accept
 ```
 
-手动 CLI fallback：
+CLI 仍然是 fallback 和自动化核心：
 
 ```bash
 npm i -g specrow
