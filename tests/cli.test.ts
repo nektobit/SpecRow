@@ -4,6 +4,6 @@ import { createProgram } from "../src/cli.js";
 
 describe("SpecRow CLI program", () => {
   it("reports the package CLI version", () => {
-    expect(createProgram().version()).toBe("0.1.3");
+    expect(createProgram().version()).toBe("0.1.4");
   });
 });
