@@ -2,33 +2,60 @@
 
 Use this file when the user asks an agent to apply SpecRow from:
 
+```txt
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=<language-code>
+```
 
 Follow these steps in the current project root.
 
-1. Determine the project language.
+## 1. Determine the working language
 
-Use the explicit `language=<language-code>` argument from the user's apply command when present:
+Determine the working language before running `specrow init`.
 
-```txt
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru
+Priority:
+
+1. Use the explicit `language=<language-code>` argument from the apply command.
+2. If `.specrow/config.yml` already exists, read its `language` field.
+3. If neither source is available, ask the user which working language to use.
+
+Ask the language question in the user's current conversation language.
+
+Once the language is determined, use it for all replies, status updates, questions, final installation reports, and SpecRow files created or revised during this flow.
+
+Do not silently choose English for a new project when the language is ambiguous.
+
+## 2. Use MCP first, CLI as fallback
+
+MCP is the default way for agents to work with SpecRow.
+
+Before using shell commands, check whether the current agent already has an MCP server named `specrow` available.
+
+When the `specrow` MCP server is available, use its MCP tools for SpecRow work:
+
+- `specrow_init`
+- `specrow_validate`
+- `specrow_integration_status`
+- other `specrow_*` tools for proposal, review, build, revise, accept, archive, status, context, and template workflows
+
+Use the `specrow` MCP server before the CLI whenever both are available.
+
+Use CLI commands only if MCP is unavailable, cannot be registered, or fails in a way the CLI can reasonably handle.
+
+## 3. Ensure SpecRow is installed
+
+First check whether the SpecRow MCP server command is available:
+
+```bash
+specrow-mcp --help
 ```
 
-When an explicit `language=<language-code>` argument is present, immediately switch your own replies, status updates, questions, and final installation report to that language before continuing with the rest of this install flow. Use the same language for any SpecRow files you create or revise. Do not wait until after `specrow init` to change language.
-
-If `.specrow/config.yml` already exists, read its `language` field and keep that language unless the user explicitly asks to change it.
-
-If `.specrow/config.yml` provides the language and no explicit apply argument overrides it, immediately use that configured language for your replies, status updates, questions, final installation report, and any SpecRow files you create or revise.
-
-If neither source is available, ask the user which working language to use before running `specrow init`. Ask that question in the user's current conversation language. Supported built-in languages are `en`, `ru`, `es`, and `zh-CN`. Do not silently choose English for a new project when the language is ambiguous.
-
-2. Check whether the SpecRow CLI is available.
+If `specrow-mcp` is missing, check whether the SpecRow CLI is available:
 
 ```bash
 specrow --version
 ```
 
-3. If the command is missing, install SpecRow.
+If both commands are missing, install SpecRow.
 
 Prefer the user's existing Node.js package manager if the project makes it obvious. Otherwise use npm:
 
@@ -38,22 +65,11 @@ npm i -g specrow
 
 If package installation requires approval, ask the user before installing.
 
-4. Initialize the SpecRow workspace if `.specrow/config.yml` does not exist.
+## 4. Install or refresh agent integrations
 
-Pass the determined language explicitly:
+After SpecRow is available, register or refresh the agent integration so the agent can connect to the MCP server named `specrow`.
 
-```bash
-specrow init --language <language-code>
-```
-
-5. Install agent integrations.
-
-SpecRow configures MCP by default for supported agents. The generated
-`/specrow:*` commands, prompts, skills, rules, and workflows stay as the
-user-facing trigger layer and should tell the agent to use MCP tools first,
-with CLI commands as fallback.
-
-If you can identify your agent environment, pass the matching tool name:
+If you can identify the current agent environment, pass the matching tool name:
 
 ```bash
 specrow integrate --tools codex
@@ -74,18 +90,71 @@ For a portable fallback that any agent can read, install generic instructions:
 specrow integrate --tools generic
 ```
 
-Use `--no-mcp` only when the user explicitly needs legacy command, skill,
-rule, or prompt guidance without MCP configuration.
+If manual MCP configuration is required, use:
 
-6. Validate the workspace and report what changed.
+```txt
+server name: specrow
+command: specrow-mcp
+```
+
+If `specrow-mcp` is unavailable but the CLI exists, try this command instead:
+
+```bash
+specrow mcp
+```
+
+Generated `/specrow:*` commands, prompts, skills, rules, and workflows remain the user-facing trigger layer. They should tell the agent to use MCP tools first, with CLI commands as fallback.
+
+Use `--no-mcp` only when the user explicitly needs legacy command, skill, rule, or prompt guidance without MCP configuration.
+
+## 5. Initialize the workspace
+
+If `.specrow/config.yml` already exists, do not reinitialize the workspace unless the user explicitly asks to change the configuration.
+
+If `.specrow/config.yml` does not exist, initialize the workspace with the determined language.
+
+Prefer MCP:
+
+```txt
+specrow_init
+```
+
+Pass the language explicitly:
+
+```json
+{ "language": "<language-code>" }
+```
+
+CLI fallback:
+
+```bash
+specrow init --language <language-code>
+```
+
+## 6. Validate and report
+
+After installation or initialization, validate the workspace and check integration status.
+
+Prefer MCP:
+
+```txt
+specrow_validate
+specrow_integration_status
+```
+
+CLI fallback:
 
 ```bash
 specrow validate
 specrow integrations status
 ```
 
-Tell the user which integrations were installed and whether their IDE or agent
-needs to be restarted before the MCP server configuration or new commands,
-prompts, skills, rules, or workflows appear.
+Tell the user:
+
+- which language is configured;
+- whether the workspace was initialized or already existed;
+- which integrations were installed or refreshed;
+- whether their IDE or agent needs to be restarted before MCP configuration or new commands, prompts, skills, rules, or workflows appear;
+- whether validation passed.
 
 Do not implement project code as part of this install flow unless the user separately asks for a SpecRow change workflow such as `/specrow:proposal` or `/specrow:build`.
