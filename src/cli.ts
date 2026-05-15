@@ -6,30 +6,30 @@ import { Command } from "commander";
 import { ZodError } from "zod";
 
 import {
-  getIntegrationStatus,
-  installSpecRowIntegrations,
-  updateSpecRowIntegrations,
-  type IntegrationInstallResult
-} from "./integrations.js";
-import { loadSpecRowConfig } from "./config.js";
-import { initSpecRowProject } from "./init.js";
-import { validateLocaleContract } from "./localeContract.js";
-import {
   acceptChange,
   archiveChange,
   createChange,
+  getIntegrationStatus,
+  getSpecRowMessage,
+  initSpecRowProject,
+  installSpecRowIntegrations,
   listActiveChanges,
+  loadSpecRowConfig,
   markChangeBuilt,
   markChangeReviewed,
   markRevisionNeeded,
+  reviewChangeReadiness,
   readChangeStatus,
+  updateSpecRowIntegrations,
+  validateSpecRowProject,
+  type IntegrationInstallResult,
   type LifecycleStatus
-} from "./lifecycle.js";
-import { getSpecRowMessage } from "./templates.js";
-import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
+} from "./core/index.js";
+import { validateLocaleContract } from "./localeContract.js";
 import { startSpecRowMcpServer } from "./mcpServer.js";
+import type { ValidationIssue } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.7";
+const SPECROW_VERSION = "0.1.8";
 
 export function createProgram(): Command {
   const program = new Command();

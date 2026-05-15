@@ -24,54 +24,27 @@ Once the language is determined, use it for all replies, status updates, questio
 
 Do not silently choose English for a new project when the language is ambiguous.
 
-## 2. Use MCP only
+Next step: check whether the `specrow` MCP server is available.
 
-MCP is the default way for agents to work with SpecRow.
+## 2. Require MCP
 
 Before changing the workspace, check whether the current agent already has an MCP server named `specrow` available.
 
-When the `specrow` MCP server is available, use its MCP tools for SpecRow work:
+Use only the `specrow` MCP server for this install flow:
 
+- `specrow_project_status`
 - `specrow_init`
 - `specrow_validate`
 - `specrow_integration_status`
 - other `specrow_*` tools for proposal, review, build, revise, accept, archive, status, context, and template workflows
 
-Temporarily do not use CLI fallback for this install flow.
+If the `specrow` MCP server is unavailable, cannot be registered, fails, points at a different workspace, or does not create the expected files, stop the install process and report the exact blocker to the user.
 
-If the `specrow` MCP server is unavailable, cannot be registered, fails, points at a different workspace, or does not create the expected files, stop the install process and report the exact blocker to the user. Do not run `specrow init`, `specrow integrate`, `specrow validate`, or any other SpecRow CLI command as a fallback.
+Do not run shell-based SpecRow project commands to continue this install flow.
 
-## 3. Ensure SpecRow is installed
+Next step: verify the MCP server configuration.
 
-First check whether the SpecRow MCP server command is available:
-
-```bash
-specrow-mcp --help
-```
-
-If `specrow-mcp` is not on `PATH`, do not treat that alone as a permanent MCP
-failure. A global agent MCP configuration can run SpecRow through `npx` without
-a globally installed `specrow-mcp` binary:
-
-```bash
-npx -y specrow@latest mcp --help
-```
-
-If `specrow-mcp` and `npx -y specrow@latest mcp --help` are both unavailable, stop and report that SpecRow MCP is not installed or cannot be started.
-
-Prefer the user's existing Node.js package manager if the project makes it obvious. Otherwise use npm:
-
-```bash
-npm i -g specrow
-```
-
-If package installation requires approval, ask the user before installing. After installation, the agent session may need to be restarted before MCP tools appear. If MCP tools are still unavailable after installation, stop and report that restart/configuration is required.
-
-## 4. Verify agent MCP integration
-
-After SpecRow is available, verify that the current agent can connect to the MCP server named `specrow`.
-
-Temporarily do not install or refresh agent integrations through the SpecRow CLI during this install flow. If the MCP server is missing or stale, stop and report the required MCP configuration to the user.
+## 3. Verify MCP server configuration
 
 If manual MCP configuration is required, use:
 
@@ -80,9 +53,7 @@ server name: specrow
 command: specrow-mcp
 ```
 
-For Codex, the MCP server entry is stored globally in the Codex config. It must
-not be bound to the project where `specrow integrate` happened to run. Use a
-workspace-agnostic entry:
+For Codex, the MCP server entry is stored globally in the Codex config. It must not be bound to the project where setup happened. Use a workspace-aware entry:
 
 ```toml
 [mcp_servers.specrow]
@@ -90,30 +61,44 @@ command = "npx"
 args = ["-y", "specrow@latest", "mcp"]
 ```
 
-Do not write a Codex MCP entry like this, because it pins every future workspace
-to one project:
+Do not write an MCP entry like this, because it pins every future workspace to one project:
 
 ```toml
 args = ["-y", "specrow@latest", "mcp", "/path/to/one/project"]
 ```
 
-If an existing Codex MCP server named `specrow` points at a different workspace,
-stop and report that the user must refresh the global MCP entry before this
-install flow can continue.
+If the current agent session still sees an old MCP server after configuration changes, stop the install and tell the user to restart the agent before expecting MCP tools to use the new workspace.
 
-If the current agent session still sees the old MCP server after refreshing the
-config, stop the install, report that MCP was refreshed, and tell the user to
-restart Codex before expecting MCP tools to use the new workspace.
+Next step: inspect the current project with MCP.
 
-Generated `/specrow:*` commands, prompts, skills, rules, and workflows remain the user-facing trigger layer. During this temporary install flow, they should tell the agent to use MCP tools only and stop if MCP is unavailable or misconfigured.
+## 4. Inspect the workspace
 
-Use `--no-mcp` only when the user explicitly needs legacy command, skill, rule, or prompt guidance without MCP configuration.
+Use MCP:
 
-## 5. Initialize the workspace
+```txt
+specrow_project_status
+```
 
-If `.specrow/config.yml` already exists, do not reinitialize the workspace unless the user explicitly asks to change the configuration.
+Check the returned fields:
 
-If `.specrow/config.yml` does not exist, initialize the workspace with the determined language.
+- `projectRoot`
+- `initialized`
+- `absoluteConfigPath`
+- `absoluteProjectPath`
+- `language`, when present
+
+If `projectRoot` does not match the current shell workspace, stop immediately and report that MCP is pointed at the wrong workspace.
+
+If `initialized` is `true`, do not reinitialize the workspace unless the user explicitly asks to change the configuration.
+
+If `initialized` is `false`, initialize the workspace with the determined language.
+
+Next step:
+
+- Existing project: run `specrow_validate`.
+- New project: run `specrow_init`.
+
+## 5. Initialize a new workspace
 
 Use MCP:
 
@@ -127,15 +112,18 @@ Pass the language explicitly:
 { "language": "<language-code>" }
 ```
 
-After `specrow_init`, verify the MCP result and the current shell workspace before continuing:
+After `specrow_init`, verify:
 
-1. Read the `projectRoot` field returned by MCP and report it to the user.
-2. Check that `.specrow/config.yml` exists in the current shell workspace.
-3. If `projectRoot` does not match the current shell workspace, or `.specrow/config.yml` is missing, stop immediately and report that MCP is pointed at the wrong workspace or failed to create files. Do not use CLI fallback.
+1. The MCP result includes `projectRoot`.
+2. The MCP result includes `absoluteConfigPath` and `absoluteProjectPath`.
+3. `.specrow/config.yml` exists in the current shell workspace.
+4. `.specrow/project.md` exists in the current shell workspace.
+
+If any check fails, stop immediately and report whether MCP pointed at the wrong workspace or failed to create files.
+
+Next step: run `specrow_validate`.
 
 ## 6. Validate and report
-
-After installation or initialization, validate the workspace and check integration status.
 
 Use MCP:
 
@@ -144,14 +132,17 @@ specrow_validate
 specrow_integration_status
 ```
 
-If either MCP validation or MCP integration status fails, stop and report the MCP error. Do not use CLI fallback.
+If either MCP validation or MCP integration status fails, stop and report the MCP error.
 
 Tell the user:
 
+- which `projectRoot` MCP used;
 - which language is configured;
 - whether the workspace was initialized or already existed;
-- which integrations were installed or refreshed;
-- whether their IDE or agent needs to be restarted before MCP configuration or new commands, prompts, skills, rules, or workflows appear;
-- whether validation passed.
+- whether validation passed;
+- which integration files MCP reported;
+- the next logical SpecRow step.
+
+For a successfully installed workspace, the next logical step is usually `/specrow:proposal` to describe the first intended change.
 
 Do not implement project code as part of this install flow unless the user separately asks for a SpecRow change workflow such as `/specrow:proposal` or `/specrow:build`.

@@ -6,30 +6,30 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z, ZodError, type ZodTypeAny } from "zod";
 
-import { loadSpecRowConfig } from "./config.js";
-import { getIntegrationStatus } from "./integrations.js";
-import { initSpecRowProject } from "./init.js";
 import {
   acceptChange,
   archiveChange,
   createChange,
+  getIntegrationStatus,
+  getSpecRowMessage,
+  getSpecRowTemplate,
+  initSpecRowProject,
   listActiveChanges,
+  loadSpecRowConfig,
   markChangeBuilt,
   markChangeReviewed,
   markRevisionNeeded,
+  reviewChangeReadiness,
   readChangeStatus,
-  type LifecycleStatus,
-  type ReviewState
-} from "./lifecycle.js";
-import {
-  getSpecRowMessage,
-  getSpecRowTemplate,
   SUPPORTED_LANGUAGES,
-  type TemplateName
-} from "./templates.js";
-import { reviewChangeReadiness, validateSpecRowProject, type ValidationIssue } from "./validation.js";
+  validateSpecRowProject,
+  type LifecycleStatus,
+  type ReviewState,
+  type TemplateName,
+  type ValidationIssue
+} from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.7";
+const SPECROW_VERSION = "0.1.8";
 const SPECROW_DIR = ".specrow";
 
 const EmptySchema = z.object({}).optional();
@@ -196,7 +196,27 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         projectCreated: result.projectCreated,
         directories: result.directories.map((directory) => relative(projectRoot, directory)),
         language: result.language,
-        nextSteps: ["Use /specrow:proposal to create a change proposal."]
+        nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, use /specrow:proposal to create a change proposal."]
+      });
+    }),
+    specrow_project_status: tool(EmptySchema, async () => {
+      const configPath = path.join(projectRoot, SPECROW_DIR, "config.yml");
+      const projectPath = path.join(projectRoot, SPECROW_DIR, "project.md");
+      const initialized = (await pathExists(configPath)) && (await pathExists(projectPath));
+      const config = initialized ? await loadSpecRowConfig(projectRoot) : undefined;
+
+      return success({
+        message: initialized ? "SpecRow project is initialized." : "SpecRow project is not initialized.",
+        projectRoot,
+        initialized,
+        configPath: relative(projectRoot, configPath),
+        absoluteConfigPath: configPath,
+        projectPath: relative(projectRoot, projectPath),
+        absoluteProjectPath: projectPath,
+        ...(config === undefined ? {} : { language: config.language }),
+        nextSteps: initialized
+          ? ["Run specrow_validate to verify the workspace."]
+          : ["Run specrow_init with the requested language to initialize this workspace."]
       });
     }),
     specrow_create_proposal: tool(CreateProposalSchema, async (input) => {
@@ -225,7 +245,10 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         message: getSpecRowMessage(result.language, hasErrors ? "validate.failed" : "validate.ok"),
         language: result.language,
         issues: result.issues,
-        valid: !hasErrors
+        valid: !hasErrors,
+        nextSteps: hasErrors
+          ? ["Fix the reported SpecRow issues, then run specrow_validate again."]
+          : ["Run specrow_integration_status, then continue with /specrow:proposal for new work."]
       });
     }),
     specrow_review: tool(ChangeNameSchema, async (input) => {
@@ -362,7 +385,11 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
     specrow_integration_status: tool(EmptySchema, async () => {
       const files = await getIntegrationStatus(projectRoot);
       return success({
-        files
+        projectRoot,
+        files,
+        nextSteps: files.length === 0
+          ? ["SpecRow is initialized but no managed integration files are recorded. Continue with /specrow:proposal when ready."]
+          : ["Confirm the listed integration files are present, then continue with /specrow:proposal when ready."]
       });
     })
   };
@@ -393,6 +420,7 @@ function createToolRegistrations(handlers: Record<string, ToolHandler>): Record<
 }> {
   return {
     specrow_init: registration("Initialize SpecRow", "Create the .specrow project structure.", InitSchema, handlers.specrow_init, false, false),
+    specrow_project_status: registration("Project Status", "Report whether this workspace already has SpecRow project files.", EmptySchema, handlers.specrow_project_status, true, false),
     specrow_create_proposal: registration("Create Proposal", "Create a SpecRow change proposal.", CreateProposalSchema, handlers.specrow_create_proposal, false, false),
     specrow_validate: registration("Validate", "Validate the SpecRow workspace or a change.", ChangeNameSchema.partial(), handlers.specrow_validate, true, false),
     specrow_review: registration("Review", "Review a change and mark review completed when valid.", ChangeNameSchema, handlers.specrow_review, false, false),

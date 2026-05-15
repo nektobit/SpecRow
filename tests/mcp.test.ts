@@ -42,6 +42,29 @@ describe("SpecRow MCP runtime", () => {
     await expect(resolveSpecRowMcpProjectRoot(path.join(cwd, "missing"))).rejects.toThrow("directory does not exist");
   });
 
+  it("reports whether the workspace is already initialized", async () => {
+    const cwd = await createTempDir();
+    const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
+
+    await expect(runtime.callTool("specrow_project_status")).resolves.toMatchObject({
+      success: true,
+      projectRoot: path.resolve(cwd),
+      initialized: false,
+      absoluteConfigPath: path.join(path.resolve(cwd), ".specrow", "config.yml"),
+      nextSteps: [expect.stringContaining("specrow_init")]
+    });
+
+    await runtime.callTool("specrow_init", { language: "ru" });
+
+    await expect(runtime.callTool("specrow_project_status")).resolves.toMatchObject({
+      success: true,
+      projectRoot: path.resolve(cwd),
+      initialized: true,
+      language: "ru",
+      nextSteps: [expect.stringContaining("specrow_validate")]
+    });
+  });
+
   it("initializes a SpecRow project through specrow_init", async () => {
     const cwd = await createTempDir();
     const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
