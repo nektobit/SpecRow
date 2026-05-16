@@ -54,14 +54,14 @@ describe("SpecRow templates", () => {
 
       expect(spec).toContain("### ");
       expect(spec).toContain("#### ");
-      expect(proposal).toContain("/specrow:accept");
-      expect(tasks).toContain("/specrow:revise");
+      expect(proposal).toContain("specrow accept");
+      expect(tasks).toContain("specrow revise");
     }
   });
 
   it("renders localized messages with placeholders", () => {
     expect(getSpecRowMessage("ru", "init.ready", { path: ".specrow" })).toBe("Готово .specrow");
-    expect(getSpecRowMessage("es", "next.acceptOrRevise")).toContain("/specrow:accept");
+    expect(getSpecRowMessage("es", "next.acceptOrRevise")).toContain("specrow accept");
   });
 
   it("fails clearly when a language resource is missing", () => {

@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow es un flujo de especificaciones agent-first. Los usuarios describen intención con comandos `/specrow:*`, mientras que la CLI `specrow` sigue siendo el núcleo técnico para agentes, CI, automatización y fallback manual.
+SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la intención en lenguaje natural, por ejemplo `specrow proposal` o `specrow build`; los agentes ejecutan el workflow mediante el servidor MCP de SpecRow.
 
 ## Leer en tu idioma
 
@@ -13,7 +13,7 @@ SpecRow es un flujo de especificaciones agent-first. Los usuarios describen inte
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
-El sitio cubre el flujo MVP completo: primeros pasos, de proposal a accept, comandos de agente, CLI core, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
+El sitio cubre el flujo MVP completo: primeros pasos, de proposal a accept, herramientas MCP, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
 
 ## Inicio rápido
 
@@ -23,32 +23,31 @@ Empieza con el agent installer. Pasa explícitamente el idioma de trabajo del pr
 apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=es
 ```
 
-El agente comprueba o instala la CLI, inicializa `.specrow` con ese idioma, configura automáticamente la integración MCP predeterminada cuando está soportada, instala instrucciones fallback de agente si hacen falta, valida el workspace e informa si el IDE o agente necesita reinicio.
+El agente usa el servidor MCP de SpecRow para inspeccionar el workspace, inicializar `.specrow` con ese idioma cuando haga falta, validar el workspace e informar el siguiente paso lógico.
 
-Luego usa los comandos SpecRow:
+Luego dile al agente qué workflow de SpecRow quieres:
 
 ```txt
-/specrow:proposal Describe el cambio previsto
-/specrow:review
-/specrow:build
-/specrow:accept
+specrow proposal Describe el cambio previsto
+specrow review
+specrow build
+specrow accept
 ```
 
-La CLI sigue siendo el fallback y el núcleo de automatización:
+Los agentes deben tratar estas frases como intenciones de workflow y ejecutarlas mediante herramientas MCP.
+
+Para automatización fuera de una sesión de agente, también está disponible el binario `specrow`:
 
 ```bash
 npm i -g specrow
 specrow init --language es --tools codex,claude,cursor,windsurf,generic
-specrow integrate --detect
-specrow update
+specrow validate
 specrow integrations status
 ```
 
-Sin `--tools`, `specrow init` solo crea el workspace `.specrow`.
-
 ## Workspace
 
-`/specrow:init` crea:
+La inicialización de SpecRow crea:
 
 ```txt
 .specrow/
@@ -66,13 +65,11 @@ version: 1
 language: es
 ```
 
-Cuando hay integraciones instaladas, `config.yml` también registra las tools elegidas y los managed files para que `specrow update` pueda regenerarlos.
-
 El idioma configurado controla plantillas integradas y mensajes lifecycle/status. Los recursos de idioma ausentes son errores. SpecRow no hace fallback silencioso a inglés.
 
 ## Accept Gate
 
-Build no actualiza specs como verdad final y no archiva un cambio. Las specs y el archivo se actualizan solo después de aceptación explícita del usuario mediante `/specrow:accept`.
+Build no actualiza specs como verdad final y no archiva un cambio. Las specs y el archivo se actualizan solo después de aceptación explícita del usuario mediante el workflow `specrow accept`.
 
 ## Migration Notes
 

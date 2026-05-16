@@ -143,6 +143,6 @@ Tell the user:
 - which integration files MCP reported;
 - the next logical SpecRow step.
 
-For a successfully installed workspace, the next logical step is usually `/specrow:proposal` to describe the first intended change.
+For a successfully installed workspace, the next logical step is usually `specrow proposal` to describe the first intended change.
 
-Do not implement project code as part of this install flow unless the user separately asks for a SpecRow change workflow such as `/specrow:proposal` or `/specrow:build`.
+Do not implement project code as part of this install flow unless the user separately asks for a SpecRow change workflow such as `specrow proposal` or `specrow build`.

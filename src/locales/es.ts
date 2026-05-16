@@ -132,7 +132,7 @@ Define las comprobaciones explícitas necesarias antes de que el usuario pueda a
 
 - [ ] El comportamiento está implementado y verificado.
 - [ ] Los archivos integrados están escritos en el idioma del proyecto.
-- [ ] Las especificaciones no se actualizan como verdad final antes de /specrow:accept.
+- [ ] Las especificaciones no se actualizan como verdad final antes de specrow accept.
 
 ## Actualizaciones de especificación
 Cuando cambien requisitos, describe los cambios previstos con esta estructura.
@@ -160,7 +160,7 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
 
 ## Puerta de aceptación
 - [ ] El resultado de construcción está listo para revisión del usuario.
-- [ ] El siguiente paso es /specrow:accept o /specrow:revise.
+- [ ] El siguiente paso es specrow accept o specrow revise.
 `
   },
   messages: {
@@ -181,16 +181,16 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     "status.change": "{change}: {state}; revisión: {review}; aceptado: {accepted}.",
     "list.empty": "No hay cambios activos.",
     "list.warning": "Advertencia: {warning}",
-    "next.acceptOrRevise": "Siguiente paso: /specrow:accept o /specrow:revise.",
+    "next.acceptOrRevise": "Siguiente paso: specrow accept o specrow revise.",
     "error.missingTemplate": "Falta la plantilla de SpecRow \"{name}\" para el idioma \"{language}\".",
     "error.missingMessage": "Falta el mensaje de SpecRow \"{name}\" para el idioma \"{language}\"."
   },
   agentCommands: {
     "/specrow:init": {
-      userIntent: "Configurar SpecRow para el proyecto actual sin exigir que el usuario recuerde flags o archivos de CLI.",
+      userIntent: "Configurar SpecRow para el proyecto actual sin exigir que el usuario recuerde nombres de tools o archivos.",
       agentBehavior: [
         "Determinar el idioma de trabajo del proyecto desde el usuario o preguntarlo si es ambiguo.",
-        "Ejecutar la orden init de CLI como detalle técnico.",
+        "Llamar la tool MCP de inicialización de SpecRow como detalle técnico.",
         "Confirmar que existen .specrow/config.yml, project.md, specs/, changes/ y archive/."
       ],
       forbiddenActions: ["No crear directorios de trabajo heredados.", "No continuar si faltan recursos del idioma solicitado."],
@@ -206,7 +206,7 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
       userIntent: "Convertir la intención del usuario en una propuesta de cambio concreta y un esqueleto de tareas.",
       agentBehavior: [
         "Elegir un nombre estable para el cambio a partir de la intención del usuario.",
-        "Crear proposal.md, tasks.md y status.yml mediante CLI core.",
+        "Crear proposal.md, tasks.md y status.yml mediante herramientas MCP de SpecRow.",
         "Completar la propuesta y las tareas en el idioma configurado del proyecto.",
         "Validar el cambio y mostrar problemas bloqueantes antes de iniciar la implementación."
       ],
@@ -245,17 +245,17 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
       reviewPolicyRequiredWhen: [
         "Cambios de seguridad, privacidad o permisos.",
         "Cambios de modelo de datos, migración, persistencia u operaciones destructivas.",
-        "Cambios de API pública, contrato CLI, automatización o CI.",
+        "Cambios de API pública, contrato de comandos, automatización o CI.",
         "Cambios de arquitectura, workflow entre módulos, localización o ciclo de vida visible para usuarios."
       ]
     },
     "/specrow:build": {
       userIntent: "Implementar y verificar un cambio aprobado sin convertirlo en verdad final.",
       agentBehavior: [
-        "Usar CLI context para cargar propuesta, tareas, estado y advertencias de cambios activos.",
+        "Usar el contexto MCP de SpecRow para cargar propuesta, tareas, estado y advertencias de cambios activos.",
         "Implementar solo el trabajo descrito por el cambio.",
         "Ejecutar verificación relevante y actualizar tareas con evidencia cuando corresponda.",
-        "Terminar dejando el cambio en espera de /specrow:accept o /specrow:revise."
+        "Terminar dejando el cambio en espera de specrow accept o specrow revise."
       ],
       forbiddenActions: ["No ejecutar aceptación.", "No archivar el cambio.", "No actualizar especificaciones como verdad final."],
       languageRules: [
@@ -293,7 +293,7 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
       userIntent: "Registrar la aceptación explícita del usuario y permitir la integración final de especificaciones y archivo.",
       agentBehavior: [
         "Continuar solo cuando el usuario acepte claramente el trabajo construido o la revisión completada.",
-        "Registrar la aceptación explícita mediante CLI core.",
+        "Registrar la aceptación explícita mediante herramientas MCP de SpecRow.",
         "Usar esta ruta como la única autorización de usuario para que las especificaciones sean verdad final y para archivar."
       ],
       forbiddenActions: [
@@ -329,18 +329,18 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     invocationTemplate: "Usa este workflow cuando el usuario escriba `{command}` o pida la misma intención.",
     agentInstructions: {
       title: "Instrucciones del agente SpecRow",
-      overview: "SpecRow es un workflow de especificaciones agent-first. Trata los mensajes `/specrow:*` como intenciones de workflow. Usa primero las herramientas MCP de SpecRow cuando esten disponibles y usa la CLI `specrow` como fallback de implementacion.",
+      overview: "SpecRow es un workflow de especificaciones agent-first. Trata mensajes como `specrow proposal`, `specrow build` o pedidos directos de SpecRow como intenciones de workflow. Ejecutalos mediante herramientas MCP de SpecRow.",
       languageRule: "Antes de crear o revisar archivos integrados de SpecRow, lee `.specrow/config.yml` y usa su `language` configurado. No hagas fallback silencioso al inglés.",
       toolCore: "Nucleo de herramientas:",
       forbidden: "Prohibido:"
     },
-    toolCoreFallback: "Usa primero las herramientas MCP de SpecRow cuando esten disponibles. Si MCP no esta disponible, usa estos comandos CLI de fallback:",
+    toolCoreFallback: "Usa estas herramientas MCP de SpecRow:",
     skill: {
-      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o comandos /specrow:*.",
+      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o pida specrow proposal, review, build, revise o accept.",
       whenToUse: "Cuándo usar",
       instructions: "Instrucciones",
       triggers: [
-        "El usuario invoca un comando `/specrow:*`.",
+        "El usuario pide un workflow de SpecRow como `specrow proposal` o `specrow build`.",
         "El usuario pide inicializar SpecRow, crear una propuesta, revisar, construir, revisar cambios o aceptar un cambio SpecRow."
       ]
     }

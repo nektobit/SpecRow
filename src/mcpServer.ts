@@ -196,7 +196,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         projectCreated: result.projectCreated,
         directories: result.directories.map((directory) => relative(projectRoot, directory)),
         language: result.language,
-        nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, use /specrow:proposal to create a change proposal."]
+        nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, ask for `specrow proposal` to create a change proposal."]
       });
     }),
     specrow_project_status: tool(EmptySchema, async () => {
@@ -231,7 +231,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         proposalPath: relative(projectRoot, result.proposalPath),
         tasksPath: relative(projectRoot, result.tasksPath),
         statusPath: relative(projectRoot, result.statusPath),
-        nextSteps: ["Use /specrow:review after the proposal and tasks are ready."]
+        nextSteps: ["Ask for `specrow review` after the proposal and tasks are ready."]
       });
     }),
     specrow_validate: tool(ChangeNameSchema.partial(), async (input) => {
@@ -248,7 +248,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         valid: !hasErrors,
         nextSteps: hasErrors
           ? ["Fix the reported SpecRow issues, then run specrow_validate again."]
-          : ["Run specrow_integration_status, then continue with /specrow:proposal for new work."]
+          : ["Run specrow_integration_status, then continue with `specrow proposal` for new work."]
       });
     }),
     specrow_review: tool(ChangeNameSchema, async (input) => {
@@ -257,13 +257,13 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       const hasErrors = hasBlockingErrors(result.issues);
 
       if (hasErrors) {
-        return failure("VALIDATION_FAILED", getSpecRowMessage(result.language, "validate.failed"), result.issues, "Fix blocking errors, then run /specrow:review again.");
+        return failure("VALIDATION_FAILED", getSpecRowMessage(result.language, "validate.failed"), result.issues, "Fix blocking errors, then ask for `specrow review` again.");
       }
 
       const status = await markChangeReviewed(projectRoot, input.changeName);
       return lifecycleSuccess(result.language, result.issues.length > 0 ? "review.warning" : "lifecycle.reviewed", status, {
         issues: result.issues,
-        nextSteps: ["Use /specrow:build when implementation is ready to start."]
+        nextSteps: ["Ask for `specrow build` when implementation is ready to start."]
       });
     }),
     specrow_status: tool(ChangeNameSchema.partial(), async (input) => {
@@ -311,7 +311,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       const status = await readChangeStatus(projectRoot, input.changeName);
       return lifecycleSuccess(result.language, "build.started", status, {
         issues: result.issues,
-        nextSteps: ["Implement the requested work, then use /specrow:build to finish."]
+        nextSteps: ["Implement the requested work, then finish the MCP build workflow."]
       });
     }),
     specrow_build_finish: tool(ChangeNameSchema, async (input) => {
@@ -319,7 +319,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       const language = await projectLanguage(projectRoot);
       const status = await markChangeBuilt(projectRoot, input.changeName);
       return lifecycleSuccess(language, "lifecycle.built", status, {
-        nextSteps: ["Use /specrow:accept only after explicit user acceptance, or /specrow:revise if changes are requested."]
+        nextSteps: ["Ask for `specrow accept` only after explicit user acceptance, or `specrow revise` if changes are requested."]
       });
     }),
     specrow_revise: tool(ChangeNameSchema, async (input) => {
@@ -327,7 +327,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       const language = await projectLanguage(projectRoot);
       const status = await markRevisionNeeded(projectRoot, input.changeName);
       return lifecycleSuccess(language, "lifecycle.revisionNeeded", status, {
-        nextSteps: ["Complete follow-up work before requesting /specrow:accept again."]
+        nextSteps: ["Complete follow-up work before requesting `specrow accept` again."]
       });
     }),
     specrow_accept: tool(AcceptSchema, async (input) => {
@@ -338,7 +338,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         followUpWorkCompleted: input.followUpWorkCompleted
       });
       return lifecycleSuccess(language, "lifecycle.accepted", status, {
-        nextSteps: ["Continue the user-facing /specrow:accept flow with specrow_archive to archive the accepted change."]
+        nextSteps: ["Continue the MCP accept workflow with specrow_archive to archive the accepted change."]
       });
     }),
     specrow_archive: tool(ChangeNameSchema, async (input) => {
@@ -388,8 +388,8 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         projectRoot,
         files,
         nextSteps: files.length === 0
-          ? ["SpecRow is initialized but no managed integration files are recorded. Continue with /specrow:proposal when ready."]
-          : ["Confirm the listed integration files are present, then continue with /specrow:proposal when ready."]
+          ? ["SpecRow is initialized but no managed integration files are recorded. Continue with `specrow proposal` when ready."]
+          : ["Confirm the listed integration files are present, then continue with `specrow proposal` when ready."]
       });
     })
   };
@@ -622,11 +622,11 @@ function errorToFailure(error: unknown): McpFailure {
   }
 
   if (message.includes("requires explicit user acceptance")) {
-    return failure("INVALID_STATE", message, undefined, "Ask the user for explicit /specrow:accept before calling specrow_accept.");
+    return failure("INVALID_STATE", message, undefined, "Ask the user for explicit `specrow accept` before calling specrow_accept.");
   }
 
   if (message.includes("must be built before acceptance")) {
-    return failure("INVALID_STATE", message, undefined, "Use /specrow:revise for requested changes, or complete follow-up work before /specrow:accept.");
+    return failure("INVALID_STATE", message, undefined, "Use `specrow revise` for requested changes, or complete follow-up work before `specrow accept`.");
   }
 
   if (message.includes("must be accepted") || message.includes("already exists")) {

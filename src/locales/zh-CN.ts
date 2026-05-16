@@ -132,7 +132,7 @@ export const zhCN = {
 
 - [ ] 行为已实现并验证。
 - [ ] 内置文件使用项目工作语言编写。
-- [ ] 在 /specrow:accept 之前，规格不会作为最终事实被更新。
+- [ ] 在 specrow accept 之前，规格不会作为最终事实被更新。
 
 ## 规格更新
 当需求发生变化时，使用此结构描述预期规格更改。
@@ -160,7 +160,7 @@ export const zhCN = {
 
 ## 验收门禁
 - [ ] 构建结果已准备好供用户审查。
-- [ ] 下一步是 /specrow:accept 或 /specrow:revise。
+- [ ] 下一步是 specrow accept 或 specrow revise。
 `
   },
   messages: {
@@ -181,16 +181,16 @@ export const zhCN = {
     "status.change": "{change}: {state}; 评审: {review}; 已验收: {accepted}。",
     "list.empty": "没有活跃变更。",
     "list.warning": "警告：{warning}",
-    "next.acceptOrRevise": "下一步：/specrow:accept 或 /specrow:revise。",
+    "next.acceptOrRevise": "下一步：specrow accept 或 specrow revise。",
     "error.missingTemplate": "语言 \"{language}\" 缺少 SpecRow 模板 \"{name}\"。",
     "error.missingMessage": "语言 \"{language}\" 缺少 SpecRow 消息 \"{name}\"。"
   },
   agentCommands: {
     "/specrow:init": {
-      userIntent: "为当前项目设置 SpecRow，用户无需记住 CLI 参数或文件。",
+      userIntent: "为当前项目设置 SpecRow，用户无需记住工具名称或文件。",
       agentBehavior: [
         "从用户意图确定项目工作语言，存在歧义时询问。",
-        "将 CLI init 命令作为实现细节执行。",
+        "将 SpecRow MCP 初始化工具作为实现细节调用。",
         "确认 .specrow/config.yml、project.md、specs/、changes/ 和 archive/ 已存在。"
       ],
       forbiddenActions: ["不要创建旧版工作目录。", "请求语言资源缺失时不要继续。"],
@@ -206,7 +206,7 @@ export const zhCN = {
       userIntent: "将用户意图转为具体变更提案和任务骨架。",
       agentBehavior: [
         "根据用户意图选择稳定的变更名称。",
-        "通过 CLI core 创建 proposal.md、tasks.md 和 status.yml。",
+        "通过 SpecRow MCP 工具创建 proposal.md、tasks.md 和 status.yml。",
         "使用配置的项目语言填写提案和任务内容。",
         "验证变更，并在开始实现前暴露阻塞问题。"
       ],
@@ -241,17 +241,17 @@ export const zhCN = {
       reviewPolicyRequiredWhen: [
         "安全、隐私或权限行为变更。",
         "数据模型、迁移、持久化或破坏性操作变更。",
-        "公共 API、CLI 契约、自动化或 CI 行为变更。",
+        "公共 API、命令契约、自动化或 CI 行为变更。",
         "架构、跨模块 workflow、本地化或用户可见生命周期变更。"
       ]
     },
     "/specrow:build": {
       userIntent: "实现并验证已批准的变更，但不将其变成最终事实。",
       agentBehavior: [
-        "使用 CLI context 加载提案、任务、状态和活跃变更警告。",
+        "使用 SpecRow MCP context 加载提案、任务、状态和活跃变更警告。",
         "只实现变更描述的工作。",
         "运行相关验证，并在适当时用实现证据更新变更任务。",
-        "结束时让变更等待 /specrow:accept 或 /specrow:revise。"
+        "结束时让变更等待 specrow accept 或 specrow revise。"
       ],
       forbiddenActions: ["不要执行验收。", "不要归档变更。", "不要将规格更新为最终事实。"],
       languageRules: [
@@ -282,7 +282,7 @@ export const zhCN = {
       userIntent: "记录用户明确验收，并允许最终规格集成和归档。",
       agentBehavior: [
         "仅当用户明确接受已构建或已完成修订的工作时继续。",
-        "通过 CLI core 记录明确验收。",
+        "通过 SpecRow MCP 工具记录明确验收。",
         "将此路径作为规格成为最终事实和归档的唯一用户授权。"
       ],
       forbiddenActions: ["不要从沉默、测试成功或实现完成推断验收。", "不要接受尚未构建或修订未完成的变更。"],
@@ -311,18 +311,18 @@ export const zhCN = {
     invocationTemplate: "当用户写入 `{command}` 或表达相同意图时，使用此 workflow。",
     agentInstructions: {
       title: "SpecRow 代理说明",
-      overview: "SpecRow 是 agent-first 的规格 workflow。将用户的 `/specrow:*` 消息视为 workflow 意图。可用时优先使用 SpecRow MCP 工具，并把 `specrow` CLI 作为 fallback 实现细节使用。",
+      overview: "SpecRow 是 agent-first 的规格 workflow。将 `specrow proposal`、`specrow build` 或直接的 SpecRow 请求视为 workflow 意图，并通过 SpecRow MCP 工具执行。",
       languageRule: "创建或修改内置 SpecRow 文件前，读取 `.specrow/config.yml` 并使用其中配置的 `language`。不要静默 fallback 到英文。",
       toolCore: "工具核心：",
       forbidden: "禁止："
     },
-    toolCoreFallback: "可用时优先使用 SpecRow MCP 工具。如果 MCP 不可用，使用以下 CLI fallback 命令：",
+    toolCoreFallback: "使用这些 SpecRow MCP 工具：",
     skill: {
-      description: "当用户提到 SpecRow 或 /specrow:* 命令时，使用 SpecRow workflow。",
+      description: "当用户提到 SpecRow，或请求 specrow proposal、review、build、revise、accept 时，使用 SpecRow workflow。",
       whenToUse: "何时使用",
       instructions: "说明",
       triggers: [
-        "用户调用 `/specrow:*` 命令。",
+        "用户请求 SpecRow workflow，例如 `specrow proposal` 或 `specrow build`。",
         "用户要求初始化 SpecRow、创建提案、review、build、revise 或 accept 一个 SpecRow 变更。"
       ]
     }

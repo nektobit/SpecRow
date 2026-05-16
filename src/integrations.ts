@@ -543,8 +543,6 @@ ${command.userIntent}
 
 ## ${sections.toolCore}
 ${command.toolCore.map((line) => `- \`${line}\``).join("\n")}
-${integrationText.toolCoreFallback}
-${command.cliCore.map((line) => `- \`${line}\``).join("\n")}
 
 ## ${sections.agentBehavior}
 ${command.agentBehavior.map((line) => `- ${line}`).join("\n")}
@@ -576,8 +574,6 @@ ${command.userIntent}
 
 ${integrationText.agentInstructions.toolCore}
 ${command.toolCore.map((line) => `- \`${line}\``).join("\n")}
-${integrationText.toolCoreFallback}
-${command.cliCore.map((line) => `- \`${line}\``).join("\n")}
 
 ${integrationText.agentInstructions.forbidden}
 ${command.forbiddenActions.map((line) => `- ${line}`).join("\n")}`

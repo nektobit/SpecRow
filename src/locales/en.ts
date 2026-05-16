@@ -132,7 +132,7 @@ Define the explicit checks required before the user can accept this change.
 
 - [ ] Behavior is implemented and verified.
 - [ ] Built-in files are written in the project language.
-- [ ] Specs are not updated as final truth before /specrow:accept.
+- [ ] Specs are not updated as final truth before specrow accept.
 
 ## Spec Updates
 Describe the intended spec changes using this structure when requirements change.
@@ -160,7 +160,7 @@ Describe the intended spec changes using this structure when requirements change
 
 ## Acceptance Gate
 - [ ] Build output is ready for user review.
-- [ ] The next step is /specrow:accept or /specrow:revise.
+- [ ] The next step is specrow accept or specrow revise.
 `
   },
   messages: {
@@ -181,16 +181,16 @@ Describe the intended spec changes using this structure when requirements change
     "status.change": "{change}: {state}; review: {review}; accepted: {accepted}.",
     "list.empty": "No active changes.",
     "list.warning": "Warning: {warning}",
-    "next.acceptOrRevise": "Next step: /specrow:accept or /specrow:revise.",
+    "next.acceptOrRevise": "Next step: specrow accept or specrow revise.",
     "error.missingTemplate": "Missing SpecRow template \"{name}\" for language \"{language}\".",
     "error.missingMessage": "Missing SpecRow message \"{name}\" for language \"{language}\"."
   },
   agentCommands: {
     "/specrow:init": {
-      userIntent: "Set up SpecRow for the current project without requiring the user to know CLI flags or files.",
+      userIntent: "Set up SpecRow for the current project without requiring the user to know tool names or files.",
       agentBehavior: [
         "Determine the intended project language from the user or ask for it when it is ambiguous.",
-        "Run the CLI init command as an implementation detail.",
+        "Call the SpecRow MCP init tool as an implementation detail.",
         "Confirm that .specrow/config.yml, project.md, specs/, changes/, and archive/ exist."
       ],
       forbiddenActions: [
@@ -209,7 +209,7 @@ Describe the intended spec changes using this structure when requirements change
       userIntent: "Turn the user's intent into a concrete change proposal and task skeleton.",
       agentBehavior: [
         "Choose a stable change name from the user's intent.",
-        "Create proposal.md, tasks.md, and status.yml through the CLI core.",
+        "Create proposal.md, tasks.md, and status.yml through SpecRow MCP tools.",
         "Fill proposal and task content in the configured project language.",
         "Validate the change and surface any blocking issues before implementation starts."
       ],
@@ -254,17 +254,17 @@ Describe the intended spec changes using this structure when requirements change
       reviewPolicyRequiredWhen: [
         "Security, privacy, or permission behavior changes.",
         "Data model, migration, persistence, or destructive operation changes.",
-        "Public API, CLI contract, automation, or CI behavior changes.",
+        "Public API, command contract, automation, or CI behavior changes.",
         "Architecture, cross-module workflow, localization, or user-visible lifecycle changes."
       ]
     },
     "/specrow:build": {
       userIntent: "Implement and verify an approved change without turning it into final truth.",
       agentBehavior: [
-        "Use CLI context to load the proposal, tasks, status, and active-change warnings.",
+        "Use SpecRow MCP context to load the proposal, tasks, status, and active-change warnings.",
         "Implement only the work described by the change.",
         "Run relevant verification and update the change tasks with implementation evidence when appropriate.",
-        "Finish by leaving the change waiting for /specrow:accept or /specrow:revise."
+        "Finish by leaving the change waiting for specrow accept or specrow revise."
       ],
       forbiddenActions: [
         "Do not run acceptance.",
@@ -310,7 +310,7 @@ Describe the intended spec changes using this structure when requirements change
       userIntent: "Record explicit user acceptance and allow final spec integration and archive.",
       agentBehavior: [
         "Proceed only when the user clearly accepts the built or completed revision work.",
-        "Record explicit acceptance through the CLI core.",
+        "Record explicit acceptance through SpecRow MCP tools.",
         "Use this path as the only user-facing authorization for specs becoming final truth and for archive."
       ],
       forbiddenActions: [
@@ -346,18 +346,18 @@ Describe the intended spec changes using this structure when requirements change
     invocationTemplate: "Use this workflow when the user writes `{command}` or asks for the same intent.",
     agentInstructions: {
       title: "SpecRow Agent Instructions",
-      overview: "SpecRow is an agent-first specification workflow. Treat `/specrow:*` user messages as workflow intentions. Use SpecRow MCP tools first when available, and use the `specrow` CLI as the fallback implementation detail.",
+      overview: "SpecRow is an agent-first specification workflow. Treat user messages such as `specrow proposal`, `specrow build`, or direct SpecRow requests as workflow intentions. Execute them through SpecRow MCP tools.",
       languageRule: "Before creating or revising built-in SpecRow files, read `.specrow/config.yml` and use its configured `language`. Do not silently fall back to English.",
       toolCore: "Tool core:",
       forbidden: "Forbidden:"
     },
-    toolCoreFallback: "Use SpecRow MCP tools first when they are available. If MCP is unavailable, use these CLI fallback commands:",
+    toolCoreFallback: "Use these SpecRow MCP tools:",
     skill: {
-      description: "Use SpecRow workflows when the user mentions SpecRow or /specrow:* commands.",
+      description: "Use SpecRow workflows when the user mentions SpecRow or asks for specrow proposal, review, build, revise, or accept.",
       whenToUse: "When to Use",
       instructions: "Instructions",
       triggers: [
-        "The user invokes a `/specrow:*` command.",
+        "The user asks for a SpecRow workflow such as `specrow proposal` or `specrow build`.",
         "The user asks to initialize SpecRow, create a proposal, review, build, revise, or accept a SpecRow change."
       ]
     }

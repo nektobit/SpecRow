@@ -131,7 +131,7 @@ describe("SpecRow MCP runtime", () => {
     await expect(runtime.callTool("specrow_accept", { changeName: "accept-gate", explicitUserAcceptance: false })).resolves.toMatchObject({
       success: false,
       code: "INVALID_STATE",
-      suggestion: expect.stringContaining("/specrow:accept")
+      suggestion: expect.stringContaining("specrow accept")
     });
     await expect(runtime.callTool("specrow_accept", { changeName: "accept-gate", explicitUserAcceptance: true })).resolves.toMatchObject({
       success: true,
