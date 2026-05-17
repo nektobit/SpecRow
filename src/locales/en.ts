@@ -205,6 +205,31 @@ Describe the intended spec changes using this structure when requirements change
       ],
       stopConditions: ["Missing template or message resources for the requested language."]
     },
+    "/specrow:explore": {
+      userIntent: "Explore an idea, problem, or possible change before committing it to a proposal.",
+      agentBehavior: [
+        "Inspect project status and context before committing to a change.",
+        "Use read-only SpecRow tools and codebase context to clarify goals, options, risks, affected areas, and open questions.",
+        "Ask focused questions when the intended change, scope, or acceptance expectations are ambiguous.",
+        "End with a concise exploration summary and recommend /specrow:proposal when the intent is ready."
+      ],
+      forbiddenActions: [
+        "Do not create proposal.md, tasks.md, status.yml, or a change directory during exploration.",
+        "Do not implement code during exploration.",
+        "Do not accept, archive, or update specs as final truth."
+      ],
+      languageRules: [
+        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
+        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
+        "Stop with a clear missing-resource error when a required template or message is unavailable.",
+        "Do not silently fall back to English."
+      ],
+      stopConditions: [
+        "The project is not initialized and exploration requires project-specific context.",
+        "The requested topic is too broad to produce actionable questions or options.",
+        "The configured language has missing templates or lifecycle messages."
+      ]
+    },
     "/specrow:proposal": {
       userIntent: "Turn the user's intent into a concrete change proposal and task skeleton.",
       agentBehavior: [
@@ -346,19 +371,19 @@ Describe the intended spec changes using this structure when requirements change
     invocationTemplate: "Use this workflow when the user writes `{command}` or asks for the same intent.",
     agentInstructions: {
       title: "SpecRow Agent Instructions",
-      overview: "SpecRow is an agent-first specification workflow. Treat user messages such as `specrow proposal`, `specrow build`, or direct SpecRow requests as workflow intentions. Execute them through SpecRow MCP tools.",
+      overview: "SpecRow is an agent-first specification workflow. Treat user messages such as `specrow explore`, `specrow proposal`, `specrow build`, or direct SpecRow requests as workflow intentions. Execute them through SpecRow MCP tools.",
       languageRule: "Before creating or revising built-in SpecRow files, read `.specrow/config.yml` and use its configured `language`. Do not silently fall back to English.",
       toolCore: "Tool core:",
       forbidden: "Forbidden:"
     },
     toolCoreFallback: "Use these SpecRow MCP tools:",
     skill: {
-      description: "Use SpecRow workflows when the user mentions SpecRow or asks for specrow proposal, review, build, revise, or accept.",
+      description: "Use SpecRow workflows when the user mentions SpecRow or asks for specrow explore, proposal, review, build, revise, or accept.",
       whenToUse: "When to Use",
       instructions: "Instructions",
       triggers: [
-        "The user asks for a SpecRow workflow such as `specrow proposal` or `specrow build`.",
-        "The user asks to initialize SpecRow, create a proposal, review, build, revise, or accept a SpecRow change."
+        "The user asks for a SpecRow workflow such as `specrow explore`, `specrow proposal`, or `specrow build`.",
+        "The user asks to initialize SpecRow, explore an idea, create a proposal, review, build, revise, or accept a SpecRow change."
       ]
     }
   }

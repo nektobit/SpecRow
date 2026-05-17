@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la intención en lenguaje natural, por ejemplo `specrow proposal` o `specrow build`; los agentes ejecutan el workflow mediante el servidor MCP de SpecRow.
+SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la intención en lenguaje natural, por ejemplo `specrow explore`, `specrow proposal` o `specrow build`; los agentes ejecutan el workflow mediante el servidor MCP de SpecRow.
 
 ## Leer en tu idioma
 
@@ -13,7 +13,7 @@ SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la i
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
-El sitio cubre el flujo MVP completo: primeros pasos, de proposal a accept, herramientas MCP, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
+El sitio cubre el flujo MVP completo: primeros pasos, explore, de proposal a accept, herramientas MCP, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
 
 ## Inicio rápido
 
@@ -28,6 +28,7 @@ El agente usa el servidor MCP de SpecRow para inspeccionar el workspace, inicial
 Luego dile al agente qué workflow de SpecRow quieres:
 
 ```txt
+specrow explore Discutir la idea antes de crear un cambio
 specrow proposal Describe el cambio previsto
 specrow review
 specrow build

@@ -30,6 +30,22 @@ describe("SpecRow agent commands", () => {
     expect(proposal.cliCore).toEqual(["specrow proposal <change-name>", "specrow validate <change-name>", "specrow context <change-name>"]);
   });
 
+  it("keeps explore read-only and pre-proposal", () => {
+    const explore = getAgentCommandSpec("/specrow:explore", "en");
+
+    expect(explore.phase).toBe("exploration");
+    expect(explore.toolCore).toEqual(["specrow_project_status", "specrow_context", "specrow_validate", "specrow_template_context"]);
+    expect(explore.allowsFinalSpecIntegration).toBe(false);
+    expect(explore.allowsArchive).toBe(false);
+    expect(explore.forbiddenActions).toEqual(
+      expect.arrayContaining([
+        "Do not create proposal.md, tasks.md, status.yml, or a change directory during exploration.",
+        "Do not implement code during exploration."
+      ])
+    );
+    expect(explore.nextCommands).toEqual(["/specrow:proposal", "/specrow:init"]);
+  });
+
   it("requires configured language resources without falling back to English", () => {
     for (const language of SUPPORTED_LANGUAGES) {
       expect(() => assertAgentCommandLanguageResources(language)).not.toThrow();

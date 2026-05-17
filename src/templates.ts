@@ -7,6 +7,7 @@ export type TemplateName = "project" | "spec" | "proposal" | "tasks";
 
 export type AgentCommandName =
   | "/specrow:init"
+  | "/specrow:explore"
   | "/specrow:proposal"
   | "/specrow:review"
   | "/specrow:build"
@@ -108,6 +109,7 @@ export const REQUIRED_MESSAGES: readonly MessageName[] = [
 
 export const REQUIRED_AGENT_COMMANDS: readonly AgentCommandName[] = [
   "/specrow:init",
+  "/specrow:explore",
   "/specrow:proposal",
   "/specrow:review",
   "/specrow:build",

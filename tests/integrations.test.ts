@@ -70,6 +70,9 @@ describe("SpecRow integrations", () => {
     await expect(readFile(path.join(homeDir, ".codex", "prompts", "specrow-init.md"), "utf8")).resolves.toContain(
       "/specrow:init"
     );
+    await expect(readFile(path.join(homeDir, ".codex", "prompts", "specrow-explore.md"), "utf8")).resolves.toContain(
+      "/specrow:explore"
+    );
     await expect(readFile(path.join(homeDir, ".codex", "skills", "specrow", "SKILL.md"), "utf8")).resolves.toContain(
       "SpecRow Agent Instructions"
     );

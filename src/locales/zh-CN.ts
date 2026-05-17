@@ -202,6 +202,31 @@ export const zhCN = {
       ],
       stopConditions: ["请求语言缺少模板或消息资源。"]
     },
+    "/specrow:explore": {
+      userIntent: "在提交为提案之前，探索想法、问题或可能的变更。",
+      agentBehavior: [
+        "在确定变更之前检查项目状态和上下文。",
+        "使用只读 SpecRow 工具和代码库上下文，澄清目标、选项、风险、受影响区域和开放问题。",
+        "当预期变更、范围或验收期望不明确时，提出聚焦问题。",
+        "最后给出简短探索摘要，并在意图成熟时建议 /specrow:proposal。"
+      ],
+      forbiddenActions: [
+        "探索期间不要创建 proposal.md、tasks.md、status.yml 或变更目录。",
+        "探索期间不要实现代码。",
+        "不要接受、归档或将规格更新为最终事实。"
+      ],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: [
+        "项目未初始化，且探索需要项目特定上下文。",
+        "请求主题过宽，无法产出可执行的问题或选项。",
+        "配置语言缺少模板或生命周期消息。"
+      ]
+    },
     "/specrow:proposal": {
       userIntent: "将用户意图转为具体变更提案和任务骨架。",
       agentBehavior: [
@@ -311,19 +336,19 @@ export const zhCN = {
     invocationTemplate: "当用户写入 `{command}` 或表达相同意图时，使用此 workflow。",
     agentInstructions: {
       title: "SpecRow 代理说明",
-      overview: "SpecRow 是 agent-first 的规格 workflow。将 `specrow proposal`、`specrow build` 或直接的 SpecRow 请求视为 workflow 意图，并通过 SpecRow MCP 工具执行。",
+      overview: "SpecRow 是 agent-first 的规格 workflow。将 `specrow explore`、`specrow proposal`、`specrow build` 或直接的 SpecRow 请求视为 workflow 意图，并通过 SpecRow MCP 工具执行。",
       languageRule: "创建或修改内置 SpecRow 文件前，读取 `.specrow/config.yml` 并使用其中配置的 `language`。不要静默 fallback 到英文。",
       toolCore: "工具核心：",
       forbidden: "禁止："
     },
     toolCoreFallback: "使用这些 SpecRow MCP 工具：",
     skill: {
-      description: "当用户提到 SpecRow，或请求 specrow proposal、review、build、revise、accept 时，使用 SpecRow workflow。",
+      description: "当用户提到 SpecRow，或请求 specrow explore、proposal、review、build、revise、accept 时，使用 SpecRow workflow。",
       whenToUse: "何时使用",
       instructions: "说明",
       triggers: [
-        "用户请求 SpecRow workflow，例如 `specrow proposal` 或 `specrow build`。",
-        "用户要求初始化 SpecRow、创建提案、review、build、revise 或 accept 一个 SpecRow 变更。"
+        "用户请求 SpecRow workflow，例如 `specrow explore`、`specrow proposal` 或 `specrow build`。",
+        "用户要求初始化 SpecRow、探索想法、创建提案、review、build、revise 或 accept 一个 SpecRow 变更。"
       ]
     }
   }

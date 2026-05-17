@@ -122,6 +122,24 @@ describe("SpecRow MCP runtime", () => {
     });
   });
 
+  it("includes explore in the workflow guide without adding a mutating tool", async () => {
+    const cwd = await createTempProject();
+    const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
+
+    await expect(runtime.callTool("specrow_workflow_guide")).resolves.toMatchObject({
+      success: true,
+      workflow: ["explore", "proposal", "review", "build", "revise", "accept", "archive"],
+      tools: {
+        explore: expect.stringContaining("specrow_context"),
+        proposal: "specrow_create_proposal"
+      }
+    });
+    await expect(runtime.callTool("specrow_explore")).resolves.toMatchObject({
+      success: false,
+      code: "NOT_FOUND"
+    });
+  });
+
   it("enforces the explicit accept gate and revision follow-up gate", async () => {
     const cwd = await createTempProject();
     await createChange({ cwd, changeName: "accept-gate" });

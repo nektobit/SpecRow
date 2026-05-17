@@ -9,6 +9,7 @@ import {
 
 export const AGENT_COMMAND_NAMES = [
   "/specrow:init",
+  "/specrow:explore",
   "/specrow:proposal",
   "/specrow:review",
   "/specrow:build",
@@ -18,7 +19,7 @@ export const AGENT_COMMAND_NAMES = [
 
 export type AgentCommandName = (typeof AGENT_COMMAND_NAMES)[number];
 
-export type AgentCommandPhase = "setup" | "proposal" | "review" | "implementation" | "revision" | "acceptance";
+export type AgentCommandPhase = "setup" | "exploration" | "proposal" | "review" | "implementation" | "revision" | "acceptance";
 
 export interface ReviewPolicy {
   default: "recommended";
@@ -68,6 +69,34 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     languageRules: AGENT_LANGUAGE_RULES,
     stopConditions: ["Missing template or message resources for the requested language."],
     nextCommands: ["/specrow:proposal"],
+    allowsFinalSpecIntegration: false,
+    allowsArchive: false,
+    requiresExplicitUserAcceptance: false
+  },
+  {
+    name: "/specrow:explore",
+    phase: "exploration",
+    userIntent: "Explore an idea, problem, or possible change before committing it to a proposal.",
+    toolCore: ["specrow_project_status", "specrow_context", "specrow_validate", "specrow_template_context"],
+    cliCore: ["specrow status", "specrow context", "specrow validate"],
+    agentBehavior: [
+      "Inspect project status and context before committing to a change.",
+      "Use read-only SpecRow tools and codebase context to clarify goals, options, risks, affected areas, and open questions.",
+      "Ask focused questions when the intended change, scope, or acceptance expectations are ambiguous.",
+      "End with a concise exploration summary and recommend /specrow:proposal when the intent is ready."
+    ],
+    forbiddenActions: [
+      "Do not create proposal.md, tasks.md, status.yml, or a change directory during exploration.",
+      "Do not implement code during exploration.",
+      "Do not accept, archive, or update specs as final truth."
+    ],
+    languageRules: AGENT_LANGUAGE_RULES,
+    stopConditions: [
+      "The project is not initialized and exploration requires project-specific context.",
+      "The requested topic is too broad to produce actionable questions or options.",
+      "The configured language has missing templates or lifecycle messages."
+    ],
+    nextCommands: ["/specrow:proposal", "/specrow:init"],
     allowsFinalSpecIntegration: false,
     allowsArchive: false,
     requiresExplicitUserAcceptance: false

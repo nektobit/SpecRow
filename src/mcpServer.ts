@@ -196,7 +196,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         projectCreated: result.projectCreated,
         directories: result.directories.map((directory) => relative(projectRoot, directory)),
         language: result.language,
-        nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, ask for `specrow proposal` to create a change proposal."]
+        nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, ask for `specrow explore` to clarify an idea or `specrow proposal` to create a change proposal."]
       });
     }),
     specrow_project_status: tool(EmptySchema, async () => {
@@ -248,7 +248,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         valid: !hasErrors,
         nextSteps: hasErrors
           ? ["Fix the reported SpecRow issues, then run specrow_validate again."]
-          : ["Run specrow_integration_status, then continue with `specrow proposal` for new work."]
+          : ["Run specrow_integration_status, then continue with `specrow explore` for discovery or `specrow proposal` for new work."]
       });
     }),
     specrow_review: tool(ChangeNameSchema, async (input) => {
@@ -350,8 +350,9 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
     specrow_workflow_guide: tool(EmptySchema, async () =>
       success({
         message: "SpecRow workflow guide.",
-        workflow: ["proposal", "review", "build", "revise", "accept", "archive"],
+        workflow: ["explore", "proposal", "review", "build", "revise", "accept", "archive"],
         tools: {
+          explore: "specrow_project_status + specrow_context + specrow_validate",
           proposal: "specrow_create_proposal",
           review: "specrow_review",
           buildStart: "specrow_build_start",
@@ -388,8 +389,8 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         projectRoot,
         files,
         nextSteps: files.length === 0
-          ? ["SpecRow is initialized but no managed integration files are recorded. Continue with `specrow proposal` when ready."]
-          : ["Confirm the listed integration files are present, then continue with `specrow proposal` when ready."]
+          ? ["SpecRow is initialized but no managed integration files are recorded. Continue with `specrow explore` for discovery or `specrow proposal` when ready."]
+          : ["Confirm the listed integration files are present, then continue with `specrow explore` for discovery or `specrow proposal` when ready."]
       });
     })
   };

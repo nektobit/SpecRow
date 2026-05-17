@@ -18,6 +18,12 @@ Sets up SpecRow for the current project. The agent determines the intended proje
 
 The agent stops if the requested language resources are missing.
 
+### `/specrow:explore`
+
+Explores an idea, problem, or possible change before committing it to a proposal. The agent reads project status and context, uses only read-only SpecRow tools, inspects relevant codebase context when useful, and clarifies goals, options, risks, affected areas, open questions, and acceptance expectations.
+
+Exploration does not create `proposal.md`, `tasks.md`, `status.yml`, or a change directory. It does not implement code, accept, archive, or update specs as final truth. When the intent is clear enough, the next step is `/specrow:proposal`.
+
 ### `/specrow:proposal`
 
 Turns user intent into a change proposal. The agent chooses a stable change name, creates the change through the CLI core, fills `proposal.md` and `tasks.md` in the project language, validates the result, and reports blocking issues.

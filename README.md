@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow is an agent-first specification workflow. Users describe intent in plain language, such as `specrow proposal` or `specrow build`; agents execute the workflow through the SpecRow MCP server.
+SpecRow is an agent-first specification workflow. Users describe intent in plain language, such as `specrow explore`, `specrow proposal`, or `specrow build`; agents execute the workflow through the SpecRow MCP server.
 
 ## Read This In Your Language
 
@@ -13,7 +13,7 @@ SpecRow is an agent-first specification workflow. Users describe intent in plain
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
-The site covers the full MVP workflow: getting started, proposal to accept, MCP tools, templates, localization, validation, lifecycle rules, and differences from OpenSpec.
+The site covers the full MVP workflow: getting started, explore, proposal to accept, MCP tools, templates, localization, validation, lifecycle rules, and differences from OpenSpec.
 
 ## Quick Start
 
@@ -28,6 +28,7 @@ The agent uses the SpecRow MCP server to inspect the workspace, initialize `.spe
 Then tell the agent what SpecRow workflow you want:
 
 ```txt
+specrow explore Discuss the idea before creating a change
 specrow proposal Describe the intended change
 specrow review
 specrow build

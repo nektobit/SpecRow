@@ -202,6 +202,31 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
       ],
       stopConditions: ["Faltan plantillas o mensajes para el idioma solicitado."]
     },
+    "/specrow:explore": {
+      userIntent: "Explorar una idea, un problema o un posible cambio antes de convertirlo en propuesta.",
+      agentBehavior: [
+        "Inspeccionar el estado y el contexto del proyecto antes de comprometerse con un cambio.",
+        "Usar herramientas read-only de SpecRow y contexto del codebase para aclarar objetivos, opciones, riesgos, áreas afectadas y preguntas abiertas.",
+        "Hacer preguntas enfocadas cuando el cambio previsto, el alcance o las expectativas de aceptación sean ambiguos.",
+        "Terminar con un resumen breve de exploración y recomendar /specrow:proposal cuando la intención esté lista."
+      ],
+      forbiddenActions: [
+        "No crear proposal.md, tasks.md, status.yml ni un directorio de cambio durante la exploración.",
+        "No implementar código durante la exploración.",
+        "No aceptar, archivar ni actualizar especificaciones como verdad final."
+      ],
+      languageRules: [
+        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
+        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
+        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
+        "No hacer fallback silencioso al inglés."
+      ],
+      stopConditions: [
+        "El proyecto no está inicializado y la exploración requiere contexto específico del proyecto.",
+        "El tema solicitado es demasiado amplio para producir preguntas u opciones accionables.",
+        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida."
+      ]
+    },
     "/specrow:proposal": {
       userIntent: "Convertir la intención del usuario en una propuesta de cambio concreta y un esqueleto de tareas.",
       agentBehavior: [
@@ -329,19 +354,19 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     invocationTemplate: "Usa este workflow cuando el usuario escriba `{command}` o pida la misma intención.",
     agentInstructions: {
       title: "Instrucciones del agente SpecRow",
-      overview: "SpecRow es un workflow de especificaciones agent-first. Trata mensajes como `specrow proposal`, `specrow build` o pedidos directos de SpecRow como intenciones de workflow. Ejecutalos mediante herramientas MCP de SpecRow.",
+      overview: "SpecRow es un workflow de especificaciones agent-first. Trata mensajes como `specrow explore`, `specrow proposal`, `specrow build` o pedidos directos de SpecRow como intenciones de workflow. Ejecutalos mediante herramientas MCP de SpecRow.",
       languageRule: "Antes de crear o revisar archivos integrados de SpecRow, lee `.specrow/config.yml` y usa su `language` configurado. No hagas fallback silencioso al inglés.",
       toolCore: "Nucleo de herramientas:",
       forbidden: "Prohibido:"
     },
     toolCoreFallback: "Usa estas herramientas MCP de SpecRow:",
     skill: {
-      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o pida specrow proposal, review, build, revise o accept.",
+      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o pida specrow explore, proposal, review, build, revise o accept.",
       whenToUse: "Cuándo usar",
       instructions: "Instrucciones",
       triggers: [
-        "El usuario pide un workflow de SpecRow como `specrow proposal` o `specrow build`.",
-        "El usuario pide inicializar SpecRow, crear una propuesta, revisar, construir, revisar cambios o aceptar un cambio SpecRow."
+        "El usuario pide un workflow de SpecRow como `specrow explore`, `specrow proposal` o `specrow build`.",
+        "El usuario pide inicializar SpecRow, explorar una idea, crear una propuesta, revisar, construir, revisar cambios o aceptar un cambio SpecRow."
       ]
     }
   }
