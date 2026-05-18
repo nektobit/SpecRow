@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import sparkleIconSvg from '@primer/octicons/build/svg/sparkle-fill-16.svg?raw'
+import terminalIconSvg from '@primer/octicons/build/svg/terminal-16.svg?raw'
 
 type TokenKind = 'space' | 'comment' | 'command' | 'subcommand' | 'option' | 'placeholder' | 'value' | 'argument'
+export type ConsoleVariant = 'ai' | 'cmd'
 
 interface Token {
   text: string
@@ -11,11 +14,15 @@ interface Token {
 
 const props = defineProps<{
   commands: readonly string[]
+  variant?: ConsoleVariant
 }>()
 
 const { t } = useI18n()
 const copied = ref(false)
 
+const variant = computed<ConsoleVariant>(() => props.variant ?? 'cmd')
+const label = computed(() => (variant.value === 'ai' ? 'Agent chat' : 'Terminal'))
+const iconSvg = computed(() => (variant.value === 'ai' ? sparkleIconSvg : terminalIconSvg))
 const commandText = computed(() => props.commands.join('\n'))
 const highlightedLines = computed(() => props.commands.map(tokenizeCommand))
 
@@ -91,12 +98,11 @@ function isPlaceholder(text: string): boolean {
 </script>
 
 <template>
-  <div class="console-block">
+  <div class="console-block" :class="[`${variant}-console`, `console-block-${variant}`]">
     <div class="console-toolbar">
-      <div class="console-dots" aria-hidden="true">
-        <span />
-        <span />
-        <span />
+      <div class="console-title">
+        <span class="console-title-icon" aria-hidden="true" v-html="iconSvg" />
+        <span>{{ label }}</span>
       </div>
       <button
         class="console-copy"
@@ -130,7 +136,6 @@ function isPlaceholder(text: string): boolean {
   overflow: hidden;
   border: 1px solid #31363f;
   border-radius: 8px;
-  background: #090d12;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -143,28 +148,56 @@ function isPlaceholder(text: string): boolean {
   padding: 0.5rem 0.625rem;
 }
 
-.console-dots {
-  display: flex;
-  gap: 0.375rem;
+.console-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #cbd5e1;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.console-dots span {
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 999px;
-  background: #3b4654;
+.console-title-icon {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  align-items: center;
+  justify-content: center;
+  color: #7dd3fc;
 }
 
-.console-dots span:first-child {
-  background: #d36b5d;
+.console-title-icon :deep(svg) {
+  width: 1rem;
+  height: 1rem;
+  display: block;
+  fill: currentColor;
 }
 
-.console-dots span:nth-child(2) {
-  background: #d1a74f;
+.console-block-ai {
+  border-color: #2b4b43;
+  background: #081310;
 }
 
-.console-dots span:nth-child(3) {
-  background: #42b883;
+.console-block-ai .console-toolbar {
+  background: #11241f;
+}
+
+.console-block-ai .console-title-icon {
+  color: #8ef0c2;
+}
+
+.console-block-cmd {
+  border-color: #2d4058;
+  background: #080f18;
+}
+
+.console-block-cmd .console-toolbar {
+  background: #111c2b;
+}
+
+.console-block-cmd .console-title-icon {
+  color: #93c5fd;
 }
 
 .console-copy {

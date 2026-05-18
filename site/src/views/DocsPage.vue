@@ -7,6 +7,8 @@ import { defaultLocale, docContent, type LocaleCode, type PageSlug, type Paragra
 import { blockId, readingMinutes, sectionLinks } from '../docs'
 import ConsoleBlock from '../components/ConsoleBlock.vue'
 
+type ConsoleVariant = 'ai' | 'cmd'
+
 const homePage: PageSlug = 'instructions'
 const extraInfoPages: PageSlug[] = ['manifesto', 'localization', 'knowledge-base']
 
@@ -43,6 +45,45 @@ function isCommandLine(line: string): boolean {
 function sectionCommands(block: { heading: string; commands?: string[] }): string[] {
   return block.commands ?? (isCommandLine(block.heading) ? [block.heading] : [])
 }
+
+function consoleVariant(commands: readonly string[], heading = ''): ConsoleVariant {
+  const normalizedHeading = heading.toLowerCase()
+
+  if (commands.some((command) => command.trim().startsWith('apply '))) {
+    return 'ai'
+  }
+
+  if (commands.every((command) => command.trim().startsWith('mcp__specrow__.'))) {
+    return 'ai'
+  }
+
+  if (pageSlug.value === 'agent-commands') {
+    return 'ai'
+  }
+
+  if (commands.some(isExplicitTerminalCommand)) {
+    return 'cmd'
+  }
+
+  if (pageSlug.value === 'instructions') {
+    return normalizedHeading.includes('cli') ? 'cmd' : 'ai'
+  }
+
+  if (pageSlug.value === 'mcp-server') {
+    return normalizedHeading.includes('cli') ? 'cmd' : 'ai'
+  }
+
+  return 'cmd'
+}
+
+function isExplicitTerminalCommand(command: string): boolean {
+  const normalizedCommand = command.trim()
+
+  return (
+    /^(npm|pnpm|npx)\b/.test(normalizedCommand) ||
+    /^specrow\s+(init|integrate|mcp)\b/.test(normalizedCommand)
+  )
+}
 </script>
 
 <template>
@@ -72,7 +113,7 @@ function sectionCommands(block: { heading: string; commands?: string[] }): strin
                 <template v-else>{{ part }}</template>
               </template>
             </p>
-            <ConsoleBlock v-if="sectionCommands(block).length > 0" :commands="sectionCommands(block)" />
+            <ConsoleBlock v-if="sectionCommands(block).length > 0" :commands="sectionCommands(block)" :variant="consoleVariant(sectionCommands(block), block.heading)" />
           </section>
 
           <section v-else-if="block.type === 'list-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
@@ -87,7 +128,7 @@ function sectionCommands(block: { heading: string; commands?: string[] }): strin
           <section v-else-if="block.type === 'code-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
             <h2>{{ block.heading }}</h2>
             <p>{{ block.intro }}</p>
-            <ConsoleBlock v-if="isCommandSnippet(block.code)" :commands="commandLines(block.code)" />
+            <ConsoleBlock v-if="isCommandSnippet(block.code)" :commands="commandLines(block.code)" :variant="consoleVariant(commandLines(block.code), block.heading)" />
             <pre v-else><code>{{ block.code }}</code></pre>
             <p>{{ block.outro }}</p>
           </section>
@@ -95,7 +136,7 @@ function sectionCommands(block: { heading: string; commands?: string[] }): strin
           <section v-else-if="block.type === 'command-section'" :id="blockId(index)" class="doc-section scroll-mt-24">
             <h2>{{ block.heading }}</h2>
             <p>{{ block.intro }}</p>
-            <ConsoleBlock :commands="block.commands" />
+            <ConsoleBlock :commands="block.commands" :variant="consoleVariant(block.commands, block.heading)" />
             <p>{{ block.outro }}</p>
           </section>
 
