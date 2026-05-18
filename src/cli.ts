@@ -20,16 +20,18 @@ import {
   markRevisionNeeded,
   reviewChangeReadiness,
   readChangeStatus,
+  runMigration,
   updateSpecRowIntegrations,
   validateSpecRowProject,
   type IntegrationInstallResult,
-  type LifecycleStatus
+  type LifecycleStatus,
+  type MigrationResult
 } from "./core/index.js";
 import { validateLocaleContract } from "./localeContract.js";
 import { startSpecRowMcpServer } from "./mcpServer.js";
 import type { ValidationIssue } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.9";
+const SPECROW_VERSION = "0.1.10";
 
 export function createProgram(): Command {
   const program = new Command();
@@ -89,6 +91,30 @@ export function createProgram(): Command {
         }
 
         process.exitCode = 1;
+      }
+    });
+
+  program
+    .command("migrate")
+    .description("Migrate OpenSpec, SpecKit, or documentation folder artifacts into SpecRow.")
+    .argument("[source]", "Known system name (openspec, speckit, system) or documentation folder.")
+    .option("-l, --language <code>", "Project language code for auto-initialization.", "en")
+    .option("--source-root <path>", "Root used to detect known specification systems.")
+    .option("-f, --force", "Overwrite existing migration target files.", false)
+    .option("--dry-run", "Show the migration plan without writing files.", false)
+    .action(async (source: string | undefined, options: { language: string; sourceRoot?: string; force: boolean; dryRun: boolean }) => {
+      try {
+        printMigrationResult(
+          await runMigration({
+            source,
+            sourceRoot: options.sourceRoot,
+            language: options.language,
+            force: options.force,
+            dryRun: options.dryRun
+          })
+        );
+      } catch (error) {
+        handleCommandError(error);
       }
     });
 
@@ -479,6 +505,31 @@ function printIntegrationResult(result: IntegrationInstallResult): void {
   for (const file of result.files) {
     const reason = file.reason === undefined ? "" : ` (${file.reason})`;
     console.log(`${file.action} ${file.tool} ${file.kind} ${file.path}${reason}`);
+  }
+}
+
+function printMigrationResult(result: MigrationResult): void {
+  if (result.initialized || result.wouldInitialize) {
+    console.log(getSpecRowMessage(result.language, "migration.initialized", { path: ".specrow" }));
+  }
+
+  console.log(
+    getSpecRowMessage(result.language, "migration.sourceDetected", {
+      kind: result.source.kind,
+      source: pathForDisplay(result.source.root)
+    })
+  );
+  console.log(
+    getSpecRowMessage(result.language, result.dryRun ? "migration.dryRun" : "migration.completed", {
+      source: pathForDisplay(result.source.root)
+    })
+  );
+  console.log(getSpecRowMessage(result.language, "migration.copied", { count: String(result.copied.length) }));
+  console.log(getSpecRowMessage(result.language, "migration.converted", { count: String(result.converted.length) }));
+  console.log(getSpecRowMessage(result.language, "migration.skipped", { count: String(result.skipped.length) }));
+
+  for (const warning of result.warnings) {
+    console.log(getSpecRowMessage(result.language, "migration.warning", { warning }));
   }
 }
 

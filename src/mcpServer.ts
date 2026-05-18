@@ -21,6 +21,7 @@ import {
   markRevisionNeeded,
   reviewChangeReadiness,
   readChangeStatus,
+  runMigration,
   SUPPORTED_LANGUAGES,
   validateSpecRowProject,
   type LifecycleStatus,
@@ -29,7 +30,7 @@ import {
   type ValidationIssue
 } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.9";
+const SPECROW_VERSION = "0.1.10";
 const SPECROW_DIR = ".specrow";
 
 const EmptySchema = z.object({}).optional();
@@ -49,6 +50,13 @@ const AcceptSchema = ChangeNameSchema.extend({
 });
 const TemplateContextSchema = z.object({
   template: z.enum(["project", "spec", "proposal", "tasks"]).optional()
+});
+const MigrateSchema = z.object({
+  source: z.string().min(1).optional(),
+  sourceRoot: z.string().min(1).optional(),
+  language: z.string().min(2).max(32).optional(),
+  force: z.boolean().optional(),
+  dryRun: z.boolean().optional()
 });
 
 export type McpErrorCode =
@@ -234,6 +242,29 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         nextSteps: ["Ask for `specrow review` after the proposal and tasks are ready."]
       });
     }),
+    specrow_migrate: tool(MigrateSchema, async (input) => {
+      const result = await runMigration({
+        cwd: projectRoot,
+        source: input.source,
+        sourceRoot: input.sourceRoot,
+        language: input.language,
+        force: input.force,
+        dryRun: input.dryRun,
+        allowExternalSource: false
+      });
+
+      return success({
+        message: getSpecRowMessage(result.language, result.dryRun ? "migration.dryRun" : "migration.completed", {
+          source: relative(projectRoot, result.source.root)
+        }),
+        language: result.language,
+        migration: result,
+        nextSteps: [
+          "Run specrow_validate to check migrated SpecRow files.",
+          "Review migrated warnings and preserved source artifacts before treating migrated specs as final truth."
+        ]
+      });
+    }),
     specrow_validate: tool(ChangeNameSchema.partial(), async (input) => {
       if (input.changeName !== undefined) {
         assertSafeChangeName(input.changeName);
@@ -350,8 +381,9 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
     specrow_workflow_guide: tool(EmptySchema, async () =>
       success({
         message: "SpecRow workflow guide.",
-        workflow: ["explore", "proposal", "review", "build", "revise", "accept", "archive"],
+        workflow: ["migrate", "explore", "proposal", "review", "build", "revise", "accept", "archive"],
         tools: {
+          migrate: "specrow_project_status + specrow_migrate + specrow_validate",
           explore: "specrow_project_status + specrow_context + specrow_validate",
           proposal: "specrow_create_proposal",
           review: "specrow_review",
@@ -423,6 +455,7 @@ function createToolRegistrations(handlers: Record<string, ToolHandler>): Record<
     specrow_init: registration("Initialize SpecRow", "Create the .specrow project structure.", InitSchema, handlers.specrow_init, false, false),
     specrow_project_status: registration("Project Status", "Report whether this workspace already has SpecRow project files.", EmptySchema, handlers.specrow_project_status, true, false),
     specrow_create_proposal: registration("Create Proposal", "Create a SpecRow change proposal.", CreateProposalSchema, handlers.specrow_create_proposal, false, false),
+    specrow_migrate: registration("Migrate", "Migrate OpenSpec, SpecKit, or documentation folder artifacts into SpecRow.", MigrateSchema, handlers.specrow_migrate, false, false),
     specrow_validate: registration("Validate", "Validate the SpecRow workspace or a change.", ChangeNameSchema.partial(), handlers.specrow_validate, true, false),
     specrow_review: registration("Review", "Review a change and mark review completed when valid.", ChangeNameSchema, handlers.specrow_review, false, false),
     specrow_status: registration("Status", "Read change status or active change list.", ChangeNameSchema.partial(), handlers.specrow_status, true, false),
@@ -614,7 +647,7 @@ function errorToFailure(error: unknown): McpFailure {
     return failure("MISSING_LANGUAGE_RESOURCE", message);
   }
 
-  if (message.includes("cannot contain paths") || message.includes("Unsafe SpecRow path")) {
+  if (message.includes("cannot contain paths") || message.includes("Unsafe SpecRow path") || message.includes("must be inside the SpecRow project root") || message.includes("Migration source cannot be inside .specrow")) {
     return failure("UNSAFE_PATH", message);
   }
 

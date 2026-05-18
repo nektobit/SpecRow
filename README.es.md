@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la intención en lenguaje natural, por ejemplo `specrow explore`, `specrow proposal` o `specrow build`; los agentes ejecutan el workflow mediante el servidor MCP de SpecRow.
+SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la intención en lenguaje natural, por ejemplo `specrow migrate`, `specrow explore`, `specrow proposal` o `specrow build`; los agentes ejecutan el workflow mediante el servidor MCP de SpecRow.
 
 ## Leer en tu idioma
 
@@ -28,6 +28,7 @@ El agente usa el servidor MCP de SpecRow para inspeccionar el workspace, inicial
 Luego dile al agente qué workflow de SpecRow quieres:
 
 ```txt
+specrow migrate openspec
 specrow explore Discutir la idea antes de crear un cambio
 specrow proposal Describe el cambio previsto
 specrow review
@@ -42,6 +43,7 @@ Para automatización fuera de una sesión de agente, también está disponible e
 ```bash
 npm i -g specrow
 specrow init --language es --tools codex,claude,cursor,windsurf,generic
+specrow migrate ./docs
 specrow validate
 specrow integrations status
 ```
@@ -74,4 +76,6 @@ Build no actualiza specs como verdad final y no archiva un cambio. Las specs y e
 
 ## Migration Notes
 
-Prototipos locales antiguos pueden haber usado la CLI `specfly` o el directorio `.specfly`. Los proyectos nuevos usan el binario `specrow` y `.specrow/`. Mueve los archivos específicos del proyecto que aún necesites a las ubicaciones equivalentes dentro de `.specrow/`.
+Usa `specrow migrate openspec`, `specrow migrate speckit` o `specrow migrate ./docs` para llevar artefactos de especificación existentes a `.specrow/`. Si falta `.specrow`, la migración lo inicializa primero. La fuente heredada no se elimina, y los registros archivados se copian como historial preservado sin transformación.
+
+Prototipos locales antiguos pueden haber usado la CLI `specfly` o el directorio `.specfly`. Los proyectos nuevos usan el binario `specrow` y `.specrow/`.

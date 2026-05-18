@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow is an agent-first specification workflow. Users describe intent in plain language, such as `specrow explore`, `specrow proposal`, or `specrow build`; agents execute the workflow through the SpecRow MCP server.
+SpecRow is an agent-first specification workflow. Users describe intent in plain language, such as `specrow migrate`, `specrow explore`, `specrow proposal`, or `specrow build`; agents execute the workflow through the SpecRow MCP server.
 
 ## Read This In Your Language
 
@@ -28,6 +28,7 @@ The agent uses the SpecRow MCP server to inspect the workspace, initialize `.spe
 Then tell the agent what SpecRow workflow you want:
 
 ```txt
+specrow migrate openspec
 specrow explore Discuss the idea before creating a change
 specrow proposal Describe the intended change
 specrow review
@@ -42,6 +43,7 @@ For automation outside an agent session, the `specrow` binary is also available:
 ```bash
 npm i -g specrow
 specrow init --language en --tools codex,claude,cursor,windsurf,generic
+specrow migrate ./docs
 specrow validate
 specrow integrations status
 ```
@@ -74,4 +76,6 @@ Build does not update specs as final truth and does not archive a change. Specs 
 
 ## Migration Notes
 
-Older local prototypes may have used the `specfly` CLI name or a `.specfly` workspace directory. New projects use the `specrow` binary and `.specrow/`. Move any project-specific files you still need into the matching `.specrow/` locations.
+Use `specrow migrate openspec`, `specrow migrate speckit`, or `specrow migrate ./docs` to bring existing specification artifacts into `.specrow/`. If `.specrow` is missing, migration initializes it first. The legacy source is not deleted, and archived records are copied as preserved history without transformation.
+
+Older local prototypes may have used the `specfly` CLI name or a `.specfly` workspace directory. New projects use the `specrow` binary and `.specrow/`.

@@ -7,6 +7,7 @@ export type TemplateName = "project" | "spec" | "proposal" | "tasks";
 
 export type AgentCommandName =
   | "/specrow:init"
+  | "/specrow:migrate"
   | "/specrow:explore"
   | "/specrow:proposal"
   | "/specrow:review"
@@ -33,6 +34,19 @@ export type MessageName =
   | "list.empty"
   | "list.warning"
   | "next.acceptOrRevise"
+  | "migration.completed"
+  | "migration.dryRun"
+  | "migration.initialized"
+  | "migration.sourceDetected"
+  | "migration.copied"
+  | "migration.converted"
+  | "migration.skipped"
+  | "migration.warning"
+  | "migration.warning.noSpecKitFeatures"
+  | "migration.warning.noDocumentationFiles"
+  | "migration.warning.importedDocumentationReview"
+  | "migration.proposalAppendix"
+  | "migration.tasksAppendix"
   | "error.missingTemplate"
   | "error.missingMessage";
 
@@ -103,12 +117,26 @@ export const REQUIRED_MESSAGES: readonly MessageName[] = [
   "list.empty",
   "list.warning",
   "next.acceptOrRevise",
+  "migration.completed",
+  "migration.dryRun",
+  "migration.initialized",
+  "migration.sourceDetected",
+  "migration.copied",
+  "migration.converted",
+  "migration.skipped",
+  "migration.warning",
+  "migration.warning.noSpecKitFeatures",
+  "migration.warning.noDocumentationFiles",
+  "migration.warning.importedDocumentationReview",
+  "migration.proposalAppendix",
+  "migration.tasksAppendix",
   "error.missingTemplate",
   "error.missingMessage"
 ];
 
 export const REQUIRED_AGENT_COMMANDS: readonly AgentCommandName[] = [
   "/specrow:init",
+  "/specrow:migrate",
   "/specrow:explore",
   "/specrow:proposal",
   "/specrow:review",

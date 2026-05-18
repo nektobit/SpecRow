@@ -30,6 +30,22 @@ describe("SpecRow agent commands", () => {
     expect(proposal.cliCore).toEqual(["specrow proposal <change-name>", "specrow validate <change-name>", "specrow context <change-name>"]);
   });
 
+  it("keeps migrate non-destructive and review-gated", () => {
+    const migrate = getAgentCommandSpec("/specrow:migrate", "en");
+
+    expect(migrate.phase).toBe("migration");
+    expect(migrate.toolCore).toEqual(["specrow_project_status", "specrow_migrate", "specrow_validate", "specrow_context"]);
+    expect(migrate.allowsFinalSpecIntegration).toBe(false);
+    expect(migrate.allowsArchive).toBe(false);
+    expect(migrate.forbiddenActions).toEqual(
+      expect.arrayContaining([
+        "Do not delete, move, or rewrite the legacy source.",
+        "Do not transform archived source entries; copy archive records as preserved history."
+      ])
+    );
+    expect(migrate.nextCommands).toEqual(["/specrow:review", "/specrow:proposal"]);
+  });
+
   it("keeps explore read-only and pre-proposal", () => {
     const explore = getAgentCommandSpec("/specrow:explore", "en");
 

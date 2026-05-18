@@ -18,6 +18,12 @@ Sets up SpecRow for the current project. The agent determines the intended proje
 
 The agent stops if the requested language resources are missing.
 
+### `/specrow:migrate`
+
+Migrates existing OpenSpec, SpecKit, or documentation-folder specification artifacts into SpecRow. The agent identifies the source, initializes `.specrow` when needed, runs `specrow migrate [folder | system]` through the MCP tool or CLI core, validates the result, and reports warnings that require user review.
+
+Migration does not delete, move, or rewrite the legacy source. Archived source entries are copied as preserved history without transformation. Migrated specs are not treated as final truth until the user reviews the result.
+
 ### `/specrow:explore`
 
 Explores an idea, problem, or possible change before committing it to a proposal. The agent reads project status and context, uses only read-only SpecRow tools, inspects relevant codebase context when useful, and clarifies goals, options, risks, affected areas, open questions, and acceptance expectations.

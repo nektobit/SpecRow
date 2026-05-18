@@ -182,6 +182,23 @@ export const ru = {
     "list.empty": "Активных изменений нет.",
     "list.warning": "Предупреждение: {warning}",
     "next.acceptOrRevise": "Следующий шаг: specrow accept или specrow revise.",
+    "migration.completed": "Миграция завершена для {source}.",
+    "migration.dryRun": "Пробная миграция завершена для {source}.",
+    "migration.initialized": "Инициализирован {path} для миграции.",
+    "migration.sourceDetected": "Обнаружен источник {kind}: {source}.",
+    "migration.copied": "Скопировано файлов миграции: {count}.",
+    "migration.converted": "Преобразовано активных изменений: {count}.",
+    "migration.skipped": "Пропущено существующих целей миграции: {count}.",
+    "migration.warning": "Предупреждение миграции: {warning}",
+    "migration.warning.noSpecKitFeatures": "В {path} не найдены директории возможностей SpecKit.",
+    "migration.warning.noDocumentationFiles": "В {path} не найдены файлы документации.",
+    "migration.warning.importedDocumentationReview": "Импортированная документация скопирована как исходный материал; проверьте ее, прежде чем считать финальными спецификациями SpecRow.",
+    "migration.proposalAppendix": `## Источник миграции
+Мигрировано из источника {kind}: {source}.
+Исходные артефакты сохранены в {path}.`,
+    "migration.tasksAppendix": `## Проверка миграции
+- [ ] Проверить артефакты источника {kind}, сохраненные в {path}.
+- [ ] Подтвердить результат миграции из {source}, прежде чем считать его финальной правдой SpecRow.`,
     "error.missingTemplate": "Отсутствует шаблон SpecRow \"{name}\" для языка \"{language}\".",
     "error.missingMessage": "Отсутствует сообщение SpecRow \"{name}\" для языка \"{language}\"."
   },
@@ -204,6 +221,31 @@ export const ru = {
         "Не выполнять скрытый fallback на английский."
       ],
       stopConditions: ["Отсутствуют шаблоны или сообщения для запрошенного языка."]
+    },
+    "/specrow:migrate": {
+      userIntent: "Перенести существующие артефакты спецификаций OpenSpec, SpecKit или папки документации в SpecRow.",
+      agentBehavior: [
+        "Определить, является ли источник OpenSpec, SpecKit или папкой документации, до записи результата миграции.",
+        "Инициализировать SpecRow, если проект еще не инициализирован.",
+        "Запустить миграцию через MCP-инструмент SpecRow или CLI-ядро и сохранить трассировку источника.",
+        "Проверить мигрированные файлы SpecRow и сообщить предупреждения, требующие проверки пользователя."
+      ],
+      forbiddenActions: [
+        "Не удалять, не перемещать и не переписывать legacy source.",
+        "Не преобразовывать архивные записи источника; копировать записи архива как сохраненную историю.",
+        "Не считать мигрированные спецификации финальной правдой без проверки пользователя."
+      ],
+      languageRules: [
+        "Перед созданием или изменением встроенных файлов SpecRow прочитать .specrow/config.yml.",
+        "Использовать настроенный язык для project.md, спецификаций, предложений, задач и сообщений жизненного цикла.",
+        "Остановиться с понятной ошибкой об отсутствующем ресурсе, если нужный шаблон или сообщение недоступны.",
+        "Не выполнять скрытый fallback на английский."
+      ],
+      stopConditions: [
+        "Запрошенный источник не найден или его нельзя безопасно прочитать.",
+        "Для настроенного языка отсутствуют шаблоны или сообщения жизненного цикла.",
+        "Результат миграции перезаписал бы существующие файлы SpecRow без явного force."
+      ]
     },
     "/specrow:explore": {
       userIntent: "Исследовать идею, проблему или возможное изменение до оформления предложения.",
@@ -371,19 +413,19 @@ export const ru = {
     invocationTemplate: "Используйте этот workflow, когда пользователь пишет `{command}` или просит то же по смыслу.",
     agentInstructions: {
       title: "Инструкции агента SpecRow",
-      overview: "SpecRow — agent-first workflow спецификаций. Считайте сообщения пользователя вроде `specrow explore`, `specrow proposal`, `specrow build` или прямые просьбы про SpecRow намерениями workflow. Выполняйте их через MCP-инструменты SpecRow.",
+      overview: "SpecRow — agent-first workflow спецификаций. Считайте сообщения пользователя вроде `specrow migrate`, `specrow explore`, `specrow proposal`, `specrow build` или прямые просьбы про SpecRow намерениями workflow. Выполняйте их через MCP-инструменты SpecRow.",
       languageRule: "Перед созданием или изменением встроенных файлов SpecRow прочитайте `.specrow/config.yml` и используйте настроенный `language`. Не выполняйте скрытый fallback на английский.",
       toolCore: "Ядро инструментов:",
       forbidden: "Запрещено:"
     },
     toolCoreFallback: "Используйте эти MCP-инструменты SpecRow:",
     skill: {
-      description: "Используйте workflow SpecRow, когда пользователь упоминает SpecRow или просит specrow explore, proposal, review, build, revise или accept.",
+      description: "Используйте workflow SpecRow, когда пользователь упоминает SpecRow или просит specrow migrate, explore, proposal, review, build, revise или accept.",
       whenToUse: "Когда использовать",
       instructions: "Инструкции",
       triggers: [
-        "Пользователь просит workflow SpecRow вроде `specrow explore`, `specrow proposal` или `specrow build`.",
-        "Пользователь просит инициализировать SpecRow, исследовать идею, создать предложение, выполнить review, build, revise или accept для изменения SpecRow."
+        "Пользователь просит workflow SpecRow вроде `specrow migrate`, `specrow explore`, `specrow proposal` или `specrow build`.",
+        "Пользователь просит инициализировать SpecRow, мигрировать существующие артефакты спецификаций, исследовать идею, создать предложение, выполнить review, build, revise или accept для изменения SpecRow."
       ]
     }
   }

@@ -1,6 +1,6 @@
 # SpecRow
 
-SpecRow: agent-first workflow для спецификаций. Пользователь описывает намерение обычной фразой, например `specrow explore`, `specrow proposal` или `specrow build`; агент выполняет workflow через MCP-сервер SpecRow.
+SpecRow: agent-first workflow для спецификаций. Пользователь описывает намерение обычной фразой, например `specrow migrate`, `specrow explore`, `specrow proposal` или `specrow build`; агент выполняет workflow через MCP-сервер SpecRow.
 
 ## Читать на своем языке
 
@@ -28,6 +28,7 @@ apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install
 Затем скажите агенту, какой workflow SpecRow нужен:
 
 ```txt
+specrow migrate openspec
 specrow explore Обсудить идею до создания изменения
 specrow proposal Опишите нужное изменение
 specrow review
@@ -42,6 +43,7 @@ specrow accept
 ```bash
 npm i -g specrow
 specrow init --language ru --tools codex,claude,cursor,windsurf,generic
+specrow migrate ./docs
 specrow validate
 specrow integrations status
 ```
@@ -74,4 +76,6 @@ Build не обновляет спеки как финальную правду 
 
 ## Migration Notes
 
-Старые локальные прототипы могли использовать CLI `specfly` или директорию `.specfly`. Новые проекты используют бинарь `specrow` и `.specrow/`. Перенесите нужные проектные файлы в соответствующие места внутри `.specrow/`.
+Используйте `specrow migrate openspec`, `specrow migrate speckit` или `specrow migrate ./docs`, чтобы перенести существующие артефакты спецификаций в `.specrow/`. Если `.specrow` отсутствует, миграция сначала инициализирует его. Legacy source не удаляется, а архивные записи копируются как сохраненная история без преобразования.
+
+Старые локальные прототипы могли использовать CLI `specfly` или директорию `.specfly`. Новые проекты используют бинарь `specrow` и `.specrow/`.

@@ -182,6 +182,23 @@ export const zhCN = {
     "list.empty": "没有活跃变更。",
     "list.warning": "警告：{warning}",
     "next.acceptOrRevise": "下一步：specrow accept 或 specrow revise。",
+    "migration.completed": "{source} 的迁移已完成。",
+    "migration.dryRun": "{source} 的迁移 dry-run 已完成。",
+    "migration.initialized": "已为迁移初始化 {path}。",
+    "migration.sourceDetected": "已在 {source} 检测到 {kind} 来源。",
+    "migration.copied": "已复制迁移文件：{count}。",
+    "migration.converted": "已转换活跃变更：{count}。",
+    "migration.skipped": "已跳过现有迁移目标：{count}。",
+    "migration.warning": "迁移警告：{warning}",
+    "migration.warning.noSpecKitFeatures": "在 {path} 下未找到 SpecKit 功能目录。",
+    "migration.warning.noDocumentationFiles": "在 {path} 下未找到文档文件。",
+    "migration.warning.importedDocumentationReview": "导入的文档已作为来源材料复制；在将其视为最终 SpecRow 规格前请先审查。",
+    "migration.proposalAppendix": `## 迁移来源
+已从 {kind} 来源 {source} 迁移。
+原始产物保存在 {path}。`,
+    "migration.tasksAppendix": `## 迁移审查
+- [ ] 审查保存在 {path} 的 {kind} 来源产物。
+- [ ] 在将其视为 SpecRow 最终事实前，确认来自 {source} 的迁移结果。`,
     "error.missingTemplate": "语言 \"{language}\" 缺少 SpecRow 模板 \"{name}\"。",
     "error.missingMessage": "语言 \"{language}\" 缺少 SpecRow 消息 \"{name}\"。"
   },
@@ -201,6 +218,31 @@ export const zhCN = {
         "不要静默 fallback 到英文。"
       ],
       stopConditions: ["请求语言缺少模板或消息资源。"]
+    },
+    "/specrow:migrate": {
+      userIntent: "将现有 OpenSpec、SpecKit 或文档文件夹中的规格产物迁移到 SpecRow。",
+      agentBehavior: [
+        "在写入迁移输出前，识别来源是 OpenSpec、SpecKit 还是文档文件夹。",
+        "当项目尚未初始化时初始化 SpecRow。",
+        "通过 SpecRow MCP 工具或 CLI 核心运行迁移，并保留来源可追溯性。",
+        "验证已迁移的 SpecRow 文件，并报告需要用户审查的警告。"
+      ],
+      forbiddenActions: [
+        "不要删除、移动或重写 legacy source。",
+        "不要转换来源中的归档条目；将归档记录作为保留历史复制。",
+        "未经用户审查，不要将已迁移规格视为最终事实。"
+      ],
+      languageRules: [
+        "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
+        "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",
+        "必需模板或消息不可用时，以明确的缺失资源错误停止。",
+        "不要静默 fallback 到英文。"
+      ],
+      stopConditions: [
+        "找不到请求的来源，或无法安全读取。",
+        "配置语言缺少模板或生命周期消息。",
+        "迁移输出会在没有明确 force 的情况下覆盖现有 SpecRow 文件。"
+      ]
     },
     "/specrow:explore": {
       userIntent: "在提交为提案之前，探索想法、问题或可能的变更。",
@@ -336,19 +378,19 @@ export const zhCN = {
     invocationTemplate: "当用户写入 `{command}` 或表达相同意图时，使用此 workflow。",
     agentInstructions: {
       title: "SpecRow 代理说明",
-      overview: "SpecRow 是 agent-first 的规格 workflow。将 `specrow explore`、`specrow proposal`、`specrow build` 或直接的 SpecRow 请求视为 workflow 意图，并通过 SpecRow MCP 工具执行。",
+      overview: "SpecRow 是 agent-first 的规格 workflow。将 `specrow migrate`、`specrow explore`、`specrow proposal`、`specrow build` 或直接的 SpecRow 请求视为 workflow 意图，并通过 SpecRow MCP 工具执行。",
       languageRule: "创建或修改内置 SpecRow 文件前，读取 `.specrow/config.yml` 并使用其中配置的 `language`。不要静默 fallback 到英文。",
       toolCore: "工具核心：",
       forbidden: "禁止："
     },
     toolCoreFallback: "使用这些 SpecRow MCP 工具：",
     skill: {
-      description: "当用户提到 SpecRow，或请求 specrow explore、proposal、review、build、revise、accept 时，使用 SpecRow workflow。",
+      description: "当用户提到 SpecRow，或请求 specrow migrate、explore、proposal、review、build、revise、accept 时，使用 SpecRow workflow。",
       whenToUse: "何时使用",
       instructions: "说明",
       triggers: [
-        "用户请求 SpecRow workflow，例如 `specrow explore`、`specrow proposal` 或 `specrow build`。",
-        "用户要求初始化 SpecRow、探索想法、创建提案、review、build、revise 或 accept 一个 SpecRow 变更。"
+        "用户请求 SpecRow workflow，例如 `specrow migrate`、`specrow explore`、`specrow proposal` 或 `specrow build`。",
+        "用户要求初始化 SpecRow、迁移现有规格产物、探索想法、创建提案、review、build、revise 或 accept 一个 SpecRow 变更。"
       ]
     }
   }

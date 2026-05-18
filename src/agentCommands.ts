@@ -9,6 +9,7 @@ import {
 
 export const AGENT_COMMAND_NAMES = [
   "/specrow:init",
+  "/specrow:migrate",
   "/specrow:explore",
   "/specrow:proposal",
   "/specrow:review",
@@ -19,7 +20,7 @@ export const AGENT_COMMAND_NAMES = [
 
 export type AgentCommandName = (typeof AGENT_COMMAND_NAMES)[number];
 
-export type AgentCommandPhase = "setup" | "exploration" | "proposal" | "review" | "implementation" | "revision" | "acceptance";
+export type AgentCommandPhase = "setup" | "migration" | "exploration" | "proposal" | "review" | "implementation" | "revision" | "acceptance";
 
 export interface ReviewPolicy {
   default: "recommended";
@@ -69,6 +70,34 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
     languageRules: AGENT_LANGUAGE_RULES,
     stopConditions: ["Missing template or message resources for the requested language."],
     nextCommands: ["/specrow:proposal"],
+    allowsFinalSpecIntegration: false,
+    allowsArchive: false,
+    requiresExplicitUserAcceptance: false
+  },
+  {
+    name: "/specrow:migrate",
+    phase: "migration",
+    userIntent: "Migrate existing OpenSpec, SpecKit, or documentation-folder specification artifacts into SpecRow.",
+    toolCore: ["specrow_project_status", "specrow_migrate", "specrow_validate", "specrow_context"],
+    cliCore: ["specrow migrate [folder | system]", "specrow validate", "specrow context"],
+    agentBehavior: [
+      "Identify whether the source is OpenSpec, SpecKit, or a documentation folder before writing migration output.",
+      "Initialize SpecRow when the project is not initialized.",
+      "Run migration through the SpecRow MCP tool or CLI core and preserve source traceability.",
+      "Validate migrated SpecRow files and report warnings that require user review."
+    ],
+    forbiddenActions: [
+      "Do not delete, move, or rewrite the legacy source.",
+      "Do not transform archived source entries; copy archive records as preserved history.",
+      "Do not treat migrated specs as final truth without user review."
+    ],
+    languageRules: AGENT_LANGUAGE_RULES,
+    stopConditions: [
+      "The requested source cannot be found or safely read.",
+      "The configured language has missing templates or lifecycle messages.",
+      "Migrated output would overwrite existing SpecRow files without explicit force."
+    ],
+    nextCommands: ["/specrow:review", "/specrow:proposal"],
     allowsFinalSpecIntegration: false,
     allowsArchive: false,
     requiresExplicitUserAcceptance: false

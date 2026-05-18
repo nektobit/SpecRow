@@ -182,6 +182,23 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     "list.empty": "No hay cambios activos.",
     "list.warning": "Advertencia: {warning}",
     "next.acceptOrRevise": "Siguiente paso: specrow accept o specrow revise.",
+    "migration.completed": "Migración completada para {source}.",
+    "migration.dryRun": "Ensayo de migración completado para {source}.",
+    "migration.initialized": "Inicializado {path} para la migración.",
+    "migration.sourceDetected": "Se detectó fuente {kind} en {source}.",
+    "migration.copied": "Archivos de migración copiados: {count}.",
+    "migration.converted": "Cambios activos convertidos: {count}.",
+    "migration.skipped": "Destinos de migración existentes omitidos: {count}.",
+    "migration.warning": "Advertencia de migración: {warning}",
+    "migration.warning.noSpecKitFeatures": "No se encontraron directorios de características SpecKit en {path}.",
+    "migration.warning.noDocumentationFiles": "No se encontraron archivos de documentación en {path}.",
+    "migration.warning.importedDocumentationReview": "La documentación importada se copió como material de origen; revísala antes de tratarla como especificaciones finales de SpecRow.",
+    "migration.proposalAppendix": `## Fuente de migración
+Migrado desde la fuente {kind}: {source}.
+Los artefactos originales se conservan en {path}.`,
+    "migration.tasksAppendix": `## Revisión de migración
+- [ ] Revisar los artefactos de fuente {kind} conservados en {path}.
+- [ ] Confirmar el resultado migrado desde {source} antes de tratarlo como verdad final de SpecRow.`,
     "error.missingTemplate": "Falta la plantilla de SpecRow \"{name}\" para el idioma \"{language}\".",
     "error.missingMessage": "Falta el mensaje de SpecRow \"{name}\" para el idioma \"{language}\"."
   },
@@ -201,6 +218,31 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
         "No hacer fallback silencioso al inglés."
       ],
       stopConditions: ["Faltan plantillas o mensajes para el idioma solicitado."]
+    },
+    "/specrow:migrate": {
+      userIntent: "Migrar artefactos de especificación existentes de OpenSpec, SpecKit o una carpeta de documentación a SpecRow.",
+      agentBehavior: [
+        "Identificar si la fuente es OpenSpec, SpecKit o una carpeta de documentación antes de escribir la salida de migración.",
+        "Inicializar SpecRow cuando el proyecto no esté inicializado.",
+        "Ejecutar la migración mediante la herramienta MCP de SpecRow o el núcleo CLI y preservar la trazabilidad de la fuente.",
+        "Validar los archivos SpecRow migrados e informar advertencias que requieren revisión del usuario."
+      ],
+      forbiddenActions: [
+        "No eliminar, mover ni reescribir la fuente heredada.",
+        "No transformar entradas archivadas de la fuente; copiar registros de archivo como historial preservado.",
+        "No tratar las especificaciones migradas como verdad final sin revisión del usuario."
+      ],
+      languageRules: [
+        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
+        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
+        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
+        "No hacer fallback silencioso al inglés."
+      ],
+      stopConditions: [
+        "La fuente solicitada no se puede encontrar o leer de forma segura.",
+        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida.",
+        "La salida migrada sobrescribiría archivos SpecRow existentes sin force explícito."
+      ]
     },
     "/specrow:explore": {
       userIntent: "Explorar una idea, un problema o un posible cambio antes de convertirlo en propuesta.",
@@ -354,19 +396,19 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
     invocationTemplate: "Usa este workflow cuando el usuario escriba `{command}` o pida la misma intención.",
     agentInstructions: {
       title: "Instrucciones del agente SpecRow",
-      overview: "SpecRow es un workflow de especificaciones agent-first. Trata mensajes como `specrow explore`, `specrow proposal`, `specrow build` o pedidos directos de SpecRow como intenciones de workflow. Ejecutalos mediante herramientas MCP de SpecRow.",
+      overview: "SpecRow es un workflow de especificaciones agent-first. Trata mensajes como `specrow migrate`, `specrow explore`, `specrow proposal`, `specrow build` o pedidos directos de SpecRow como intenciones de workflow. Ejecutalos mediante herramientas MCP de SpecRow.",
       languageRule: "Antes de crear o revisar archivos integrados de SpecRow, lee `.specrow/config.yml` y usa su `language` configurado. No hagas fallback silencioso al inglés.",
       toolCore: "Nucleo de herramientas:",
       forbidden: "Prohibido:"
     },
     toolCoreFallback: "Usa estas herramientas MCP de SpecRow:",
     skill: {
-      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o pida specrow explore, proposal, review, build, revise o accept.",
+      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o pida specrow migrate, explore, proposal, review, build, revise o accept.",
       whenToUse: "Cuándo usar",
       instructions: "Instrucciones",
       triggers: [
-        "El usuario pide un workflow de SpecRow como `specrow explore`, `specrow proposal` o `specrow build`.",
-        "El usuario pide inicializar SpecRow, explorar una idea, crear una propuesta, revisar, construir, revisar cambios o aceptar un cambio SpecRow."
+        "El usuario pide un workflow de SpecRow como `specrow migrate`, `specrow explore`, `specrow proposal` o `specrow build`.",
+        "El usuario pide inicializar SpecRow, migrar artefactos de especificación existentes, explorar una idea, crear una propuesta, revisar, construir, revisar cambios o aceptar un cambio SpecRow."
       ]
     }
   }

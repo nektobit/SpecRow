@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -122,14 +122,15 @@ describe("SpecRow MCP runtime", () => {
     });
   });
 
-  it("includes explore in the workflow guide without adding a mutating tool", async () => {
+  it("includes migrate and explore in the workflow guide without adding a mutating explore tool", async () => {
     const cwd = await createTempProject();
     const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
 
     await expect(runtime.callTool("specrow_workflow_guide")).resolves.toMatchObject({
       success: true,
-      workflow: ["explore", "proposal", "review", "build", "revise", "accept", "archive"],
+      workflow: ["migrate", "explore", "proposal", "review", "build", "revise", "accept", "archive"],
       tools: {
+        migrate: expect.stringContaining("specrow_migrate"),
         explore: expect.stringContaining("specrow_context"),
         proposal: "specrow_create_proposal"
       }
@@ -137,6 +138,39 @@ describe("SpecRow MCP runtime", () => {
     await expect(runtime.callTool("specrow_explore")).resolves.toMatchObject({
       success: false,
       code: "NOT_FOUND"
+    });
+  });
+
+  it("migrates project-local documentation through specrow_migrate", async () => {
+    const cwd = await createTempProject("en");
+    await mkdir(path.join(cwd, "docs"), { recursive: true });
+    await writeFile(path.join(cwd, "docs", "capability.md"), "capability notes\n", "utf8");
+    const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
+
+    await expect(runtime.callTool("specrow_migrate", { source: "docs" })).resolves.toMatchObject({
+      success: true,
+      language: "en",
+      migration: {
+        source: { kind: "folder" },
+        copied: [
+          expect.objectContaining({
+            targetPath: path.join(".specrow", "specs", "imported", "capability.md")
+          })
+        ]
+      }
+    });
+    await expect(readFile(path.join(cwd, ".specrow", "specs", "imported", "capability.md"), "utf8")).resolves.toBe(
+      "capability notes\n"
+    );
+  });
+
+  it("keeps specrow_migrate locked to the MCP project root", async () => {
+    const cwd = await createTempProject();
+    const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
+
+    await expect(runtime.callTool("specrow_migrate", { source: ".." })).resolves.toMatchObject({
+      success: false,
+      code: "UNSAFE_PATH"
     });
   });
 
