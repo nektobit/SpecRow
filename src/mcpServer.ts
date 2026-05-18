@@ -29,7 +29,7 @@ import {
   type ValidationIssue
 } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.8";
+const SPECROW_VERSION = "0.1.9";
 const SPECROW_DIR = ".specrow";
 
 const EmptySchema = z.object({}).optional();
