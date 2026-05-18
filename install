@@ -46,14 +46,29 @@ Next step: verify the MCP server configuration.
 
 ## 3. Verify MCP server configuration
 
-If manual MCP configuration is required, use:
+If manual MCP configuration is required, register SpecRow in the actual MCP configuration used by the current agent, editor, or MCP host. Do not assume that a global CLI config file is used by every host.
+
+Use a server named `specrow`.
+
+Recommended npm-based server configuration:
 
 ```txt
 server name: specrow
-command: specrow-mcp
+command: npx
+args: -y specrow@latest mcp
 ```
 
-For Codex, the MCP server entry is stored globally in the Codex config. It must not be bound to the project where setup happened. Use a workspace-aware entry:
+For Windows hosts that do not resolve `npx` from PATH, use the explicit Node.js command wrapper:
+
+```txt
+server name: specrow
+command: C:\Program Files\nodejs\npx.cmd
+args: -y specrow@latest mcp
+```
+
+If the host is configured to use a globally installed SpecRow binary instead, `command: specrow-mcp` with no project path is also valid.
+
+For TOML-based MCP configuration, the equivalent workspace-aware entry is:
 
 ```toml
 [mcp_servers.specrow]
@@ -61,13 +76,17 @@ command = "npx"
 args = ["-y", "specrow@latest", "mcp"]
 ```
 
-Do not write an MCP entry like this, because it pins every future workspace to one project:
+Do not pass a project path by default. Without an explicit path, SpecRow MCP uses the current working directory provided by the agent/editor as `projectRoot`, which keeps the configuration reusable across projects.
+
+Do not write an MCP entry like this unless the user explicitly wants this MCP server locked to one project:
 
 ```toml
 args = ["-y", "specrow@latest", "mcp", "/path/to/one/project"]
 ```
 
-If the current agent session still sees an old MCP server after configuration changes, stop the install and tell the user to restart the agent before expecting MCP tools to use the new workspace.
+If the current agent session still sees an old MCP server after configuration changes, stop the install and tell the user to restart or reload the agent/editor MCP session before expecting MCP tools to use the new workspace.
+
+Verify success through MCP `tools/list`. The server should expose `specrow_project_status`, `specrow_init`, `specrow_validate`, and other `specrow_*` tools. Do not use MCP resources as the success criterion; resources may be empty or irrelevant for this workflow.
 
 Next step: inspect the current project with MCP.
 
