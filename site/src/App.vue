@@ -9,7 +9,7 @@ import specrowLogoUrl from './assets/specrow-logo.svg'
 import specrowPackage from '../../package.json'
 
 const homePage = 'instructions'
-const asidePages = new Set(['knowledge-base', 'manifesto', 'localization'])
+const asidePages = new Set(['sd-development', 'manifesto', 'localization'])
 const specrowVersion = specrowPackage.version
 
 const route = useRoute()

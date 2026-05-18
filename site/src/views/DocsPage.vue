@@ -10,7 +10,7 @@ import ConsoleBlock from '../components/ConsoleBlock.vue'
 type ConsoleVariant = 'ai' | 'cmd'
 
 const homePage: PageSlug = 'instructions'
-const extraInfoPages: PageSlug[] = ['manifesto', 'localization', 'knowledge-base']
+const extraInfoPages: PageSlug[] = ['manifesto', 'localization', 'sd-development']
 
 const route = useRoute()
 const { t } = useI18n()

@@ -44,7 +44,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       templates: 'Templates',
       localization: 'Localization',
       'validation-lifecycle': 'Validation',
-      'knowledge-base': 'Knowledge Base',
+      'sd-development': 'SD Development',
     },
   },
   ru: {
@@ -71,7 +71,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       templates: 'Шаблоны',
       localization: 'Локализация',
       'validation-lifecycle': 'Валидация',
-      'knowledge-base': 'База знаний',
+      'sd-development': 'SD разработка',
     },
   },
   es: {
@@ -98,7 +98,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       templates: 'Plantillas',
       localization: 'Localización',
       'validation-lifecycle': 'Validación',
-      'knowledge-base': 'Base de conocimiento',
+      'sd-development': 'Desarrollo SD',
     },
   },
   'zh-CN': {
@@ -125,7 +125,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       templates: '模板',
       localization: '本地化',
       'validation-lifecycle': '验证',
-      'knowledge-base': '知识库',
+      'sd-development': 'SD 开发',
     },
   },
 }
