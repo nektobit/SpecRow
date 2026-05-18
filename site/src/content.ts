@@ -24,7 +24,7 @@ export const pages = [
 
 export type PageSlug = (typeof pages)[number]['slug']
 
-export type TextPart = string | { text: string; page: PageSlug }
+export type TextPart = string | { text: string; page: PageSlug } | { text: string; marks: readonly ('bold' | 'italic')[] }
 export type Paragraph = string | TextPart[]
 
 export type Block =
@@ -65,7 +65,23 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
       title: 'Getting Started',
       description: 'Use SpecRow through MCP workflows in agent sessions. Use the CLI only for CI, scripts, or automation outside an agent session.',
       blocks: [
-        { type: 'section', heading: 'What Is Spec-Driven Development?', paragraphs: ['Spec-Driven Development (SDD) flips the script on traditional software development. For decades, code has been king: specifications were just scaffolding we built and discarded once the "real work" of coding began. SDD changes this: specifications become executable, directly generating working implementations rather than just guiding them.'] },
+        {
+          type: 'section',
+          heading: 'What Is Spec-Driven Development?',
+          paragraphs: [
+            [
+              { text: 'A specification is a ', marks: ['italic'] },
+              { text: 'document', marks: ['italic', 'bold'] },
+              { text: ' with an unambiguous description of what needs to be done. A contract for development and verification.', marks: ['italic'] },
+            ],
+            "Spec-Driven Development, or development through specification, is a methodology whose principles trace back to NASA workflows in the 1960s. In those years, the cost of mistakes was high: billions of dollars and astronauts' lives depended on software code. NASA programmers created a set of rules that, over the years, shaped a proven methodology.",
+            'The method is this: documentation is written first, and only after the full description of "how every button should work" is complete does the code get written. The result is constantly checked against the documentation. If we want to make a change, the documentation changes first, and only then the code.',
+            'Since 2026, this methodology has found new life. Writing code together with a neural network? Complete project documentation is your main assistant. You get predictable software written in the style you need. You no longer have to spend time explaining the "rules of the game" several times to a new agent; continue from the point where you stopped last time.',
+            'SpecRow stores the description of what the project is, which parts it consists of, and which tools and scripts are available to the agent for writing code. This is the long-lived part of the documentation.',
+            'In addition, there are changes, which say what needs to be done during the session. These changes are described, implemented, and archived.',
+            'SpecRow does not solve every SDD problem. It regulates how specs are written, where they live, and how they are checked, closing the loop from "described" to "received the result" without breaking on the human factor.',
+          ],
+        },
         { type: 'command-section', heading: 'Install Through An Agent', intro: 'You can start using SpecRow through an agent. Paste the following line into your IDE chat, and the agent will install the CLI and configure the environment.', commands: ['apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=en'], outro: 'The language parameter tells the agent which project working language to use when it initializes .specrow and installs integrations.' },
         { type: 'section', heading: 'Normal Use', paragraphs: ['After setup, tell the agent what you want with SpecRow MCP workflows. The agent should call MCP tools, read .specrow files, run validation, and prepare context without requiring you to memorize tool names.'] },
         { type: 'command-section', heading: 'Automation CLI', intro: 'Use the CLI directly for automation, CI, or manual setup outside an agent session.', commands: ['npm i -g specrow', 'specrow init --language en --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update', 'specrow integrations status'], outro: 'Without --tools, specrow init only creates the .specrow workspace.' },
@@ -205,7 +221,23 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
       title: 'Начало работы',
       description: 'Как начать работу со SpecRow: подготовить проект, создать первые спецификации и использовать их как основу для разработки.',
       blocks: [
-        { type: 'section', heading: 'Что такое Spec-Driven Development?', paragraphs: ['Spec-Driven Development, или разработка через спецификации, меняет привычную логику создания ПО. Раньше в центре почти всегда был код, а спецификации часто служили временной опорой: их писали на старте, чтобы договориться о решении, а потом откладывали в сторону, когда начиналась «настоящая» разработка. В SDD спецификация становится центром рабочего процесса. Она описывает будущую систему и помогает напрямую получать реализацию, которую можно проверять и развивать дальше.'] },
+        {
+          type: 'section',
+          heading: 'Что такое Spec-Driven Development?',
+          paragraphs: [
+            [
+              { text: 'Спецификация — это ', marks: ['italic'] },
+              { text: 'документ', marks: ['italic', 'bold'] },
+              { text: ' с однозначным описанием того, что нужно сделать. Контракт для разработки и проверки.', marks: ['italic'] },
+            ],
+            'Spec-Driven Development, или разработка через спецификацию. Принципы SDD берут начало в рабочих процессах NASA еще в 1960-х годах. В те годы цена ошибки была высокой, от программного кода зависели миллиарды долларов и жизни астронавтов. Программисты NASA создали набор правил, который с течением лет сформировался в проверенную методологию.',
+            'Методика такова: сначала пишется документация, и после полного описания “как должна работать каждая кнопка” пишется код. Результат постоянно сверяется с документацией. Если хотим внести изменение, сначала меняется документация и только потом код.',
+            'С 2026 года эта методология получила новую жизнь. Пишете код совместно с нейросетью? Полная проектная документация — ваш основной помощник. Вы получаете предсказуемую, написанную в нужном стиле программу. Больше не нужно тратить время на то, чтобы по нескольку раз объяснять “правила игры” новому агенту: продолжайте работать с того места, на котором остановились последний раз.',
+            'В SpecRow живет описание того, что из себя представляет проект, из каких частей состоит, какие инструменты и скрипты доступны агенту для написания кода. Это долгоживущая часть документации.',
+            'Помимо этого существуют changes, или изменения, которые говорят, что нужно сделать в течение сессии. Эти изменения описываются, воплощаются и архивируются.',
+            'SpecRow не решает всех проблем SDD. Он регламентирует, как пишутся спеки, где лежат и как проверяются, замыкая цикл «описал — получил результат» без отрыва на человеческий фактор.',
+          ],
+        },
         { type: 'command-section', heading: 'Установка через агента', intro: 'Вы можете начать работу со SpecRow через агента. Просто вставьте следующую строку в чат вашей IDE, агент сам установит CLI и настроит окружение.', commands: ['apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru'], outro: 'Параметр language сообщает агенту, какой рабочий язык проекта использовать при инициализации .specrow и установке интеграций.' },
         { type: 'section', heading: 'Работа вместе с агентом', paragraphs: ['Начните с обсуждения идеи. Если задача ещё не до конца понятна, используйте explore: агент изучит контекст и поможет сформулировать изменение, но ничего не запишет в проект.'], commands: ['specrow explore Обсудить вход без пароля'] },
         { type: 'section', heading: 'Создание proposal', headingLevel: 3, paragraphs: ['Когда стало понятно, что нужно сделать, создайте proposal:'], commands: ['specrow proposal Добавить вход без пароля'] },
@@ -351,7 +383,23 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
       title: 'Primeros pasos',
       description: 'Usa SpecRow primero con workflows MCP. Usa la CLI solo para CI, scripts o automatización fuera de una sesión de agente.',
       blocks: [
-        { type: 'section', heading: '¿Qué es Spec-Driven Development?', paragraphs: ['Spec-Driven Development (SDD), o desarrollo guiado por especificaciones, cambia el guion del desarrollo de software tradicional. Durante décadas, el código fue el centro: las especificaciones eran solo andamiaje que construíamos y descartábamos cuando comenzaba el "trabajo real" de programar. SDD cambia esto: las especificaciones se vuelven ejecutables y generan directamente implementaciones funcionales, en lugar de limitarse a guiarlas.'] },
+        {
+          type: 'section',
+          heading: '¿Qué es Spec-Driven Development?',
+          paragraphs: [
+            [
+              { text: 'Una especificación es un ', marks: ['italic'] },
+              { text: 'documento', marks: ['italic', 'bold'] },
+              { text: ' con una descripción inequívoca de lo que hay que hacer. Un contrato para desarrollar y verificar.', marks: ['italic'] },
+            ],
+            'Spec-Driven Development, o desarrollo mediante especificación, es una metodología cuyos principios se remontan a los procesos de trabajo de NASA en la década de 1960. En aquellos años, el coste de un error era alto: del código de software dependían miles de millones de dólares y la vida de los astronautas. Los programadores de NASA crearon un conjunto de reglas que, con los años, formó una metodología probada.',
+            'La metodología es esta: primero se escribe la documentación, y solo después de describir por completo "cómo debe funcionar cada botón" se escribe el código. El resultado se contrasta constantemente con la documentación. Si queremos introducir un cambio, primero cambia la documentación y solo después el código.',
+            'Desde 2026, esta metodología ha cobrado nueva vida. ¿Escribes código junto con una red neuronal? La documentación completa del proyecto es tu asistente principal. Obtienes un programa predecible, escrito en el estilo que necesitas. Ya no hace falta dedicar tiempo a explicar varias veces las "reglas del juego" a un agente nuevo; continúa desde el punto en el que te detuviste la última vez.',
+            'SpecRow conserva la descripción de qué es el proyecto, de qué partes se compone y qué herramientas y scripts tiene disponibles el agente para escribir código. Esta es la parte duradera de la documentación.',
+            'Además existen changes, o cambios, que indican qué hay que hacer durante la sesión. Estos cambios se describen, se implementan y se archivan.',
+            'SpecRow no resuelve todos los problemas de SDD. Regula cómo se escriben las specs, dónde viven y cómo se verifican, cerrando el ciclo de "descrito" a "resultado obtenido" sin depender del factor humano.',
+          ],
+        },
         { type: 'command-section', heading: 'Instalar mediante un agente', intro: 'Puedes empezar a usar SpecRow mediante un agente. Pega la siguiente línea en el chat de tu IDE, y el agente instalará la CLI y configurará el entorno.', commands: ['apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=es'], outro: 'El parámetro language indica al agente qué idioma de trabajo del proyecto debe usar al inicializar .specrow e instalar integraciones.' },
         { type: 'section', heading: 'Uso normal', paragraphs: ['Después de la instalación, dile al agente lo que quieres con workflows MCP de SpecRow. El agente debe llamar herramientas MCP, leer archivos .specrow, ejecutar validación y preparar contexto sin exigirte memorizar nombres de tools.'] },
         { type: 'command-section', heading: 'CLI para automatización', intro: 'Usa la CLI directamente para automatización, CI o instalación manual fuera de una sesión de agente.', commands: ['npm i -g specrow', 'specrow init --language es --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update', 'specrow integrations status'], outro: 'Sin --tools, specrow init solo crea el workspace .specrow.' },
@@ -491,7 +539,23 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
       title: '开始使用',
       description: '优先通过MCP workflow使用 SpecRow。CLI 仅用于代理会话之外的 CI、脚本或自动化。',
       blocks: [
-        { type: 'section', heading: '什么是 Spec-Driven Development？', paragraphs: ['Spec-Driven Development (SDD)，即规格驱动开发，改变了传统软件开发的思路。几十年来，代码一直处于核心地位：规格只是我们搭建的脚手架，一旦真正开始编码，就会被丢弃。SDD 改变了这一点：规格变成可执行内容，直接生成可工作的实现，而不只是指导实现。'] },
+        {
+          type: 'section',
+          heading: '什么是 Spec-Driven Development？',
+          paragraphs: [
+            [
+              { text: '规格是一份', marks: ['italic'] },
+              { text: '文档', marks: ['italic', 'bold'] },
+              { text: '，用明确无歧义的方式说明需要做什么。它是开发和验证的契约。', marks: ['italic'] },
+            ],
+            'Spec-Driven Development，即通过规格进行开发，是一种原则可追溯到 1960 年代 NASA 工作流程的方法论。当时错误的代价很高：软件代码关系到数十亿美元和宇航员的生命。NASA 程序员创建了一套规则，随着时间推移形成了经过验证的方法论。',
+            '方法是这样的：先写文档，只有在完整描述“每个按钮应该如何工作”之后，才开始写代码。结果会持续与文档核对。如果要引入变更，先修改文档，然后再修改代码。',
+            '自 2026 年起，这套方法论获得了新的生命。你在和神经网络一起写代码吗？完整的项目文档就是你的主要助手。你会得到可预测的、按照所需风格编写的程序。不再需要花时间一遍遍向新代理解释“游戏规则”；从上次停下的位置继续工作即可。',
+            'SpecRow 保存项目是什么、由哪些部分组成，以及代理可用于编写代码的工具和脚本。这是文档中长期存在的部分。',
+            '除此之外，还有 changes，也就是变更，用来说明本次会话中需要完成什么。这些变更会被描述、实现并归档。',
+            'SpecRow 并不解决 SDD 的所有问题。它规定 specs 如何编写、放在哪里、如何检查，从而闭合“描述了需求 — 得到了结果”的循环，减少对人为因素的依赖。',
+          ],
+        },
         { type: 'command-section', heading: '通过代理安装', intro: '你可以通过代理开始使用 SpecRow。只需把下面这一行粘贴到 IDE 聊天中，代理会安装 CLI 并配置环境。', commands: ['apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=zh-CN'], outro: 'language 参数会告诉代理在初始化 .specrow 和安装集成时使用哪个项目工作语言。' },
         { type: 'section', heading: '常规使用', paragraphs: ['安装后，用 SpecRow MCP workflow 告诉代理你的意图。代理应调用 MCP 工具、读取 .specrow 文件、运行验证并准备上下文，而不要求用户记住工具名称。'] },
         { type: 'command-section', heading: '手动 Automation CLI', intro: '在代理会话之外需要自动化、CI 或手动安装时，直接使用 CLI。', commands: ['npm i -g specrow', 'specrow init --language zh-CN --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update', 'specrow integrations status'], outro: '没有 --tools 时，specrow init 只创建 .specrow workspace。' },

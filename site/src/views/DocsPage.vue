@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
-import { defaultLocale, docContent, type Block, type LocaleCode, type PageSlug, type Paragraph } from '../content'
+import { defaultLocale, docContent, type Block, type LocaleCode, type PageSlug, type Paragraph, type TextPart } from '../content'
 import { blockId, readingMinutes, sectionLinks } from '../docs'
 import ConsoleBlock from '../components/ConsoleBlock.vue'
 
@@ -23,6 +23,14 @@ const links = computed(() => sectionLinks(page.value))
 
 function paragraphParts(paragraph: Paragraph) {
   return Array.isArray(paragraph) ? paragraph : [paragraph]
+}
+
+function isLinkPart(part: TextPart): part is { text: string; page: PageSlug } {
+  return typeof part !== 'string' && 'page' in part
+}
+
+function hasMark(part: TextPart, mark: 'bold' | 'italic'): boolean {
+  return typeof part !== 'string' && 'marks' in part && part.marks.includes(mark)
 }
 
 function linkTo(page: PageSlug): string {
@@ -111,9 +119,12 @@ function isExplicitTerminalCommand(command: string): boolean {
             <component :is="headingTag(block)">{{ block.heading }}</component>
             <p v-for="(paragraph, paragraphIndex) in block.paragraphs" :key="paragraphIndex">
               <template v-for="part in paragraphParts(paragraph)" :key="typeof part === 'string' ? part : part.text">
-                <RouterLink v-if="typeof part !== 'string'" :to="linkTo(part.page)">
+                <RouterLink v-if="isLinkPart(part)" :to="linkTo(part.page)">
                   {{ part.text }}
                 </RouterLink>
+                <strong v-else-if="hasMark(part, 'bold') && hasMark(part, 'italic')"><em>{{ typeof part === 'string' ? part : part.text }}</em></strong>
+                <strong v-else-if="hasMark(part, 'bold')">{{ typeof part === 'string' ? part : part.text }}</strong>
+                <em v-else-if="hasMark(part, 'italic')">{{ typeof part === 'string' ? part : part.text }}</em>
                 <template v-else>{{ part }}</template>
               </template>
             </p>
@@ -147,9 +158,12 @@ function isExplicitTerminalCommand(command: string): boolean {
           <div v-else class="rounded-lg border border-[#2e2e32] bg-[#2a2a2a] p-5">
             <p v-for="(paragraph, paragraphIndex) in block.paragraphs" :key="paragraphIndex">
               <template v-for="part in paragraphParts(paragraph)" :key="typeof part === 'string' ? part : part.text">
-                <RouterLink v-if="typeof part !== 'string'" :to="linkTo(part.page)">
+                <RouterLink v-if="isLinkPart(part)" :to="linkTo(part.page)">
                   {{ part.text }}
                 </RouterLink>
+                <strong v-else-if="hasMark(part, 'bold') && hasMark(part, 'italic')"><em>{{ typeof part === 'string' ? part : part.text }}</em></strong>
+                <strong v-else-if="hasMark(part, 'bold')">{{ typeof part === 'string' ? part : part.text }}</strong>
+                <em v-else-if="hasMark(part, 'italic')">{{ typeof part === 'string' ? part : part.text }}</em>
                 <template v-else>{{ part }}</template>
               </template>
             </p>
