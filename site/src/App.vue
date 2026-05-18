@@ -6,9 +6,11 @@ import githubMarkSvg from '@primer/octicons/build/svg/mark-github-24.svg?raw'
 
 import { defaultLocale, locales, pages, type LocaleCode } from './content'
 import specrowLogoUrl from './assets/specrow-logo.svg'
+import specrowPackage from '../../package.json'
 
 const homePage = 'instructions'
 const asidePages = new Set(['knowledge-base', 'manifesto', 'localization'])
+const specrowVersion = specrowPackage.version
 
 const route = useRoute()
 const router = useRouter()
@@ -66,6 +68,9 @@ async function switchLocale(localeCode: LocaleCode): Promise<void> {
       <RouterLink class="inline-flex items-center gap-2 text-2xl font-bold leading-none text-[#fffff5db] no-underline" :to="`/${activeLocale}/`">
         <img class="size-8 rounded-md" :src="specrowLogoUrl" alt="" aria-hidden="true">
         <span>SpecRow</span>
+        <span class="rounded-md border border-[#42b88366] bg-[#42b8831a] px-1.5 py-1 text-xs font-bold leading-none text-[#42b883]">
+          v{{ specrowVersion }}
+        </span>
       </RouterLink>
 
       <nav
