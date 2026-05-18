@@ -13,10 +13,10 @@ pnpm preview
 
 Local development runs from `/`, so open `http://localhost:5173/en/`.
 
-The production build uses `/SpecRow/` as the default base path for GitHub Pages. Set
-`BASE_PATH` to override it for another hosting target.
+The production build uses `/` as the default base path for `https://specrow.com/`.
+Set `BASE_PATH` to override it for another hosting target.
 
-The sitemap and robots files use `https://nektobit.github.io/SpecRow/` by default.
+The sitemap and robots files use `https://specrow.com/` by default.
 Set `SITE_URL` to change the canonical domain:
 
 ```sh

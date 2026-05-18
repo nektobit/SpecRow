@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import * as ts from 'typescript'
 
-export const defaultSiteUrl = 'https://nektobit.github.io/SpecRow/'
+export const defaultSiteUrl = 'https://specrow.com/'
 export const homePage = 'instructions'
 
 const contentPath = resolve(import.meta.dirname, '..', 'src', 'content.ts')

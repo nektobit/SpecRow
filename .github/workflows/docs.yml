@@ -9,16 +9,14 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: docs
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build documentation site
+  build-and-deploy:
+    name: Build and deploy documentation site
     runs-on: ubuntu-latest
 
     steps:
@@ -37,32 +35,37 @@ jobs:
           cache: pnpm
           cache-dependency-path: site/pnpm-lock.yaml
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
       - name: Install dependencies
         working-directory: site
         run: pnpm install --frozen-lockfile
 
       - name: Build
         working-directory: site
+        env:
+          BASE_PATH: ${{ secrets.BASE_PATH || '/' }}
+          SITE_URL: ${{ secrets.SITE_URL || 'https://specrow.com/' }}
         run: pnpm build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site/dist
+      - name: Install deploy client
+        if: github.event_name != 'pull_request'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
 
-  deploy:
-    name: Deploy documentation site
-    if: github.event_name != 'pull_request'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      - name: Deploy to Beget
+        if: github.event_name != 'pull_request'
+        env:
+          BEGET_DEPLOY_HOST: ${{ secrets.BEGET_DEPLOY_HOST }}
+          BEGET_DEPLOY_PORT: ${{ secrets.BEGET_DEPLOY_PORT }}
+          BEGET_DEPLOY_USER: ${{ secrets.BEGET_DEPLOY_USER }}
+          BEGET_DEPLOY_PASSWORD: ${{ secrets.BEGET_DEPLOY_PASSWORD }}
+          BEGET_DEPLOY_PATH: ${{ secrets.BEGET_DEPLOY_PATH }}
+        run: |
+          test -n "$BEGET_DEPLOY_HOST"
+          test -n "$BEGET_DEPLOY_PORT"
+          test -n "$BEGET_DEPLOY_USER"
+          test -n "$BEGET_DEPLOY_PASSWORD"
+          test -n "$BEGET_DEPLOY_PATH"
 
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          lftp -u "$BEGET_DEPLOY_USER","$BEGET_DEPLOY_PASSWORD" "sftp://$BEGET_DEPLOY_HOST:$BEGET_DEPLOY_PORT" \
+            -e "set sftp:auto-confirm yes; set net:timeout 30; set net:max-retries 2; mirror --reverse --delete --verbose --parallel=2 site/dist \"$BEGET_DEPLOY_PATH\"; bye"
