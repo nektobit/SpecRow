@@ -83,8 +83,25 @@ a {
     line-height: 1.25;
 }
 
+.content-flow h3 {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    color: #fffff5db;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
 .content-flow .doc-section:first-child h2 {
     margin-top: 0;
+}
+
+.content-flow .doc-section-sub {
+    margin-left: 0.75rem;
+    border-top: 0;
+    border-left: 2px solid #2e2e32;
+    padding-top: 1rem;
+    padding-left: 1rem;
 }
 
 .content-flow p,
@@ -196,4 +213,9 @@ a {
 .article-aside-card a.article-aside-link-active {
     border-left-color: #42b883;
     color: #42b883;
+}
+
+.article-aside-card a.article-aside-link-sub {
+    padding-left: 1.35rem;
+    font-size: 0.8125rem;
 }

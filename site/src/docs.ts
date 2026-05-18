@@ -5,6 +5,7 @@ const WORDS_PER_MINUTE = 200
 export interface SectionLink {
   id: string
   label: string
+  level: 2 | 3
 }
 
 export function blockId(index: number): string {
@@ -13,7 +14,7 @@ export function blockId(index: number): string {
 
 export function sectionLinks(page: PageContent): SectionLink[] {
   return page.blocks
-    .map((block, index) => ('heading' in block ? { id: blockId(index), label: block.heading } : null))
+    .map((block, index) => ('heading' in block ? { id: blockId(index), label: block.heading, level: block.headingLevel ?? 2 } : null))
     .filter((item): item is SectionLink => item !== null)
 }
 

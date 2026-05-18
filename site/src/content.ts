@@ -28,10 +28,10 @@ export type TextPart = string | { text: string; page: PageSlug }
 export type Paragraph = string | TextPart[]
 
 export type Block =
-  | { type: 'section'; heading: string; paragraphs: Paragraph[]; commands?: string[] }
-  | { type: 'list-section'; heading: string; intro: string; items: string[]; outro: string }
-  | { type: 'code-section'; heading: string; intro: string; code: string; outro: string }
-  | { type: 'command-section'; heading: string; intro: string; commands: string[]; outro: string }
+  | { type: 'section'; heading: string; headingLevel?: 2 | 3; paragraphs: Paragraph[]; commands?: string[] }
+  | { type: 'list-section'; heading: string; headingLevel?: 2 | 3; intro: string; items: string[]; outro: string }
+  | { type: 'code-section'; heading: string; headingLevel?: 2 | 3; intro: string; code: string; outro: string }
+  | { type: 'command-section'; heading: string; headingLevel?: 2 | 3; intro: string; commands: string[]; outro: string }
   | { type: 'placeholder'; paragraphs: Paragraph[] }
 
 export interface PageContent {
@@ -207,12 +207,18 @@ export const docContent: Record<LocaleCode, Record<PageSlug, PageContent>> = {
       blocks: [
         { type: 'section', heading: 'Что такое Spec-Driven Development?', paragraphs: ['Spec-Driven Development, или разработка через спецификации, меняет привычную логику создания ПО. Раньше в центре почти всегда был код, а спецификации часто служили временной опорой: их писали на старте, чтобы договориться о решении, а потом откладывали в сторону, когда начиналась «настоящая» разработка. В SDD спецификация становится центром рабочего процесса. Она описывает будущую систему и помогает напрямую получать реализацию, которую можно проверять и развивать дальше.'] },
         { type: 'command-section', heading: 'Установка через агента', intro: 'Вы можете начать работу со SpecRow через агента. Просто вставьте следующую строку в чат вашей IDE, агент сам установит CLI и настроит окружение.', commands: ['apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru'], outro: 'Параметр language сообщает агенту, какой рабочий язык проекта использовать при инициализации .specrow и установке интеграций.' },
-        { type: 'section', heading: 'Обычная работа', paragraphs: ['После установки формулируйте задачу агенту через MCP-workflow SpecRow. Агент должен вызывать MCP-инструменты, читать файлы .specrow, запускать валидацию и готовить контекст без необходимости помнить имена инструментов.'] },
-        { type: 'command-section', heading: 'Ручной Automation CLI', intro: 'Используйте CLI напрямую для автоматизации, CI или ручной установки вне агентной сессии.', commands: ['npm i -g specrow', 'specrow init --language ru --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect', 'specrow update', 'specrow integrations status'], outro: 'Без --tools команда specrow init создает только workspace .specrow.' },
-        { type: 'code-section', heading: 'Первое изменение', intro: 'Если идея еще расплывчата, начните с explore. Переходите к proposal, когда желаемый результат понятен.', code: 'specrow explore Обсудить вход без пароля\nspecrow proposal Добавить вход без пароля', outro: 'Explore использует read-only контекст и не создает изменение. Proposal создает .specrow/changes/<change-name>/proposal.md, tasks.md и status.yml, затем валидирует изменение до реализации.' },
-        { type: 'section', heading: 'Сборка и остановка', paragraphs: ['Используйте review для рискованных изменений или когда нужен readiness check. Используйте build для реализации. Сборка завершается состоянием built и ждет revise или accept.'], commands: ['specrow review', 'specrow build', 'specrow revise', 'specrow accept'] },
-        { type: 'section', heading: 'Доработать или принять', paragraphs: ['Используйте revise, если результат требует доработки. Используйте accept только когда вы явно принимаете результат. Только accept-путь может обновлять спецификации как финальную правду и архивировать изменение.'], commands: ['specrow revise', 'specrow accept'] },
-        { type: 'section', heading: 'Старые локальные структуры', paragraphs: ['Старые прототипы могли использовать бинарь specfly или папку .specfly. Новые проекты используют specrow и .specrow. Перенесите нужные проектные файлы в соответствующие места внутри .specrow.'] },
+        { type: 'section', heading: 'Работа вместе с агентом', paragraphs: ['Начните с обсуждения идеи. Если задача ещё не до конца понятна, используйте explore: агент изучит контекст и поможет сформулировать изменение, но ничего не запишет в проект.'], commands: ['specrow explore Обсудить вход без пароля'] },
+        { type: 'section', heading: 'Создание proposal', headingLevel: 3, paragraphs: ['Когда стало понятно, что нужно сделать, создайте proposal:'], commands: ['specrow proposal Добавить вход без пароля'] },
+        { type: 'section', heading: 'Проверка и сборка', headingLevel: 3, paragraphs: ['SpecRow создаст изменение в .specrow/changes/<change-name>/: описание, список задач и статус. После этого можно попросить агента проверить план или сразу перейти к сборке.'], commands: ['specrow review', 'specrow build'] },
+        { type: 'section', heading: 'Доработка', headingLevel: 3, paragraphs: ['После сборки проверьте результат. Если что-то нужно поправить, отправьте изменение на доработку:'], commands: ['specrow revise'] },
+        { type: 'section', heading: 'Приемка', headingLevel: 3, paragraphs: ['Если всё устраивает, примите работу:', 'Только после accept изменение становится частью актуальных спецификаций. Старое изменение архивируется, а .specrow/specs становится новой «правдой» проекта.'], commands: ['specrow accept'] },
+        { type: 'section', heading: 'Ручная работа через CLI', paragraphs: ['Тот же путь можно пройти без агента.', 'Сначала установите SpecRow и создайте workspace:'], commands: ['npm i -g specrow', 'specrow init --language ru'] },
+        { type: 'section', heading: 'Интеграции для агентов', headingLevel: 3, paragraphs: ['Если нужно сразу подготовить интеграции для агентов и редакторов, добавьте инструменты:'], commands: ['specrow init --language ru --tools codex,claude,cursor,windsurf,generic', 'specrow integrate --detect'] },
+        { type: 'section', heading: 'Создание изменения вручную', headingLevel: 3, paragraphs: ['Дальше создайте изменение:'], commands: ['specrow proposal add-passwordless-login'] },
+        { type: 'list-section', heading: 'Ручное заполнение файлов', headingLevel: 3, intro: 'После этого вручную откройте файлы в .specrow/changes/add-passwordless-login/ и заполните их:', items: ['proposal.md', 'tasks.md', 'status.yml'], outro: 'Опишите, что должно измениться, какие задачи нужно выполнить и как понять, что работа готова. Затем запустите проверку.' },
+        { type: 'section', heading: 'Проверка ручного плана', headingLevel: 3, paragraphs: ['Проверьте заполненное изменение перед реализацией.'], commands: ['specrow review'] },
+        { type: 'section', heading: 'Ручная реализация и приемка', headingLevel: 3, paragraphs: ['Если всё в порядке, внесите изменения в код и спеки вручную. После этого снова проверьте проект:', 'Когда результат готов, зафиксируйте изменение:', 'После принятия SpecRow обновит актуальные спецификации и перенесёт завершённое изменение в архив.'], commands: ['specrow validate', 'specrow accept add-passwordless-login'] },
+        { type: 'section', heading: 'Обновление и проверка интеграций', paragraphs: ['Иногда нужно обновить SpecRow или проверить, какие интеграции подключены к проекту.'], commands: ['specrow update', 'specrow integrations status'] },
       ],
     },
     workflow: {
