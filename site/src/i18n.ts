@@ -1,6 +1,7 @@
 import { createI18n } from 'vue-i18n'
 
 import { defaultLocale, type LocaleCode } from './content'
+import { readLocalePreference } from './localePreference'
 
 type ShellMessages = {
   skip: string
@@ -132,7 +133,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
 
 export const i18n = createI18n({
   legacy: false,
-  locale: defaultLocale,
+  locale: readLocalePreference() ?? defaultLocale,
   fallbackLocale: defaultLocale,
   messages,
 })

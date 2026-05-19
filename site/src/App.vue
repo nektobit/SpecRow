@@ -5,6 +5,7 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import githubMarkSvg from '@primer/octicons/build/svg/mark-github-24.svg?raw'
 
 import { defaultLocale, locales, pages, type LocaleCode } from './content'
+import { isLocaleCode, writeLocalePreference } from './localePreference'
 import specrowLogoUrl from './assets/specrow-logo.svg'
 import specrowPackage from '../../package.json'
 
@@ -19,7 +20,7 @@ const isMobileMenuOpen = ref(false)
 
 const activeLocale = computed<LocaleCode>(() => {
   const value = route.params.locale
-  return locales.some((item) => item.code === value) ? (value as LocaleCode) : defaultLocale
+  return isLocaleCode(value) ? value : defaultLocale
 })
 
 const activePage = computed(() => {
@@ -33,6 +34,7 @@ watch(
   (nextLocale) => {
     locale.value = nextLocale
     document.documentElement.lang = nextLocale
+    writeLocalePreference(nextLocale)
   },
   { immediate: true },
 )
