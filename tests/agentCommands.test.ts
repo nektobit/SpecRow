@@ -30,6 +30,22 @@ describe("SpecRow agent commands", () => {
     expect(proposal.cliCore).toEqual(["specrow proposal <change-name>", "specrow validate <change-name>", "specrow context <change-name>"]);
   });
 
+  it("keeps proposal creation bounded even when the user provides implementation details", () => {
+    const proposal = getAgentCommandSpec("/specrow:proposal", "en");
+
+    expect(proposal.agentBehavior).toEqual(
+      expect.arrayContaining([
+        "After creating and validating the proposal, stop and wait for a separate /specrow:review or /specrow:build request."
+      ])
+    );
+    expect(proposal.forbiddenActions).toEqual(
+      expect.arrayContaining([
+        "Do not let a complete implementation brief override the proposal-only boundary.",
+        "Do not implement code as part of proposal creation."
+      ])
+    );
+  });
+
   it("keeps migrate non-destructive and review-gated", () => {
     const migrate = getAgentCommandSpec("/specrow:migrate", "en");
 

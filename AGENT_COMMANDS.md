@@ -32,9 +32,9 @@ Exploration does not create `proposal.md`, `tasks.md`, `status.yml`, or a change
 
 ### `/specrow:proposal`
 
-Turns user intent into a change proposal. The agent chooses a stable change name, creates the change through the CLI core, fills `proposal.md` and `tasks.md` in the project language, validates the result, and reports blocking issues.
+Turns user intent into a change proposal. The agent chooses a stable change name, creates the change through the CLI core, fills `proposal.md` and `tasks.md` in the project language, validates the result, reports blocking issues, and stops before implementation.
 
-This command does not implement code, accept the change, archive the change, or update specs as final truth.
+This command does not implement code, accept the change, archive the change, or update specs as final truth. A complete implementation brief inside a `specrow proposal` request does not override this proposal-only boundary; implementation requires a separate `/specrow:build` request.
 
 ### `/specrow:review`
 

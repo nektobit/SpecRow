@@ -30,7 +30,7 @@ import {
   type ValidationIssue
 } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.10";
+const SPECROW_VERSION = "0.1.11";
 const SPECROW_DIR = ".specrow";
 
 const EmptySchema = z.object({}).optional();
@@ -239,7 +239,10 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         proposalPath: relative(projectRoot, result.proposalPath),
         tasksPath: relative(projectRoot, result.tasksPath),
         statusPath: relative(projectRoot, result.statusPath),
-        nextSteps: ["Ask for `specrow review` after the proposal and tasks are ready."]
+        nextSteps: [
+          "Stop after proposal creation; do not implement product code from a `specrow proposal` request.",
+          "Ask for `specrow review` or wait for a separate `specrow build` request after the proposal and tasks are ready."
+        ]
       });
     }),
     specrow_migrate: tool(MigrateSchema, async (input) => {

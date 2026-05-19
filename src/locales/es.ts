@@ -275,9 +275,14 @@ Los artefactos originales se conservan en {path}.`,
         "Elegir un nombre estable para el cambio a partir de la intención del usuario.",
         "Crear proposal.md, tasks.md y status.yml mediante herramientas MCP de SpecRow.",
         "Completar la propuesta y las tareas en el idioma configurado del proyecto.",
-        "Validar el cambio y mostrar problemas bloqueantes antes de iniciar la implementación."
+        "Validar el cambio y mostrar problemas bloqueantes antes de iniciar la implementación.",
+        "Después de crear y validar la propuesta, detenerse y esperar un pedido separado de /specrow:review o /specrow:build."
       ],
-      forbiddenActions: ["No implementar código durante la creación de la propuesta.", "No aceptar, archivar ni actualizar especificaciones como verdad final."],
+      forbiddenActions: [
+        "No permitir que un brief de implementación completo anule el límite proposal-only.",
+        "No implementar código durante la creación de la propuesta.",
+        "No aceptar, archivar ni actualizar especificaciones como verdad final."
+      ],
       languageRules: [
         "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
         "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",

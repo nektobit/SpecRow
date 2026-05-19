@@ -140,9 +140,11 @@ export const AGENT_COMMAND_SPECS: readonly AgentCommandSpec[] = [
       "Choose a stable change name from the user's intent.",
       "Create proposal.md, tasks.md, and status.yml through the CLI core.",
       "Fill proposal and task content in the configured project language.",
-      "Validate the change and surface any blocking issues before implementation starts."
+      "Validate the change and surface any blocking issues before implementation starts.",
+      "After creating and validating the proposal, stop and wait for a separate /specrow:review or /specrow:build request."
     ],
     forbiddenActions: [
+      "Do not let a complete implementation brief override the proposal-only boundary.",
       "Do not implement code as part of proposal creation.",
       "Do not accept, archive, or update specs as final truth."
     ],

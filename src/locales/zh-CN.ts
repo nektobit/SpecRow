@@ -275,9 +275,14 @@ export const zhCN = {
         "根据用户意图选择稳定的变更名称。",
         "通过 SpecRow MCP 工具创建 proposal.md、tasks.md 和 status.yml。",
         "使用配置的项目语言填写提案和任务内容。",
-        "验证变更，并在开始实现前暴露阻塞问题。"
+        "验证变更，并在开始实现前暴露阻塞问题。",
+        "创建并验证提案后停止，等待单独的 /specrow:review 或 /specrow:build 请求。"
       ],
-      forbiddenActions: ["创建提案时不要实现代码。", "不要接受、归档或将规格更新为最终事实。"],
+      forbiddenActions: [
+        "不要让完整实现说明覆盖 proposal-only 边界。",
+        "创建提案时不要实现代码。",
+        "不要接受、归档或将规格更新为最终事实。"
+      ],
       languageRules: [
         "创建或修改内置 SpecRow 文件前读取 .specrow/config.yml。",
         "对 project.md、规格、提案、任务和生命周期/状态响应使用配置语言。",

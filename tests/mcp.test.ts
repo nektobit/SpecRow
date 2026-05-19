@@ -93,7 +93,11 @@ describe("SpecRow MCP runtime", () => {
         change: "mcp-flow",
         state: "proposed",
         review: { state: "required" }
-      }
+      },
+      nextSteps: [
+        expect.stringContaining("do not implement product code"),
+        expect.stringContaining("separate `specrow build` request")
+      ]
     });
     await expect(stat(path.join(cwd, ".specrow", "changes", "mcp-flow", "status.yml"))).resolves.toBeTruthy();
   });
