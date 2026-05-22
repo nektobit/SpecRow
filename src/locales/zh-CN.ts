@@ -275,6 +275,7 @@ export const zhCN = {
         "根据用户意图选择稳定的变更名称。",
         "通过 SpecRow MCP 工具创建 proposal.md、tasks.md 和 status.yml。",
         "使用配置的项目语言填写提案和任务内容。",
+        "当用户的 proposal 输入包含 `brief` 或 `бриф:` 时，将后续文本视为原始的人类侧任务描述，并转换为结构化 proposal 内容。",
         "验证变更，并在开始实现前暴露阻塞问题。",
         "创建并验证提案后停止，等待单独的 /specrow:review 或 /specrow:build 请求。"
       ],

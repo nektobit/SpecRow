@@ -38,6 +38,8 @@ specrow accept
 
 Los agentes deben tratar estas frases como intenciones de workflow y ejecutarlas mediante herramientas MCP.
 
+Consejo: usa `brief: texto de la tarea` o `бриф: текст задачи` para marcar la descripción humana original de la tarea. El agente debe usar el brief y sus reglas como punto de partida para preparar el proposal, pero el brief no es el proposal final.
+
 Para automatización fuera de una sesión de agente, también está disponible el binario `specrow`:
 
 ```bash

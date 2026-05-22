@@ -275,6 +275,7 @@ Los artefactos originales se conservan en {path}.`,
         "Elegir un nombre estable para el cambio a partir de la intención del usuario.",
         "Crear proposal.md, tasks.md y status.yml mediante herramientas MCP de SpecRow.",
         "Completar la propuesta y las tareas en el idioma configurado del proyecto.",
+        "Cuando la entrada de proposal del usuario contenga `brief` o `бриф:`, tratar el texto siguiente como la descripción humana original de la tarea y convertirlo en contenido estructurado de proposal.",
         "Validar el cambio y mostrar problemas bloqueantes antes de iniciar la implementación.",
         "Después de crear y validar la propuesta, detenerse y esperar un pedido separado de /specrow:review o /specrow:build."
       ],

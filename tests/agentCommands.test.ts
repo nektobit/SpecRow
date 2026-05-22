@@ -35,6 +35,7 @@ describe("SpecRow agent commands", () => {
 
     expect(proposal.agentBehavior).toEqual(
       expect.arrayContaining([
+        "When the user's proposal input contains `brief` or `бриф:`, treat the following text as the original human-side task description and convert it into structured proposal content.",
         "After creating and validating the proposal, stop and wait for a separate /specrow:review or /specrow:build request."
       ])
     );
@@ -44,6 +45,14 @@ describe("SpecRow agent commands", () => {
         "Do not implement code as part of proposal creation."
       ])
     );
+  });
+
+  it("localizes proposal brief handling across supported languages", () => {
+    for (const language of SUPPORTED_LANGUAGES) {
+      const proposal = getAgentCommandSpec("/specrow:proposal", language);
+
+      expect(proposal.agentBehavior.some((rule) => rule.includes("`brief`") && rule.includes("`бриф:`"))).toBe(true);
+    }
   });
 
   it("keeps migrate non-destructive and review-gated", () => {

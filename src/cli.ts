@@ -31,7 +31,7 @@ import { validateLocaleContract } from "./localeContract.js";
 import { startSpecRowMcpServer } from "./mcpServer.js";
 import type { ValidationIssue } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.11";
+const SPECROW_VERSION = "0.1.12";
 
 export function createProgram(): Command {
   const program = new Command();

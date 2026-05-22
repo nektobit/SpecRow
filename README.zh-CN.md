@@ -38,6 +38,8 @@ specrow accept
 
 代理应将这些短语视为 workflow 意图，并通过 MCP 工具执行。
 
+提示：使用 `brief: 任务文本` 或 `бриф: текст задачи` 标记原始的人类侧任务描述。代理应以 brief 及其中规则为出发点来准备 proposal，但 brief 本身不是最终 proposal。
+
 对于代理会话之外的自动化，也可以使用 `specrow` 二进制：
 
 ```bash

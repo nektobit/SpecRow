@@ -278,6 +278,7 @@ Original artifacts are preserved under {path}.`,
         "Choose a stable change name from the user's intent.",
         "Create proposal.md, tasks.md, and status.yml through SpecRow MCP tools.",
         "Fill proposal and task content in the configured project language.",
+        "When the user's proposal input contains `brief` or `бриф:`, treat the following text as the original human-side task description and convert it into structured proposal content.",
         "Validate the change and surface any blocking issues before implementation starts.",
         "After creating and validating the proposal, stop and wait for a separate /specrow:review or /specrow:build request."
       ],

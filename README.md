@@ -38,6 +38,8 @@ specrow accept
 
 Agents should treat these as workflow intentions and execute them through MCP tools.
 
+Tip: use `brief: task text` or `бриф: текст задачи` to mark the original human-side task description. The agent should use the brief as source material and constraints for preparing the proposal, but it is not the final proposal itself.
+
 For automation outside an agent session, the `specrow` binary is also available:
 
 ```bash
