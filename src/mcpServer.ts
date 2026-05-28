@@ -30,12 +30,13 @@ import {
   type ValidationIssue
 } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.12";
+const SPECROW_VERSION = "0.1.13";
 const SPECROW_DIR = ".specrow";
 
 const EmptySchema = z.object({}).optional();
 const InitSchema = z.object({
   language: z.string().min(2).max(32).optional(),
+  estimation: z.boolean().optional(),
   force: z.boolean().optional()
 });
 const ChangeNameSchema = z.object({
@@ -186,7 +187,12 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
 
   return {
     specrow_init: tool(InitSchema, async (input) => {
-      const result = await initSpecRowProject({ cwd: projectRoot, language: input.language, force: input.force });
+      const result = await initSpecRowProject({
+        cwd: projectRoot,
+        language: input.language,
+        estimation: input.estimation,
+        force: input.force
+      });
       await assertSpecRowInitCreatedFiles(projectRoot);
 
       return success({
@@ -203,6 +209,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         configOverwritten: result.configOverwritten,
         projectCreated: result.projectCreated,
         directories: result.directories.map((directory) => relative(projectRoot, directory)),
+        estimation: result.estimation,
         language: result.language,
         nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, ask for `specrow explore` to clarify an idea or `specrow proposal` to create a change proposal."]
       });
@@ -221,7 +228,12 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         absoluteConfigPath: configPath,
         projectPath: relative(projectRoot, projectPath),
         absoluteProjectPath: projectPath,
-        ...(config === undefined ? {} : { language: config.language }),
+        ...(config === undefined
+          ? {}
+          : {
+              language: config.language,
+              estimation: config.estimation ?? { enabled: false }
+            }),
         nextSteps: initialized
           ? ["Run specrow_validate to verify the workspace."]
           : ["Run specrow_init with the requested language to initialize this workspace."]

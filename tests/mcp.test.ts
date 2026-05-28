@@ -54,13 +54,16 @@ describe("SpecRow MCP runtime", () => {
       nextSteps: [expect.stringContaining("specrow_init")]
     });
 
-    await runtime.callTool("specrow_init", { language: "ru" });
+    await runtime.callTool("specrow_init", { language: "ru", estimation: true });
 
     await expect(runtime.callTool("specrow_project_status")).resolves.toMatchObject({
       success: true,
       projectRoot: path.resolve(cwd),
       initialized: true,
       language: "ru",
+      estimation: {
+        enabled: true
+      },
       nextSteps: [expect.stringContaining("specrow_validate")]
     });
   });
@@ -76,6 +79,9 @@ describe("SpecRow MCP runtime", () => {
       absoluteConfigPath: path.join(path.resolve(cwd), ".specrow", "config.yml"),
       projectPath: path.join(".specrow", "project.md"),
       absoluteProjectPath: path.join(path.resolve(cwd), ".specrow", "project.md"),
+      estimation: {
+        enabled: false
+      },
       language: "ru"
     });
     await expect(readFile(path.join(cwd, ".specrow", "config.yml"), "utf8")).resolves.toContain("language: ru");
@@ -103,7 +109,8 @@ describe("SpecRow MCP runtime", () => {
   });
 
   it("keeps the context shape aligned with the CLI context command", async () => {
-    const cwd = await createTempProject("es");
+    const cwd = await createTempDir();
+    await initSpecRowProject({ cwd, language: "es", estimation: true });
     await createChange({ cwd, changeName: "context-shape" });
     const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
 
@@ -112,7 +119,12 @@ describe("SpecRow MCP runtime", () => {
       context: {
         specrow: {
           root: ".specrow",
-          config: { language: "es" }
+          config: {
+            language: "es",
+            estimation: {
+              enabled: true
+            }
+          }
         },
         activeChanges: {
           changes: [{ change: "context-shape" }],

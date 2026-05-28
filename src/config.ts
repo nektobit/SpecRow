@@ -21,6 +21,10 @@ const IntegrationsConfigSchema = z.object({
   managedFiles: z.array(ManagedIntegrationFileSchema)
 });
 
+const EstimationConfigSchema = z.object({
+  enabled: z.boolean()
+});
+
 export const SpecRowConfigSchema = z.object({
   version: z.literal(1),
   language: z
@@ -28,6 +32,7 @@ export const SpecRowConfigSchema = z.object({
     .min(2)
     .max(32)
     .regex(/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/, "Use a language code like ru, en, es, or zh-CN."),
+  estimation: z.union([EstimationConfigSchema, z.boolean().transform((enabled) => ({ enabled }))]).optional(),
   integrations: IntegrationsConfigSchema.optional()
 });
 
@@ -38,10 +43,11 @@ export const DEFAULT_CONFIG: SpecRowConfig = {
   language: "en"
 };
 
-export function createDefaultConfig(language = DEFAULT_CONFIG.language): SpecRowConfig {
+export function createDefaultConfig(language = DEFAULT_CONFIG.language, options: { estimation?: boolean } = {}): SpecRowConfig {
   return SpecRowConfigSchema.parse({
     ...DEFAULT_CONFIG,
-    language
+    language,
+    ...(options.estimation === true ? { estimation: { enabled: true } } : {})
   });
 }
 

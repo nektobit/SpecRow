@@ -31,7 +31,7 @@ import { validateLocaleContract } from "./localeContract.js";
 import { startSpecRowMcpServer } from "./mcpServer.js";
 import type { ValidationIssue } from "./core/index.js";
 
-const SPECROW_VERSION = "0.1.12";
+const SPECROW_VERSION = "0.1.13";
 
 export function createProgram(): Command {
   const program = new Command();
@@ -45,16 +45,18 @@ export function createProgram(): Command {
     .command("init")
     .description("Create the .specrow project structure.")
     .option("-l, --language <code>", "Project language code.", "en")
+    .option("--estimation", "Ask agents to estimate implementation time after proposal creation.", false)
     .option("-f, --force", "Overwrite .specrow/config.yml if it already exists.", false)
     .option("--tools <list>", "Install agent integrations: codex,claude,cursor,windsurf,generic,all,none.")
     .option("--detect", "Detect agent integrations to install.", false)
     .option("--mcp", "Install MCP configuration for supported agent integrations.", true)
     .option("--no-mcp", "Skip MCP configuration and install only command, skill, rule, or prompt guidance.")
     .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { language: string; force: boolean; tools?: string; detect: boolean; mcp: boolean; dryRun: boolean }) => {
+    .action(async (options: { language: string; estimation: boolean; force: boolean; tools?: string; detect: boolean; mcp: boolean; dryRun: boolean }) => {
       try {
         const result = await initSpecRowProject({
           language: options.language,
+          estimation: options.estimation,
           force: options.force
         });
 

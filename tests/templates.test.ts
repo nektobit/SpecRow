@@ -55,6 +55,7 @@ describe("SpecRow templates", () => {
       expect(spec).toContain("### ");
       expect(spec).toContain("#### ");
       expect(proposal).toContain("specrow accept");
+      expect(proposal).toContain("estimation.enabled");
       expect(tasks).toContain("specrow revise");
     }
   });

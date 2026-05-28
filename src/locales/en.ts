@@ -127,6 +127,13 @@ Record decisions made while shaping the proposal.
 - Decision:
   - Reason:
 
+## Estimation
+Fill this section only when .specrow/config.yml has estimation.enabled: true.
+
+- Approximate implementation time:
+- Assumptions:
+- Confidence:
+
 ## Acceptance Criteria
 Define the explicit checks required before the user can accept this change.
 
@@ -279,6 +286,7 @@ Original artifacts are preserved under {path}.`,
         "Create proposal.md, tasks.md, and status.yml through SpecRow MCP tools.",
         "Fill proposal and task content in the configured project language.",
         "When the user's proposal input contains `brief` or `бриф:`, treat the following text as the original human-side task description and convert it into structured proposal content.",
+        "When .specrow/config.yml has estimation.enabled set to true, add an approximate implementation time estimate after shaping the proposal, including assumptions and a range.",
         "Validate the change and surface any blocking issues before implementation starts.",
         "After creating and validating the proposal, stop and wait for a separate /specrow:review or /specrow:build request."
       ],

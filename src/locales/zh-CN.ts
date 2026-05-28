@@ -127,6 +127,13 @@ export const zhCN = {
 - 决策：
   - 原因：
 
+## 估算
+仅当 .specrow/config.yml 中设置 estimation.enabled: true 时填写此章节。
+
+- 大致实现时间：
+- 假设：
+- 置信度：
+
 ## 验收标准
 定义用户接受此变更前必须完成的明确检查。
 
@@ -276,6 +283,7 @@ export const zhCN = {
         "通过 SpecRow MCP 工具创建 proposal.md、tasks.md 和 status.yml。",
         "使用配置的项目语言填写提案和任务内容。",
         "当用户的 proposal 输入包含 `brief` 或 `бриф:` 时，将后续文本视为原始的人类侧任务描述，并转换为结构化 proposal 内容。",
+        "当 .specrow/config.yml 设置 estimation.enabled: true 时，在形成提案后添加大致实现时间估算，并包含假设和范围。",
         "验证变更，并在开始实现前暴露阻塞问题。",
         "创建并验证提案后停止，等待单独的 /specrow:review 或 /specrow:build 请求。"
       ],

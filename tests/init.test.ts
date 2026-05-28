@@ -34,6 +34,7 @@ describe("initSpecRowProject", () => {
     await expect(stat(path.join(cwd, ".specfly"))).rejects.toThrow();
     expect(result.configCreated).toBe(true);
     expect(result.configOverwritten).toBe(false);
+    expect(result.estimation).toEqual({ enabled: false });
     expect(result.projectCreated).toBe(true);
   });
 
@@ -46,6 +47,17 @@ describe("initSpecRowProject", () => {
       "version: 1\nlanguage: es\n"
     );
     await expect(readFile(path.join(cwd, ".specrow", "project.md"), "utf8")).resolves.toContain("# Proyecto");
+  });
+
+  it("writes estimation settings when requested", async () => {
+    const cwd = await createTempProject();
+
+    const result = await initSpecRowProject({ cwd, estimation: true });
+
+    await expect(readFile(path.join(cwd, ".specrow", "config.yml"), "utf8")).resolves.toBe(
+      "version: 1\nlanguage: en\nestimation:\n  enabled: true\n"
+    );
+    expect(result.estimation).toEqual({ enabled: true });
   });
 
   it("does not overwrite an existing config by default", async () => {

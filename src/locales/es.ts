@@ -127,6 +127,13 @@ Registra decisiones tomadas al definir la propuesta.
 - Decisión:
   - Razón:
 
+## Estimación
+Completa esta sección solo cuando .specrow/config.yml tenga estimation.enabled: true.
+
+- Tiempo aproximado de implementación:
+- Suposiciones:
+- Confianza:
+
 ## Criterios de aceptación
 Define las comprobaciones explícitas necesarias antes de que el usuario pueda aceptar este cambio.
 
@@ -276,6 +283,7 @@ Los artefactos originales se conservan en {path}.`,
         "Crear proposal.md, tasks.md y status.yml mediante herramientas MCP de SpecRow.",
         "Completar la propuesta y las tareas en el idioma configurado del proyecto.",
         "Cuando la entrada de proposal del usuario contenga `brief` o `бриф:`, tratar el texto siguiente como la descripción humana original de la tarea y convertirlo en contenido estructurado de proposal.",
+        "Cuando .specrow/config.yml tenga estimation.enabled: true, agregar una estimación aproximada del tiempo de implementación después de formar la propuesta, incluyendo supuestos y un rango.",
         "Validar el cambio y mostrar problemas bloqueantes antes de iniciar la implementación.",
         "Después de crear y validar la propuesta, detenerse y esperar un pedido separado de /specrow:review o /specrow:build."
       ],

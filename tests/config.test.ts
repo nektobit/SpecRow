@@ -14,6 +14,26 @@ describe("SpecRow config", () => {
     });
   });
 
+  it("parses estimation settings", () => {
+    expect(parseConfig("version: 1\nlanguage: en\nestimation:\n  enabled: true\n")).toEqual({
+      version: 1,
+      language: "en",
+      estimation: {
+        enabled: true
+      }
+    });
+  });
+
+  it("normalizes legacy boolean estimation settings", () => {
+    expect(parseConfig("version: 1\nlanguage: en\nestimation: true\n")).toEqual({
+      version: 1,
+      language: "en",
+      estimation: {
+        enabled: true
+      }
+    });
+  });
+
   it("loads existing configs without integration metadata", () => {
     expect(parseConfig("version: 1\nlanguage: en\n")).toEqual({
       version: 1,
@@ -33,6 +53,12 @@ describe("SpecRow config", () => {
         kind: "mcp-config"
       }
     ]);
+  });
+
+  it("serializes enabled estimation settings", () => {
+    expect(serializeConfig({ version: 1, language: "en", estimation: { enabled: true } })).toBe(
+      "version: 1\nlanguage: en\nestimation:\n  enabled: true\n"
+    );
   });
 
   it("rejects unsupported config versions", () => {

@@ -7,6 +7,7 @@ import { getSpecRowTemplate } from "./templates.js";
 
 export interface InitOptions {
   cwd?: string;
+  estimation?: boolean;
   force?: boolean;
   language?: string;
 }
@@ -19,6 +20,9 @@ export interface InitResult {
   configOverwritten: boolean;
   projectCreated: boolean;
   directories: string[];
+  estimation: {
+    enabled: boolean;
+  };
   language: string;
 }
 
@@ -49,7 +53,9 @@ export async function initSpecRowProject(options: InitOptions = {}): Promise<Ini
 
   const configExists = await pathExists(configPath);
   const shouldWriteConfig = options.force === true || !configExists;
-  const config = shouldWriteConfig ? createDefaultConfig(options.language) : parseConfig(await readFile(configPath, "utf8"));
+  const config = shouldWriteConfig
+    ? createDefaultConfig(options.language, { estimation: options.estimation })
+    : parseConfig(await readFile(configPath, "utf8"));
   const projectTemplate = getSpecRowTemplate(config.language, "project");
 
   for (const directory of directories) {
@@ -74,6 +80,7 @@ export async function initSpecRowProject(options: InitOptions = {}): Promise<Ini
     configOverwritten: configExists && options.force === true,
     projectCreated: !projectExists,
     directories,
+    estimation: config.estimation ?? { enabled: false },
     language: config.language
   };
 }
