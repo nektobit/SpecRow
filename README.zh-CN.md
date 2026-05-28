@@ -44,7 +44,7 @@ specrow accept
 
 ```bash
 npm i -g specrow
-specrow init --language zh-CN --tools codex,claude,cursor,windsurf,generic
+specrow init --language zh-CN --estimation --tools codex,claude,cursor,windsurf,generic
 specrow migrate ./docs
 specrow validate
 specrow integrations status
@@ -71,6 +71,15 @@ language: zh-CN
 ```
 
 配置语言控制内置模板和 lifecycle/status 消息。缺少语言资源是错误。SpecRow 不会静默回退到英文。
+
+当代理应在每个 proposal 形成后添加大致实现时间估算时，添加 `estimation.enabled: true`：
+
+```yml
+version: 1
+language: zh-CN
+estimation:
+  enabled: true
+```
 
 ## Accept Gate
 

@@ -44,7 +44,7 @@ Para automatización fuera de una sesión de agente, también está disponible e
 
 ```bash
 npm i -g specrow
-specrow init --language es --tools codex,claude,cursor,windsurf,generic
+specrow init --language es --estimation --tools codex,claude,cursor,windsurf,generic
 specrow migrate ./docs
 specrow validate
 specrow integrations status
@@ -71,6 +71,15 @@ language: es
 ```
 
 El idioma configurado controla plantillas integradas y mensajes lifecycle/status. Los recursos de idioma ausentes son errores. SpecRow no hace fallback silencioso a inglés.
+
+Agrega `estimation.enabled: true` cuando los agentes deban añadir una estimación aproximada del tiempo de implementación después de formar cada proposal:
+
+```yml
+version: 1
+language: es
+estimation:
+  enabled: true
+```
 
 ## Accept Gate
 

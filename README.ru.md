@@ -44,7 +44,7 @@ specrow accept
 
 ```bash
 npm i -g specrow
-specrow init --language ru --tools codex,claude,cursor,windsurf,generic
+specrow init --language ru --estimation --tools codex,claude,cursor,windsurf,generic
 specrow migrate ./docs
 specrow validate
 specrow integrations status
@@ -71,6 +71,15 @@ language: ru
 ```
 
 Настроенный язык управляет встроенными шаблонами и lifecycle/status-сообщениями. Отсутствующие языковые ресурсы являются ошибкой. SpecRow не делает silent fallback на английский.
+
+Добавьте `estimation.enabled: true`, если агент должен добавлять примерную оценку времени реализации после формирования каждого proposal:
+
+```yml
+version: 1
+language: ru
+estimation:
+  enabled: true
+```
 
 ## Accept Gate
 
