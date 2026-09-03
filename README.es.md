@@ -1,7 +1,9 @@
+<!-- specrow:readme-section=title -->
 # SpecRow
 
 SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la intención en lenguaje natural, por ejemplo `specrow migrate`, `specrow explore`, `specrow proposal` o `specrow build`; los agentes ejecutan el workflow mediante el servidor MCP de SpecRow.
 
+<!-- specrow:readme-section=language-links -->
 ## Leer en tu idioma
 
 - [English](README.md)
@@ -9,21 +11,26 @@ SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la i
 - [Español](README.es.md)
 - [中文](README.zh-CN.md)
 
+<!-- specrow:readme-section=documentation -->
 ## Documentación
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
 El sitio cubre el flujo MVP completo: primeros pasos, explore, de proposal a accept, herramientas MCP, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
 
+<!-- specrow:readme-section=quick-start -->
 ## Inicio rápido
 
-Empieza con el agent installer. Pasa explícitamente el idioma de trabajo del proyecto:
+Instala el plugin completo en un cliente compatible:
 
-```txt
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=es
-```
+- GitHub Copilot CLI: `copilot plugin install nektobit/SpecRow`.
+- GitHub Copilot en VS Code: ejecuta `Chat: Install Plugin From Source` e introduce `https://github.com/nektobit/SpecRow`.
+- Kiro IDE (experimental): elige `Powers → Add Custom Power → Import power from GitHub` e introduce la misma URL del repositorio.
+- Codex desktop/CLI y Cursor: el paquete compatible ya está incluido, pero la instalación pública con un clic depende de que SpecRow se publique en el marketplace de cada cliente.
 
-El agente usa el servidor MCP de SpecRow para inspeccionar el workspace, inicializar `.specrow` con ese idioma cuando haga falta, validar el workspace e informar el siguiente paso lógico.
+Hermes Agent, OpenClaw, Grok Bot y NanoClaw son compatibles con el formato Agent Plugins, pero SpecRow aún no los ha probado. Claude Code, Gemini CLI y Windsurf/Cascade no tienen actualmente una instalación de SpecRow compatible en un solo paquete. Se requieren Node.js 20+, MCP stdio local y acceso a los archivos del proyecto de destino. Estos caminos están documentados por los proveedores de los clientes, pero SpecRow todavía no ejecuta pruebas end-to-end de instalación específicas de cada cliente.
+
+`npm i -g specrow` instala solo la CLI independiente; no registra el plugin en un agente. Después de instalar el plugin completo, abre un chat nuevo y pide al agente que compruebe SpecRow para el proyecto previsto.
 
 Luego dile al agente qué workflow de SpecRow quieres:
 
@@ -44,12 +51,12 @@ Para automatización fuera de una sesión de agente, también está disponible e
 
 ```bash
 npm i -g specrow
-specrow init --language es --estimation --tools codex,claude,cursor,windsurf,generic
+specrow init --language es --estimation
 specrow migrate ./docs
 specrow validate
-specrow integrations status
 ```
 
+<!-- specrow:readme-section=workspace -->
 ## Workspace
 
 La inicialización de SpecRow crea:
@@ -81,12 +88,12 @@ estimation:
   enabled: true
 ```
 
+<!-- specrow:readme-section=accept-gate -->
 ## Accept Gate
 
 Build no actualiza specs como verdad final y no archiva un cambio. Las specs y el archivo se actualizan solo después de aceptación explícita del usuario mediante el workflow `specrow accept`.
 
+<!-- specrow:readme-section=migration -->
 ## Migration Notes
 
-Usa `specrow migrate openspec`, `specrow migrate speckit` o `specrow migrate ./docs` para llevar artefactos de especificación existentes a `.specrow/`. Si falta `.specrow`, la migración lo inicializa primero. La fuente heredada no se elimina, y los registros archivados se copian como historial preservado sin transformación.
-
-Prototipos locales antiguos pueden haber usado la CLI `specfly` o el directorio `.specfly`. Los proyectos nuevos usan el binario `specrow` y `.specrow/`.
+Usa `specrow migrate openspec`, `specrow migrate speckit` o `specrow migrate ./docs` para llevar artefactos de especificación existentes a `.specrow/`. Si falta `.specrow`, la migración lo inicializa primero. El sistema de origen no se elimina, y los registros archivados se copian como historial preservado sin transformación.

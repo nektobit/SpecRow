@@ -4,14 +4,17 @@ export const es = {
   templates: {
     project: `# Proyecto
 
+<!-- specrow:section=purpose -->
 ## Propósito
 Describe para qué existe el proyecto, a quién sirve y qué resultados importan.
 
+<!-- specrow:section=working-language -->
 ## Idioma de trabajo
 Español.
 
 Todos los archivos integrados de SpecRow, las propuestas, las especificaciones, las tareas y los mensajes del ciclo de vida escritos por agentes deben usar este idioma, salvo que el usuario pida citar un término en otro idioma.
 
+<!-- specrow:section=domain-vocabulary -->
 ## Vocabulario del dominio
 Enumera términos del proyecto, nombres canónicos, siglas y palabras que no deben traducirse.
 
@@ -19,6 +22,7 @@ Enumera términos del proyecto, nombres canónicos, siglas y palabras que no deb
   - Significado:
   - Notas:
 
+<!-- specrow:section=architecture-notes -->
 ## Notas de arquitectura
 Registra el contexto técnico estable que ayuda al agente a realizar cambios correctos.
 
@@ -27,6 +31,7 @@ Registra el contexto técnico estable que ayuda al agente a realizar cambios cor
 - Módulos o límites importantes:
 - Patrones existentes que se deben preservar:
 
+<!-- specrow:section=constraints -->
 ## Restricciones
 Documenta reglas estrictas, requisitos de compatibilidad, límites de seguridad o privacidad, rendimiento y operación.
 
@@ -34,6 +39,7 @@ Documenta reglas estrictas, requisitos de compatibilidad, límites de seguridad 
   - Razón:
   - Verificación:
 
+<!-- specrow:section=verification -->
 ## Verificación
 Describe cómo se demuestra normalmente que los cambios son correctos.
 
@@ -44,9 +50,11 @@ Describe cómo se demuestra normalmente que los cambios son correctos.
 `,
     spec: `# <Nombre de la especificación>
 
+<!-- specrow:section=purpose -->
 ## Propósito
 Indica la capacidad o el comportamiento visible para el usuario que esta especificación controla. Mantén una sola capacidad enfocada por especificación.
 
+<!-- specrow:section=current-behavior -->
 ## Comportamiento actual
 Describe lo que es cierto hoy. Las especificaciones son verdad final solo después de una aceptación explícita.
 
@@ -55,6 +63,7 @@ Describe lo que es cierto hoy. Las especificaciones son verdad final solo despu�
 - Manejo de errores:
 - Casos límite importantes:
 
+<!-- specrow:section=requirements -->
 ## Requisitos
 Usa requisitos centrados en el comportamiento. Los requisitos describen comportamiento observable, interfaces, restricciones y manejo de errores, no detalles internos de implementación.
 
@@ -67,9 +76,11 @@ El sistema DEBE <comportamiento observable>.
 - **ENTONCES** <resultado esperado>
 - **Y** <resultado esperado adicional>
 
+<!-- specrow:section=constraints -->
 ## Restricciones
 Enumera reglas obligatorias para esta capacidad.
 
+<!-- specrow:section=decisions -->
 ## Decisiones
 Registra decisiones aceptadas de producto o técnicas que explican por qué existe el comportamiento actual.
 
@@ -77,6 +88,7 @@ Registra decisiones aceptadas de producto o técnicas que explican por qué exis
   - Razón:
   - Fecha:
 
+<!-- specrow:section=verification -->
 ## Verificación
 Enumera comprobaciones que demuestran que esta especificación sigue siendo cierta.
 
@@ -86,12 +98,15 @@ Enumera comprobaciones que demuestran que esta especificación sigue siendo cier
 `,
     proposal: `# Propuesta: <nombre-del-cambio>
 
+<!-- specrow:section=summary -->
 ## Resumen
 Describe el cambio previsto en unas pocas frases.
 
+<!-- specrow:section=problem -->
 ## Problema
 Explica el dolor actual, el comportamiento ausente, el riesgo o la oportunidad. Incluye el impacto en usuarios y por qué el cambio debe hacerse ahora.
 
+<!-- specrow:section=proposed-change -->
 ## Cambio propuesto
 Describe el comportamiento objetivo. Sé explícito con cada cambio relevante de antes/después.
 
@@ -101,19 +116,23 @@ Describe el comportamiento objetivo. Sé explícito con cada cambio relevante de
 - Razón: <por qué se necesita el cambio>
 - Impacto: <rompedor o compatible, quién se ve afectado>
 
+<!-- specrow:section=scope -->
 ## Alcance
 Enumera lo que incluye este cambio.
 
 - 
 
+<!-- specrow:section=out-of-scope -->
 ## Fuera de alcance
 Enumera el trabajo relacionado que este cambio excluye intencionalmente.
 
 - 
 
+<!-- specrow:section=user-impact -->
 ## Impacto en el usuario
 Describe cómo usuarios, agentes, automatización, CI o mantenedores experimentan el cambio.
 
+<!-- specrow:section=risks -->
 ## Riesgos
 Señala riesgos de compatibilidad, migración, seguridad, datos, flujo de trabajo y localización.
 
@@ -121,12 +140,14 @@ Señala riesgos de compatibilidad, migración, seguridad, datos, flujo de trabaj
   - Mitigación:
   - Verificación:
 
+<!-- specrow:section=decisions -->
 ## Decisiones
 Registra decisiones tomadas al definir la propuesta.
 
 - Decisión:
   - Razón:
 
+<!-- specrow:section=estimation -->
 ## Estimación
 Completa esta sección solo cuando .specrow/config.yml tenga estimation.enabled: true.
 
@@ -134,6 +155,7 @@ Completa esta sección solo cuando .specrow/config.yml tenga estimation.enabled:
 - Suposiciones:
 - Confianza:
 
+<!-- specrow:section=acceptance-criteria -->
 ## Criterios de aceptación
 Define las comprobaciones explícitas necesarias antes de que el usuario pueda aceptar este cambio.
 
@@ -141,6 +163,7 @@ Define las comprobaciones explícitas necesarias antes de que el usuario pueda a
 - [ ] Los archivos integrados están escritos en el idioma del proyecto.
 - [ ] Las especificaciones no se actualizan como verdad final antes de specrow accept.
 
+<!-- specrow:section=spec-updates -->
 ## Actualizaciones de especificación
 Cuando cambien requisitos, describe los cambios previstos con esta estructura.
 
@@ -151,20 +174,24 @@ Cuando cambien requisitos, describe los cambios previstos con esta estructura.
 `,
     tasks: `# Tareas: <nombre-del-cambio>
 
+<!-- specrow:section=implementation -->
 ## Implementación
 - [ ] Actualizar el código y los artefactos generados requeridos por la propuesta.
 - [ ] Mantener la implementación dentro del alcance de la propuesta aceptada.
 - [ ] No actualizar especificaciones como verdad final durante la construcción.
 
+<!-- specrow:section=verification -->
 ## Verificación
 - [ ] Ejecutar pruebas dirigidas para el comportamiento cambiado.
 - [ ] Ejecutar la prueba completa o el typecheck relevante.
 - [ ] Validar que los archivos SpecRow generados usen el idioma configurado.
 
+<!-- specrow:section=documentation -->
 ## Documentación
 - [ ] Actualizar documentación para usuarios o agentes cuando cambie el comportamiento.
 - [ ] Anotar guía de migración si se afectan proyectos existentes.
 
+<!-- specrow:section=acceptance-gate -->
 ## Puerta de aceptación
 - [ ] El resultado de construcción está listo para revisión del usuario.
 - [ ] El siguiente paso es specrow accept o specrow revise.
@@ -208,222 +235,5 @@ Los artefactos originales se conservan en {path}.`,
 - [ ] Confirmar el resultado migrado desde {source} antes de tratarlo como verdad final de SpecRow.`,
     "error.missingTemplate": "Falta la plantilla de SpecRow \"{name}\" para el idioma \"{language}\".",
     "error.missingMessage": "Falta el mensaje de SpecRow \"{name}\" para el idioma \"{language}\"."
-  },
-  agentCommands: {
-    "/specrow:init": {
-      userIntent: "Configurar SpecRow para el proyecto actual sin exigir que el usuario recuerde nombres de tools o archivos.",
-      agentBehavior: [
-        "Determinar el idioma de trabajo del proyecto desde el usuario o preguntarlo si es ambiguo.",
-        "Llamar la tool MCP de inicialización de SpecRow como detalle técnico.",
-        "Confirmar que existen .specrow/config.yml, project.md, specs/, changes/ y archive/."
-      ],
-      forbiddenActions: ["No crear directorios de trabajo heredados.", "No continuar si faltan recursos del idioma solicitado."],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: ["Faltan plantillas o mensajes para el idioma solicitado."]
-    },
-    "/specrow:migrate": {
-      userIntent: "Migrar artefactos de especificación existentes de OpenSpec, SpecKit o una carpeta de documentación a SpecRow.",
-      agentBehavior: [
-        "Identificar si la fuente es OpenSpec, SpecKit o una carpeta de documentación antes de escribir la salida de migración.",
-        "Inicializar SpecRow cuando el proyecto no esté inicializado.",
-        "Ejecutar la migración mediante la herramienta MCP de SpecRow o el núcleo CLI y preservar la trazabilidad de la fuente.",
-        "Validar los archivos SpecRow migrados e informar advertencias que requieren revisión del usuario."
-      ],
-      forbiddenActions: [
-        "No eliminar, mover ni reescribir la fuente heredada.",
-        "No transformar entradas archivadas de la fuente; copiar registros de archivo como historial preservado.",
-        "No tratar las especificaciones migradas como verdad final sin revisión del usuario."
-      ],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "La fuente solicitada no se puede encontrar o leer de forma segura.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida.",
-        "La salida migrada sobrescribiría archivos SpecRow existentes sin force explícito."
-      ]
-    },
-    "/specrow:explore": {
-      userIntent: "Explorar una idea, un problema o un posible cambio antes de convertirlo en propuesta.",
-      agentBehavior: [
-        "Inspeccionar el estado y el contexto del proyecto antes de comprometerse con un cambio.",
-        "Usar herramientas read-only de SpecRow y contexto del codebase para aclarar objetivos, opciones, riesgos, áreas afectadas y preguntas abiertas.",
-        "Hacer preguntas enfocadas cuando el cambio previsto, el alcance o las expectativas de aceptación sean ambiguos.",
-        "Terminar con un resumen breve de exploración y recomendar /specrow:proposal cuando la intención esté lista."
-      ],
-      forbiddenActions: [
-        "No crear proposal.md, tasks.md, status.yml ni un directorio de cambio durante la exploración.",
-        "No implementar código durante la exploración.",
-        "No aceptar, archivar ni actualizar especificaciones como verdad final."
-      ],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "El proyecto no está inicializado y la exploración requiere contexto específico del proyecto.",
-        "El tema solicitado es demasiado amplio para producir preguntas u opciones accionables.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida."
-      ]
-    },
-    "/specrow:proposal": {
-      userIntent: "Convertir la intención del usuario en una propuesta de cambio concreta y un esqueleto de tareas.",
-      agentBehavior: [
-        "Elegir un nombre estable para el cambio a partir de la intención del usuario.",
-        "Crear proposal.md, tasks.md y status.yml mediante herramientas MCP de SpecRow.",
-        "Completar la propuesta y las tareas en el idioma configurado del proyecto.",
-        "Cuando la entrada de proposal del usuario contenga `brief` o `бриф:`, tratar el texto siguiente como la descripción humana original de la tarea y convertirlo en contenido estructurado de proposal.",
-        "Cuando .specrow/config.yml tenga estimation.enabled: true, agregar una estimación aproximada del tiempo de implementación después de formar la propuesta, incluyendo supuestos y un rango.",
-        "Validar el cambio y mostrar problemas bloqueantes antes de iniciar la implementación.",
-        "Después de crear y validar la propuesta, detenerse y esperar un pedido separado de /specrow:review o /specrow:build."
-      ],
-      forbiddenActions: [
-        "No permitir que un brief de implementación completo anule el límite proposal-only.",
-        "No implementar código durante la creación de la propuesta.",
-        "No aceptar, archivar ni actualizar especificaciones como verdad final."
-      ],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "El proyecto no está inicializado.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida.",
-        "No se pueden producir secciones requeridas de propuesta o tareas."
-      ]
-    },
-    "/specrow:review": {
-      userIntent: "Comprobar la preparación de la propuesta antes del código; se recomienda por defecto y solo es obligatoria para cambios riesgosos.",
-      agentBehavior: [
-        "Revisar planteamiento del problema, alcance, riesgos, decisiones, criterios de aceptación y coherencia de idioma.",
-        "Tratar review como obligatoria para cambios riesgosos y recomendada para cambios ordinarios.",
-        "Preguntar al usuario o revisar la propuesta cuando review encuentre ambigüedad bloqueante."
-      ],
-      forbiddenActions: ["No implementar código durante review.", "No usar review como aceptación."],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "Faltan criterios de aceptación o son demasiado débiles.",
-        "Los cambios riesgosos carecen de decisiones explícitas sobre riesgo, migración, seguridad, datos o compatibilidad.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida."
-      ],
-      reviewPolicyRequiredWhen: [
-        "Cambios de seguridad, privacidad o permisos.",
-        "Cambios de modelo de datos, migración, persistencia u operaciones destructivas.",
-        "Cambios de API pública, contrato de comandos, automatización o CI.",
-        "Cambios de arquitectura, workflow entre módulos, localización o ciclo de vida visible para usuarios."
-      ]
-    },
-    "/specrow:build": {
-      userIntent: "Implementar y verificar un cambio aprobado sin convertirlo en verdad final.",
-      agentBehavior: [
-        "Usar el contexto MCP de SpecRow para cargar propuesta, tareas, estado y advertencias de cambios activos.",
-        "Implementar solo el trabajo descrito por el cambio.",
-        "Ejecutar verificación relevante y actualizar tareas con evidencia cuando corresponda.",
-        "Terminar dejando el cambio en espera de specrow accept o specrow revise."
-      ],
-      forbiddenActions: ["No ejecutar aceptación.", "No archivar el cambio.", "No actualizar especificaciones como verdad final."],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "La validación falla antes de implementar.",
-        "La propuesta es demasiado ambigua para implementarla con seguridad.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida."
-      ]
-    },
-    "/specrow:revise": {
-      userIntent: "Gestionar cambios solicitados por el usuario después de build sin aceptar ni archivar el cambio.",
-      agentBehavior: [
-        "Marcar el cambio como pendiente de revisión.",
-        "Aplicar los ajustes solicitados a la propuesta, tareas, implementación o evidencia de verificación.",
-        "Volver a ejecutar la verificación relevante y dejar el cambio listo para otra decisión del usuario."
-      ],
-      forbiddenActions: ["No tratar la revisión como aceptación.", "No archivar el cambio.", "No actualizar especificaciones como verdad final."],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "La revisión solicitada entra en conflicto con el alcance de la propuesta y requiere una nueva decisión del usuario.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida."
-      ]
-    },
-    "/specrow:accept": {
-      userIntent: "Registrar la aceptación explícita del usuario y permitir la integración final de especificaciones y archivo.",
-      agentBehavior: [
-        "Continuar solo cuando el usuario acepte claramente el trabajo construido o la revisión completada.",
-        "Registrar la aceptación explícita mediante herramientas MCP de SpecRow.",
-        "Usar esta ruta como la única autorización de usuario para que las especificaciones sean verdad final y para archivar."
-      ],
-      forbiddenActions: [
-        "No inferir aceptación por silencio, pruebas exitosas o implementación terminada.",
-        "No aceptar un cambio que no esté construido o completo tras revisión."
-      ],
-      languageRules: [
-        "Leer .specrow/config.yml antes de crear o revisar archivos integrados de SpecRow.",
-        "Usar el idioma configurado para project.md, especificaciones, propuestas, tareas y mensajes de ciclo de vida.",
-        "Detenerse con un error claro de recurso faltante cuando no esté disponible una plantilla o mensaje requerido.",
-        "No hacer fallback silencioso al inglés."
-      ],
-      stopConditions: [
-        "El usuario no ha aceptado explícitamente el cambio.",
-        "El cambio no está construido o la revisión no está completa.",
-        "Al idioma configurado le faltan plantillas o mensajes de ciclo de vida."
-      ]
-    }
-  },
-  integration: {
-    managedHeader: "Este archivo o sección está gestionado por SpecRow. Regenéralo con:\nspecrow update",
-    commandSections: {
-      invocation: "Invocación",
-      userIntent: "Intención del usuario",
-      toolCore: "Nucleo de herramientas",
-      agentBehavior: "Comportamiento del agente",
-      forbiddenActions: "Acciones prohibidas",
-      languageRules: "Reglas de idioma",
-      stopConditions: "Condiciones de parada",
-      nextCommands: "Siguientes comandos",
-      none: "Ninguno."
-    },
-    invocationTemplate: "Usa este workflow cuando el usuario escriba `{command}` o pida la misma intención.",
-    agentInstructions: {
-      title: "Instrucciones del agente SpecRow",
-      overview: "SpecRow es un workflow de especificaciones agent-first. Trata mensajes como `specrow migrate`, `specrow explore`, `specrow proposal`, `specrow build` o pedidos directos de SpecRow como intenciones de workflow. Ejecutalos mediante herramientas MCP de SpecRow.",
-      languageRule: "Antes de crear o revisar archivos integrados de SpecRow, lee `.specrow/config.yml` y usa su `language` configurado. No hagas fallback silencioso al inglés.",
-      toolCore: "Nucleo de herramientas:",
-      forbidden: "Prohibido:"
-    },
-    toolCoreFallback: "Usa estas herramientas MCP de SpecRow:",
-    skill: {
-      description: "Usa workflows de SpecRow cuando el usuario mencione SpecRow o pida specrow migrate, explore, proposal, review, build, revise o accept.",
-      whenToUse: "Cuándo usar",
-      instructions: "Instrucciones",
-      triggers: [
-        "El usuario pide un workflow de SpecRow como `specrow migrate`, `specrow explore`, `specrow proposal` o `specrow build`.",
-        "El usuario pide inicializar SpecRow, migrar artefactos de especificación existentes, explorar una idea, crear una propuesta, revisar, construir, revisar cambios o aceptar un cambio SpecRow."
-      ]
-    }
   }
 } satisfies LanguageResources;

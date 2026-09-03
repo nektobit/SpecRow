@@ -1,7 +1,9 @@
+<!-- specrow:readme-section=title -->
 # SpecRow
 
 SpecRow: agent-first workflow для спецификаций. Пользователь описывает намерение обычной фразой, например `specrow migrate`, `specrow explore`, `specrow proposal` или `specrow build`; агент выполняет workflow через MCP-сервер SpecRow.
 
+<!-- specrow:readme-section=language-links -->
 ## Читать на своем языке
 
 - [English](README.md)
@@ -9,21 +11,26 @@ SpecRow: agent-first workflow для спецификаций. Пользова�
 - [Español](README.es.md)
 - [中文](README.zh-CN.md)
 
+<!-- specrow:readme-section=documentation -->
 ## Документация
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
 На сайте описан полный MVP-flow: старт, explore, путь от proposal до accept, MCP-инструменты, шаблоны, локализация, валидация, lifecycle-правила и отличия от OpenSpec.
 
+<!-- specrow:readme-section=quick-start -->
 ## Быстрый старт
 
-Начинайте с agent installer. Язык проекта передается явно:
+Установите полный плагин в поддерживаемом клиенте:
 
-```txt
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=ru
-```
+- GitHub Copilot CLI: `copilot plugin install nektobit/SpecRow`.
+- GitHub Copilot в VS Code: выполните `Chat: Install Plugin From Source` и укажите `https://github.com/nektobit/SpecRow`.
+- Kiro IDE (экспериментально): выберите `Powers → Add Custom Power → Import power from GitHub` и укажите тот же URL репозитория.
+- Codex desktop/CLI и Cursor: совместимый пакет уже входит в репозиторий, но публичная установка одной кнопкой зависит от публикации SpecRow в marketplace каждого клиента.
 
-Агент использует MCP-сервер SpecRow, чтобы проверить workspace, при необходимости инициализировать `.specrow` с этим языком, запустить валидацию и сообщить следующий логичный шаг.
+Hermes Agent, OpenClaw, Grok Bot и NanoClaw совместимы с форматом Agent Plugins, но пока не проверены командой SpecRow. Для Claude Code, Gemini CLI и Windsurf/Cascade сейчас нет поддерживаемой установки SpecRow единым пакетом. Требуются Node.js 20+, локальный stdio MCP и доступ к файлам целевого проекта. Эти пути описаны разработчиками клиентов, но SpecRow пока не запускает клиентские end-to-end тесты установки.
+
+`npm i -g specrow` устанавливает только отдельный CLI и не регистрирует плагин в агенте. После полной установки плагина начните новый чат и попросите агента проверить SpecRow для нужного проекта.
 
 Затем скажите агенту, какой workflow SpecRow нужен:
 
@@ -44,12 +51,12 @@ specrow accept
 
 ```bash
 npm i -g specrow
-specrow init --language ru --estimation --tools codex,claude,cursor,windsurf,generic
+specrow init --language ru --estimation
 specrow migrate ./docs
 specrow validate
-specrow integrations status
 ```
 
+<!-- specrow:readme-section=workspace -->
 ## Workspace
 
 Инициализация SpecRow создает:
@@ -81,12 +88,12 @@ estimation:
   enabled: true
 ```
 
+<!-- specrow:readme-section=accept-gate -->
 ## Accept Gate
 
 Build не обновляет спеки как финальную правду и не архивирует изменение. Спеки и архив обновляются только после явной приемки пользователя через workflow `specrow accept`.
 
+<!-- specrow:readme-section=migration -->
 ## Migration Notes
 
-Используйте `specrow migrate openspec`, `specrow migrate speckit` или `specrow migrate ./docs`, чтобы перенести существующие артефакты спецификаций в `.specrow/`. Если `.specrow` отсутствует, миграция сначала инициализирует его. Legacy source не удаляется, а архивные записи копируются как сохраненная история без преобразования.
-
-Старые локальные прототипы могли использовать CLI `specfly` или директорию `.specfly`. Новые проекты используют бинарь `specrow` и `.specrow/`.
+Используйте `specrow migrate openspec`, `specrow migrate speckit` или `specrow migrate ./docs`, чтобы перенести существующие артефакты спецификаций в `.specrow/`. Если `.specrow` отсутствует, миграция сначала инициализирует его. Исходная система не удаляется, а архивные записи копируются как сохранённая история без преобразования.

@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
 import { defaultLocale, docContent, type Block, type LocaleCode, type PageSlug, type Paragraph, type TextPart } from '../content'
-import { blockId, readingMinutes, sectionLinks } from '../docs'
+import { blockAliases, blockId, readingMinutes, sectionLinks } from '../docs'
 import ConsoleBlock from '../components/ConsoleBlock.vue'
 
 type ConsoleVariant = 'ai' | 'cmd'
@@ -58,7 +58,10 @@ function headingTag(block: Extract<Block, { heading: string }>): 'h2' | 'h3' {
   return block.headingLevel === 3 ? 'h3' : 'h2'
 }
 
-function consoleVariant(commands: readonly string[], heading = ''): ConsoleVariant {
+function consoleVariant(commands: readonly string[], heading = '', exampleKind?: Block['exampleKind']): ConsoleVariant {
+  if (exampleKind === 'intent' || exampleKind === 'mcp') return 'ai'
+  if (exampleKind === 'cli') return 'cmd'
+
   const normalizedHeading = heading.toLowerCase()
 
   if (commands.some((command) => command.trim().startsWith('apply '))) {
@@ -93,7 +96,7 @@ function isExplicitTerminalCommand(command: string): boolean {
 
   return (
     /^(npm|pnpm|npx)\b/.test(normalizedCommand) ||
-    /^specrow\s+(init|integrate|mcp)\b/.test(normalizedCommand)
+    /^specrow\s+(init|migrate|mcp)\b/.test(normalizedCommand)
   )
 }
 </script>
@@ -115,7 +118,8 @@ function isExplicitTerminalCommand(command: string): boolean {
     <div class="mx-auto grid w-[min(1180px,calc(100%-32px))] gap-8 py-8 lg:grid-cols-[minmax(0,860px)_240px]">
       <article class="content-flow rounded-lg bg-[#242424] p-5 text-base leading-7 text-[#ebebf5db] shadow-xl shadow-black/20 md:p-8 md:text-lg md:leading-8">
         <template v-for="(block, index) in page.blocks" :key="index">
-          <section v-if="block.type === 'section'" :id="blockId(index)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+          <section v-if="block.type === 'section'" :id="blockId(block)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+            <span v-for="alias in blockAliases(pageSlug, block)" :id="alias" :key="alias" class="anchor-alias" aria-hidden="true" />
             <component :is="headingTag(block)">{{ block.heading }}</component>
             <p v-for="(paragraph, paragraphIndex) in block.paragraphs" :key="paragraphIndex">
               <template v-for="part in paragraphParts(paragraph)" :key="typeof part === 'string' ? part : part.text">
@@ -128,10 +132,11 @@ function isExplicitTerminalCommand(command: string): boolean {
                 <template v-else>{{ part }}</template>
               </template>
             </p>
-            <ConsoleBlock v-if="sectionCommands(block).length > 0" :commands="sectionCommands(block)" :variant="consoleVariant(sectionCommands(block), block.heading)" />
+            <ConsoleBlock v-if="sectionCommands(block).length > 0" :commands="sectionCommands(block)" :variant="consoleVariant(sectionCommands(block), block.heading, block.exampleKind)" />
           </section>
 
-          <section v-else-if="block.type === 'list-section'" :id="blockId(index)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+          <section v-else-if="block.type === 'list-section'" :id="blockId(block)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+            <span v-for="alias in blockAliases(pageSlug, block)" :id="alias" :key="alias" class="anchor-alias" aria-hidden="true" />
             <component :is="headingTag(block)">{{ block.heading }}</component>
             <p>{{ block.intro }}</p>
             <ul>
@@ -140,34 +145,23 @@ function isExplicitTerminalCommand(command: string): boolean {
             <p>{{ block.outro }}</p>
           </section>
 
-          <section v-else-if="block.type === 'code-section'" :id="blockId(index)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+          <section v-else-if="block.type === 'code-section'" :id="blockId(block)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+            <span v-for="alias in blockAliases(pageSlug, block)" :id="alias" :key="alias" class="anchor-alias" aria-hidden="true" />
             <component :is="headingTag(block)">{{ block.heading }}</component>
             <p>{{ block.intro }}</p>
-            <ConsoleBlock v-if="isCommandSnippet(block.code)" :commands="commandLines(block.code)" :variant="consoleVariant(commandLines(block.code), block.heading)" />
+            <ConsoleBlock v-if="isCommandSnippet(block.code)" :commands="commandLines(block.code)" :variant="consoleVariant(commandLines(block.code), block.heading, block.exampleKind)" />
             <pre v-else><code>{{ block.code }}</code></pre>
             <p>{{ block.outro }}</p>
           </section>
 
-          <section v-else-if="block.type === 'command-section'" :id="blockId(index)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+          <section v-else-if="block.type === 'command-section'" :id="blockId(block)" class="doc-section scroll-mt-24" :class="{ 'doc-section-sub': block.headingLevel === 3 }">
+            <span v-for="alias in blockAliases(pageSlug, block)" :id="alias" :key="alias" class="anchor-alias" aria-hidden="true" />
             <component :is="headingTag(block)">{{ block.heading }}</component>
             <p>{{ block.intro }}</p>
-            <ConsoleBlock :commands="block.commands" :variant="consoleVariant(block.commands, block.heading)" />
+            <ConsoleBlock :commands="block.commands" :variant="consoleVariant(block.commands, block.heading, block.exampleKind)" />
             <p>{{ block.outro }}</p>
           </section>
 
-          <div v-else class="rounded-lg border border-[#2e2e32] bg-[#2a2a2a] p-5">
-            <p v-for="(paragraph, paragraphIndex) in block.paragraphs" :key="paragraphIndex">
-              <template v-for="part in paragraphParts(paragraph)" :key="typeof part === 'string' ? part : part.text">
-                <RouterLink v-if="isLinkPart(part)" :to="linkTo(part.page)">
-                  {{ part.text }}
-                </RouterLink>
-                <strong v-else-if="hasMark(part, 'bold') && hasMark(part, 'italic')"><em>{{ typeof part === 'string' ? part : part.text }}</em></strong>
-                <strong v-else-if="hasMark(part, 'bold')">{{ typeof part === 'string' ? part : part.text }}</strong>
-                <em v-else-if="hasMark(part, 'italic')">{{ typeof part === 'string' ? part : part.text }}</em>
-                <template v-else>{{ part }}</template>
-              </template>
-            </p>
-          </div>
         </template>
       </article>
 

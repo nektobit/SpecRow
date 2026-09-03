@@ -1,37 +1,33 @@
 #!/usr/bin/env node
 import path from "node:path";
-import { readFile } from "node:fs/promises";
 
 import { Command } from "commander";
 import { ZodError } from "zod";
 
+import { loadSpecRowConfig } from "./config.js";
+import { initSpecRowProject } from "./init.js";
 import {
   acceptChange,
   archiveChange,
   createChange,
-  getIntegrationStatus,
-  getSpecRowMessage,
-  initSpecRowProject,
-  installSpecRowIntegrations,
   listActiveChanges,
-  loadSpecRowConfig,
   markChangeBuilt,
   markChangeReviewed,
   markRevisionNeeded,
-  reviewChangeReadiness,
   readChangeStatus,
-  runMigration,
-  updateSpecRowIntegrations,
-  validateSpecRowProject,
-  type IntegrationInstallResult,
-  type LifecycleStatus,
-  type MigrationResult
-} from "./core/index.js";
+  type LifecycleStatus
+} from "./lifecycle.js";
 import { validateLocaleContract } from "./localeContract.js";
+import { runMigration, type MigrationResult } from "./migration.js";
 import { startSpecRowMcpServer } from "./mcpServer.js";
-import type { ValidationIssue } from "./core/index.js";
-
-const SPECROW_VERSION = "0.1.13";
+import { getSpecRowMessage } from "./templates.js";
+import {
+  reviewChangeReadiness,
+  validateSpecRowProject,
+  type ValidationIssue
+} from "./validation.js";
+import { SPECROW_VERSION } from "./version.js";
+import { buildSpecRowContext } from "./workspace/context.js";
 
 export function createProgram(): Command {
   const program = new Command();
@@ -47,12 +43,7 @@ export function createProgram(): Command {
     .option("-l, --language <code>", "Project language code.", "en")
     .option("--estimation", "Ask agents to estimate implementation time after proposal creation.", false)
     .option("-f, --force", "Overwrite .specrow/config.yml if it already exists.", false)
-    .option("--tools <list>", "Install agent integrations: codex,claude,cursor,windsurf,generic,all,none.")
-    .option("--detect", "Detect agent integrations to install.", false)
-    .option("--mcp", "Install MCP configuration for supported agent integrations.", true)
-    .option("--no-mcp", "Skip MCP configuration and install only command, skill, rule, or prompt guidance.")
-    .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { language: string; estimation: boolean; force: boolean; tools?: string; detect: boolean; mcp: boolean; dryRun: boolean }) => {
+    .action(async (options: { language: string; estimation: boolean; force: boolean }) => {
       try {
         const result = await initSpecRowProject({
           language: options.language,
@@ -71,18 +62,6 @@ export function createProgram(): Command {
         }
 
         console.log(getSpecRowMessage(result.language, "init.ready", { path: pathForDisplay(result.root) }));
-
-        if (options.tools !== undefined || options.detect) {
-          printIntegrationResult(
-            await installSpecRowIntegrations({
-              tools: options.tools,
-              detect: options.detect,
-              force: options.force,
-              mcp: options.mcp,
-              dryRun: options.dryRun
-            })
-          );
-        }
       } catch (error) {
         if (error instanceof ZodError) {
           console.error(`Invalid config: ${error.issues.map((issue) => issue.message).join("; ")}`);
@@ -115,76 +94,6 @@ export function createProgram(): Command {
             dryRun: options.dryRun
           })
         );
-      } catch (error) {
-        handleCommandError(error);
-      }
-    });
-
-  program
-    .command("integrate")
-    .description("Install SpecRow agent integrations for the current project.")
-    .option("--tools <list>", "Agent integrations: codex,claude,cursor,windsurf,generic,all,none. Defaults to detection.")
-    .option("--detect", "Detect agent integrations to install.", false)
-    .option("--mcp", "Install MCP configuration for supported agent integrations.", true)
-    .option("--no-mcp", "Skip MCP configuration and install only command, skill, rule, or prompt guidance.")
-    .option("-f, --force", "Overwrite existing unmarked integration files.", false)
-    .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { tools?: string; detect: boolean; mcp: boolean; force: boolean; dryRun: boolean }) => {
-      try {
-        printIntegrationResult(
-          await installSpecRowIntegrations({
-            tools: options.tools,
-            detect: options.detect || options.tools === undefined,
-            force: options.force,
-            mcp: options.mcp,
-            dryRun: options.dryRun
-          })
-        );
-      } catch (error) {
-        handleCommandError(error);
-      }
-    });
-
-  program
-    .command("update")
-    .description("Regenerate installed SpecRow agent integrations.")
-    .option("--tools <list>", "Override configured integrations: codex,claude,cursor,windsurf,generic,all,none.")
-    .option("--mcp", "Regenerate MCP configuration for supported agent integrations.", true)
-    .option("--no-mcp", "Skip MCP configuration and regenerate only command, skill, rule, or prompt guidance.")
-    .option("-f, --force", "Overwrite existing unmarked integration files.", false)
-    .option("--dry-run", "Show integration files without writing them.", false)
-    .action(async (options: { tools?: string; mcp: boolean; force: boolean; dryRun: boolean }) => {
-      try {
-        printIntegrationResult(
-          await updateSpecRowIntegrations({
-            tools: options.tools,
-            force: options.force,
-            mcp: options.mcp,
-            dryRun: options.dryRun
-          })
-        );
-      } catch (error) {
-        handleCommandError(error);
-      }
-    });
-
-  const integrations = program.command("integrations").description("Inspect SpecRow agent integrations.");
-
-  integrations
-    .command("status")
-    .description("Show installed SpecRow agent integration files.")
-    .action(async () => {
-      try {
-        const files = await getIntegrationStatus(process.cwd());
-
-        if (files.length === 0) {
-          console.log("No SpecRow integrations are configured.");
-          return;
-        }
-
-        for (const file of files) {
-          console.log(`${file.tool} ${file.kind} ${file.path}: ${file.reason}`);
-        }
       } catch (error) {
         handleCommandError(error);
       }
@@ -314,27 +223,7 @@ export function createProgram(): Command {
     .argument("[change-name]")
     .action(async (changeName?: string) => {
       try {
-        const config = await loadSpecRowConfig(process.cwd());
-        const activeChanges = await listActiveChanges();
-        const context: Record<string, unknown> = {
-          specrow: {
-            root: pathForDisplay(path.join(process.cwd(), ".specrow")),
-            config
-          },
-          activeChanges
-        };
-
-        if (changeName !== undefined) {
-          const changeRoot = path.join(process.cwd(), ".specrow", "changes", changeName);
-          context.change = {
-            root: pathForDisplay(changeRoot),
-            status: await readChangeStatus(process.cwd(), changeName),
-            proposal: await readFile(path.join(changeRoot, "proposal.md"), "utf8"),
-            tasks: await readFile(path.join(changeRoot, "tasks.md"), "utf8")
-          };
-        }
-
-        console.log(JSON.stringify(context, null, 2));
+        console.log(JSON.stringify(await buildSpecRowContext(process.cwd(), changeName), null, 2));
       } catch (error) {
         handleCommandError(error);
       }
@@ -490,24 +379,6 @@ function printStatusLine(language: string, status: LifecycleStatus): void {
       accepted: String(status.acceptance.explicit)
     })
   );
-}
-
-function printIntegrationResult(result: IntegrationInstallResult): void {
-  if (result.detectedTools.length > 0) {
-    console.log(`Detected integrations: ${result.detectedTools.join(", ")}`);
-  }
-
-  if (result.tools.length === 0) {
-    console.log("No SpecRow integrations selected.");
-    return;
-  }
-
-  console.log(`${result.dryRun ? "Planned" : "Installed"} integrations: ${result.tools.join(", ")}`);
-
-  for (const file of result.files) {
-    const reason = file.reason === undefined ? "" : ` (${file.reason})`;
-    console.log(`${file.action} ${file.tool} ${file.kind} ${file.path}${reason}`);
-  }
 }
 
 function printMigrationResult(result: MigrationResult): void {

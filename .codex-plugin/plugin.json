@@ -1,0 +1,38 @@
+{
+  "name": "specrow",
+  "version": "0.2.0",
+  "description": "Agent-first specification workflow with explicit review, implementation, acceptance, and archival stages.",
+  "author": {
+    "name": "nektobit",
+    "url": "https://github.com/nektobit"
+  },
+  "homepage": "https://nektobit.github.io/SpecRow/",
+  "repository": "https://github.com/nektobit/SpecRow",
+  "license": "MIT",
+  "keywords": [
+    "specifications",
+    "spec-driven-development",
+    "agent-workflow",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "SpecRow",
+    "shortDescription": "Agent-first specification workflow",
+    "longDescription": "Plan, review, build, accept, and archive changes through a traceable specification workflow.",
+    "developerName": "nektobit",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://nektobit.github.io/SpecRow/",
+    "defaultPrompt": [
+      "Check SpecRow for this project.",
+      "Explore this change before creating a proposal.",
+      "Create a SpecRow proposal for this change."
+    ],
+    "brandColor": "#42B883"
+  }
+}

@@ -1,45 +1,53 @@
 import { constants } from "node:fs";
-import { access, readdir, readFile, stat } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z, ZodError, type ZodTypeAny } from "zod";
 
+import { loadSpecRowConfig } from "./config.js";
+import { assertLifecycleAction } from "./domain/lifecycle.js";
+import { initSpecRowProject } from "./init.js";
 import {
   acceptChange,
   archiveChange,
   createChange,
-  getIntegrationStatus,
-  getSpecRowMessage,
-  getSpecRowTemplate,
-  initSpecRowProject,
   listActiveChanges,
-  loadSpecRowConfig,
   markChangeBuilt,
   markChangeReviewed,
   markRevisionNeeded,
-  reviewChangeReadiness,
   readChangeStatus,
-  runMigration,
-  SUPPORTED_LANGUAGES,
-  validateSpecRowProject,
   type LifecycleStatus,
-  type ReviewState,
-  type TemplateName,
+  type ReviewState
+} from "./lifecycle.js";
+import { runMigration } from "./migration.js";
+import {
+  resolveRequestProjectRoot,
+  resolveSpecRowMcpProjectRoot,
+  type McpRootsProvider
+} from "./mcp/projectRoot.js";
+import { getSpecRowMessage } from "./templates.js";
+import {
+  reviewChangeReadiness,
+  validateSpecRowProject,
   type ValidationIssue
-} from "./core/index.js";
+} from "./validation.js";
+import { SPECROW_VERSION } from "./version.js";
+import { buildSpecRowContext } from "./workspace/context.js";
 
-const SPECROW_VERSION = "0.1.13";
 const SPECROW_DIR = ".specrow";
 
-const EmptySchema = z.object({}).optional();
-const InitSchema = z.object({
+const ProjectRootSchema = z.object({
+  projectRoot: z.string().min(1).optional()
+});
+const EmptySchema = ProjectRootSchema;
+const InitSchema = ProjectRootSchema.extend({
   language: z.string().min(2).max(32).optional(),
   estimation: z.boolean().optional(),
   force: z.boolean().optional()
 });
-const ChangeNameSchema = z.object({
+const ChangeNameSchema = ProjectRootSchema.extend({
   changeName: z.string().min(1)
 });
 const CreateProposalSchema = ChangeNameSchema.extend({
@@ -49,10 +57,7 @@ const AcceptSchema = ChangeNameSchema.extend({
   explicitUserAcceptance: z.boolean(),
   followUpWorkCompleted: z.boolean().optional()
 });
-const TemplateContextSchema = z.object({
-  template: z.enum(["project", "spec", "proposal", "tasks"]).optional()
-});
-const MigrateSchema = z.object({
+const MigrateSchema = ProjectRootSchema.extend({
   source: z.string().min(1).optional(),
   sourceRoot: z.string().min(1).optional(),
   language: z.string().min(2).max(32).optional(),
@@ -101,31 +106,41 @@ export interface SpecRowMcpRuntime {
 
 type ToolHandler = (input: unknown) => Promise<McpToolResult>;
 
-export async function resolveSpecRowMcpProjectRoot(projectPath?: string, env: NodeJS.ProcessEnv = process.env): Promise<string> {
-  const requested = projectPath ?? env.SPECROW_PROJECT_ROOT ?? process.cwd();
-  const root = path.resolve(requested);
+export const SPECROW_MCP_TOOL_NAMES = [
+  "specrow_init",
+  "specrow_project_status",
+  "specrow_create_proposal",
+  "specrow_migrate",
+  "specrow_validate",
+  "specrow_review",
+  "specrow_status",
+  "specrow_context",
+  "specrow_build_start",
+  "specrow_build_finish",
+  "specrow_revise",
+  "specrow_accept",
+  "specrow_archive"
+] as const;
 
-  let rootStat;
-  try {
-    rootStat = await stat(root);
-  } catch {
-    throw new Error(`Invalid SpecRow project root "${root}": directory does not exist.`);
-  }
+export type SpecRowMcpToolName = (typeof SPECROW_MCP_TOOL_NAMES)[number];
 
-  if (!rootStat.isDirectory()) {
-    throw new Error(`Invalid SpecRow project root "${root}": expected a directory.`);
-  }
-
-  return root;
-}
+export { resolveSpecRowMcpProjectRoot } from "./mcp/projectRoot.js";
 
 export async function createSpecRowMcpRuntime(options: SpecRowMcpOptions = {}): Promise<SpecRowMcpRuntime> {
-  const projectRoot = await resolveSpecRowMcpProjectRoot(options.projectRoot, options.env);
+  const env = options.env ?? process.env;
+  const projectRoot = await resolveSpecRowMcpProjectRoot(options.projectRoot, env);
   const server = new McpServer({
     name: "specrow",
     version: SPECROW_VERSION
   });
-  const handlers = createToolHandlers(projectRoot);
+  const listRoots: McpRootsProvider = async () => {
+    if (server.server.getClientCapabilities()?.roots === undefined) {
+      return [];
+    }
+
+    return (await server.server.listRoots()).roots;
+  };
+  const handlers = createToolHandlers(projectRoot, listRoots, env.PLUGIN_ROOT === undefined);
 
   for (const [name, registration] of Object.entries(createToolRegistrations(handlers))) {
     server.registerTool(
@@ -150,7 +165,7 @@ export async function createSpecRowMcpRuntime(options: SpecRowMcpOptions = {}): 
     projectRoot,
     server,
     callTool: async (name, input = {}) => {
-      const handler = handlers[name];
+      const handler = handlers[name as SpecRowMcpToolName];
 
       if (handler === undefined) {
         return failure("NOT_FOUND", `Unknown SpecRow MCP tool "${name}".`);
@@ -168,8 +183,15 @@ export async function startSpecRowMcpServer(options: SpecRowMcpOptions = {}): Pr
   await runtime.server.connect(new StdioServerTransport());
 }
 
-function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
-  const tool = <T extends ZodTypeAny>(schema: T, handler: (input: z.infer<T>) => Promise<McpToolResult>): ToolHandler => {
+function createToolHandlers(
+  defaultProjectRoot: string,
+  listRoots?: McpRootsProvider,
+  allowDefaultProjectRoot = true
+): Record<SpecRowMcpToolName, ToolHandler> {
+  const tool = <T extends ZodTypeAny>(
+    schema: T,
+    handler: (input: z.infer<T>, projectRoot: string) => Promise<McpToolResult>
+  ): ToolHandler => {
     return async (input: unknown) => {
       const parsed = schema.safeParse(input ?? {});
 
@@ -178,7 +200,15 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       }
 
       try {
-        return await handler(parsed.data);
+        const requestedProjectRoot = (parsed.data as { projectRoot?: string }).projectRoot;
+        const projectRoot = await resolveRequestProjectRoot({
+          requestedProjectRoot,
+          defaultProjectRoot,
+          listRoots,
+          allowDefaultProjectRoot
+        });
+        const result = await handler(parsed.data, projectRoot);
+        return result.success ? { ...result, projectRoot } : result;
       } catch (error) {
         return errorToFailure(error);
       }
@@ -186,7 +216,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
   };
 
   return {
-    specrow_init: tool(InitSchema, async (input) => {
+    specrow_init: tool(InitSchema, async (input, projectRoot) => {
       const result = await initSpecRowProject({
         cwd: projectRoot,
         language: input.language,
@@ -211,10 +241,10 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         directories: result.directories.map((directory) => relative(projectRoot, directory)),
         estimation: result.estimation,
         language: result.language,
-        nextSteps: ["Run specrow_validate, then specrow_integration_status. After installation is confirmed, ask for `specrow explore` to clarify an idea or `specrow proposal` to create a change proposal."]
+        nextSteps: ["Run specrow_validate. Then ask for `specrow explore` to clarify an idea or `specrow proposal` to create a change proposal."]
       });
     }),
-    specrow_project_status: tool(EmptySchema, async () => {
+    specrow_project_status: tool(EmptySchema, async (_input, projectRoot) => {
       const configPath = path.join(projectRoot, SPECROW_DIR, "config.yml");
       const projectPath = path.join(projectRoot, SPECROW_DIR, "project.md");
       const initialized = (await pathExists(configPath)) && (await pathExists(projectPath));
@@ -239,7 +269,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
           : ["Run specrow_init with the requested language to initialize this workspace."]
       });
     }),
-    specrow_create_proposal: tool(CreateProposalSchema, async (input) => {
+    specrow_create_proposal: tool(CreateProposalSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const result = await createChange({
         cwd: projectRoot,
@@ -257,7 +287,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         ]
       });
     }),
-    specrow_migrate: tool(MigrateSchema, async (input) => {
+    specrow_migrate: tool(MigrateSchema, async (input, projectRoot) => {
       const result = await runMigration({
         cwd: projectRoot,
         source: input.source,
@@ -280,7 +310,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         ]
       });
     }),
-    specrow_validate: tool(ChangeNameSchema.partial(), async (input) => {
+    specrow_validate: tool(ChangeNameSchema.partial(), async (input, projectRoot) => {
       if (input.changeName !== undefined) {
         assertSafeChangeName(input.changeName);
       }
@@ -294,10 +324,10 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         valid: !hasErrors,
         nextSteps: hasErrors
           ? ["Fix the reported SpecRow issues, then run specrow_validate again."]
-          : ["Run specrow_integration_status, then continue with `specrow explore` for discovery or `specrow proposal` for new work."]
+          : ["Continue with `specrow explore` for discovery or `specrow proposal` for new work."]
       });
     }),
-    specrow_review: tool(ChangeNameSchema, async (input) => {
+    specrow_review: tool(ChangeNameSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const result = await reviewChangeReadiness(projectRoot, input.changeName);
       const hasErrors = hasBlockingErrors(result.issues);
@@ -312,7 +342,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         nextSteps: ["Ask for `specrow build` when implementation is ready to start."]
       });
     }),
-    specrow_status: tool(ChangeNameSchema.partial(), async (input) => {
+    specrow_status: tool(ChangeNameSchema.partial(), async (input, projectRoot) => {
       const language = await projectLanguage(projectRoot);
 
       if (input.changeName !== undefined) {
@@ -328,25 +358,16 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         activeChanges
       });
     }),
-    specrow_list: tool(EmptySchema, async () => {
-      const language = await projectLanguage(projectRoot);
-      const activeChanges = await listActiveChanges(projectRoot);
-      return success({
-        message: activeChanges.changes.length === 0 ? getSpecRowMessage(language, "list.empty") : "Active SpecRow changes.",
-        language,
-        activeChanges
-      });
-    }),
-    specrow_context: tool(ChangeNameSchema.partial(), async (input) => {
+    specrow_context: tool(ChangeNameSchema.partial(), async (input, projectRoot) => {
       if (input.changeName !== undefined) {
         assertSafeChangeName(input.changeName);
       }
 
       return success({
-        context: await buildContext(projectRoot, input.changeName)
+        context: await buildSpecRowContext(projectRoot, input.changeName)
       });
     }),
-    specrow_build_start: tool(ChangeNameSchema, async (input) => {
+    specrow_build_start: tool(ChangeNameSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const result = await validateSpecRowProject(projectRoot, input.changeName);
 
@@ -355,12 +376,13 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
       }
 
       const status = await readChangeStatus(projectRoot, input.changeName);
+      assertLifecycleAction(status, "build");
       return lifecycleSuccess(result.language, "build.started", status, {
         issues: result.issues,
         nextSteps: ["Implement the requested work, then finish the MCP build workflow."]
       });
     }),
-    specrow_build_finish: tool(ChangeNameSchema, async (input) => {
+    specrow_build_finish: tool(ChangeNameSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const language = await projectLanguage(projectRoot);
       const status = await markChangeBuilt(projectRoot, input.changeName);
@@ -368,7 +390,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         nextSteps: ["Ask for `specrow accept` only after explicit user acceptance, or `specrow revise` if changes are requested."]
       });
     }),
-    specrow_revise: tool(ChangeNameSchema, async (input) => {
+    specrow_revise: tool(ChangeNameSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const language = await projectLanguage(projectRoot);
       const status = await markRevisionNeeded(projectRoot, input.changeName);
@@ -376,7 +398,7 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         nextSteps: ["Complete follow-up work before requesting `specrow accept` again."]
       });
     }),
-    specrow_accept: tool(AcceptSchema, async (input) => {
+    specrow_accept: tool(AcceptSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const language = await projectLanguage(projectRoot);
       const status = await acceptChange(projectRoot, input.changeName, {
@@ -387,58 +409,11 @@ function createToolHandlers(projectRoot: string): Record<string, ToolHandler> {
         nextSteps: ["Continue the MCP accept workflow with specrow_archive to archive the accepted change."]
       });
     }),
-    specrow_archive: tool(ChangeNameSchema, async (input) => {
+    specrow_archive: tool(ChangeNameSchema, async (input, projectRoot) => {
       assertSafeChangeName(input.changeName);
       const language = await projectLanguage(projectRoot);
       const status = await archiveChange(projectRoot, input.changeName);
       return lifecycleSuccess(language, "lifecycle.archived", status);
-    }),
-    specrow_workflow_guide: tool(EmptySchema, async () =>
-      success({
-        message: "SpecRow workflow guide.",
-        workflow: ["migrate", "explore", "proposal", "review", "build", "revise", "accept", "archive"],
-        tools: {
-          migrate: "specrow_project_status + specrow_migrate + specrow_validate",
-          explore: "specrow_project_status + specrow_context + specrow_validate",
-          proposal: "specrow_create_proposal",
-          review: "specrow_review",
-          buildStart: "specrow_build_start",
-          buildFinish: "specrow_build_finish",
-          revise: "specrow_revise",
-          accept: "specrow_accept",
-          archive: "specrow_archive"
-        },
-        acceptGate: {
-          explicitUserAcceptance: "Required and must be true.",
-          revisionNeeded: "Requires followUpWorkCompleted true."
-        }
-      })
-    ),
-    specrow_template_context: tool(TemplateContextSchema, async (input) => {
-      const config = await loadSpecRowConfig(projectRoot);
-      const templates = (input.template === undefined ? ["project", "spec", "proposal", "tasks"] : [input.template]) as TemplateName[];
-      return success({
-        language: config.language,
-        templates: Object.fromEntries(templates.map((template) => [template, getSpecRowTemplate(config.language, template)]))
-      });
-    }),
-    specrow_language_status: tool(EmptySchema, async () => {
-      const config = await loadSpecRowConfig(projectRoot);
-      return success({
-        language: config.language,
-        supportedLanguages: SUPPORTED_LANGUAGES,
-        supported: SUPPORTED_LANGUAGES.includes(config.language as (typeof SUPPORTED_LANGUAGES)[number])
-      });
-    }),
-    specrow_integration_status: tool(EmptySchema, async () => {
-      const files = await getIntegrationStatus(projectRoot);
-      return success({
-        projectRoot,
-        files,
-        nextSteps: files.length === 0
-          ? ["SpecRow is initialized but no managed integration files are recorded. Continue with `specrow explore` for discovery or `specrow proposal` when ready."]
-          : ["Confirm the listed integration files are present, then continue with `specrow explore` for discovery or `specrow proposal` when ready."]
-      });
     })
   };
 }
@@ -458,7 +433,7 @@ async function assertSpecRowInitCreatedFiles(projectRoot: string): Promise<void>
   }
 }
 
-function createToolRegistrations(handlers: Record<string, ToolHandler>): Record<string, {
+function createToolRegistrations(handlers: Record<SpecRowMcpToolName, ToolHandler>): Record<SpecRowMcpToolName, {
   title: string;
   description: string;
   schema: ZodTypeAny;
@@ -467,24 +442,19 @@ function createToolRegistrations(handlers: Record<string, ToolHandler>): Record<
   destructive: boolean;
 }> {
   return {
-    specrow_init: registration("Initialize SpecRow", "Create the .specrow project structure.", InitSchema, handlers.specrow_init, false, false),
+    specrow_init: registration("Initialize SpecRow", "Create the .specrow project structure.", InitSchema, handlers.specrow_init, false, true),
     specrow_project_status: registration("Project Status", "Report whether this workspace already has SpecRow project files.", EmptySchema, handlers.specrow_project_status, true, false),
     specrow_create_proposal: registration("Create Proposal", "Create a SpecRow change proposal.", CreateProposalSchema, handlers.specrow_create_proposal, false, false),
-    specrow_migrate: registration("Migrate", "Migrate OpenSpec, SpecKit, or documentation folder artifacts into SpecRow.", MigrateSchema, handlers.specrow_migrate, false, false),
+    specrow_migrate: registration("Migrate", "Migrate OpenSpec, SpecKit, or documentation folder artifacts into SpecRow.", MigrateSchema, handlers.specrow_migrate, false, true),
     specrow_validate: registration("Validate", "Validate the SpecRow workspace or a change.", ChangeNameSchema.partial(), handlers.specrow_validate, true, false),
     specrow_review: registration("Review", "Review a change and mark review completed when valid.", ChangeNameSchema, handlers.specrow_review, false, false),
     specrow_status: registration("Status", "Read change status or active change list.", ChangeNameSchema.partial(), handlers.specrow_status, true, false),
-    specrow_list: registration("List", "List active SpecRow changes.", EmptySchema, handlers.specrow_list, true, false),
     specrow_context: registration("Context", "Return agent-readable SpecRow context.", ChangeNameSchema.partial(), handlers.specrow_context, true, false),
     specrow_build_start: registration("Build Start", "Check that a change is ready for implementation.", ChangeNameSchema, handlers.specrow_build_start, true, false),
     specrow_build_finish: registration("Build Finish", "Mark implementation work as built.", ChangeNameSchema, handlers.specrow_build_finish, false, false),
     specrow_revise: registration("Revise", "Mark a change as needing revision.", ChangeNameSchema, handlers.specrow_revise, false, false),
     specrow_accept: registration("Accept", "Record explicit user acceptance.", AcceptSchema, handlers.specrow_accept, false, false),
-    specrow_archive: registration("Archive", "Archive an accepted change.", ChangeNameSchema, handlers.specrow_archive, false, true),
-    specrow_workflow_guide: registration("Workflow Guide", "Explain the SpecRow MCP workflow.", EmptySchema, handlers.specrow_workflow_guide, true, false),
-    specrow_template_context: registration("Template Context", "Return localized SpecRow templates.", TemplateContextSchema, handlers.specrow_template_context, true, false),
-    specrow_language_status: registration("Language Status", "Return configured and supported languages.", EmptySchema, handlers.specrow_language_status, true, false),
-    specrow_integration_status: registration("Integration Status", "Return configured SpecRow integration files.", EmptySchema, handlers.specrow_integration_status, true, false)
+    specrow_archive: registration("Archive", "Archive an accepted change.", ChangeNameSchema, handlers.specrow_archive, false, true)
   };
 }
 
@@ -566,29 +536,6 @@ async function listSpecRowResourceUris(projectRoot: string): Promise<string[]> {
   return resources;
 }
 
-async function buildContext(projectRoot: string, changeName?: string): Promise<Record<string, unknown>> {
-  const config = await loadSpecRowConfig(projectRoot);
-  const context: Record<string, unknown> = {
-    specrow: {
-      root: relative(projectRoot, path.join(projectRoot, SPECROW_DIR)),
-      config
-    },
-    activeChanges: await listActiveChanges(projectRoot)
-  };
-
-  if (changeName !== undefined) {
-    const changeRoot = path.join(projectRoot, SPECROW_DIR, "changes", changeName);
-    context.change = {
-      root: relative(projectRoot, changeRoot),
-      status: await readChangeStatus(projectRoot, changeName),
-      proposal: await readFile(path.join(changeRoot, "proposal.md"), "utf8"),
-      tasks: await readFile(path.join(changeRoot, "tasks.md"), "utf8")
-    };
-  }
-
-  return context;
-}
-
 async function readSpecRowFile(projectRoot: string, ...segments: string[]): Promise<string> {
   const targetPath = path.resolve(projectRoot, SPECROW_DIR, ...segments);
   assertInsideProjectSpecRow(projectRoot, targetPath);
@@ -666,6 +613,19 @@ function errorToFailure(error: unknown): McpFailure {
     return failure("UNSAFE_PATH", message);
   }
 
+  if (
+    message.includes("SpecRow project root") ||
+    message.includes("MCP workspace roots") ||
+    message.includes("MCP client did not provide a workspace root")
+  ) {
+    return failure(
+      "INVALID_PROJECT_ROOT",
+      message,
+      undefined,
+      "Pass the absolute projectRoot for a filesystem workspace announced by the MCP client."
+    );
+  }
+
   if (message.includes("does not exist") || message.includes("ENOENT")) {
     return failure("NOT_FOUND", message);
   }
@@ -678,7 +638,12 @@ function errorToFailure(error: unknown): McpFailure {
     return failure("INVALID_STATE", message, undefined, "Use `specrow revise` for requested changes, or complete follow-up work before `specrow accept`.");
   }
 
-  if (message.includes("must be accepted") || message.includes("already exists")) {
+  if (
+    message.includes("must be accepted") ||
+    message.includes("requires completed review") ||
+    message.includes("cannot transition") ||
+    message.includes("already exists")
+  ) {
     return failure("INVALID_STATE", message);
   }
 

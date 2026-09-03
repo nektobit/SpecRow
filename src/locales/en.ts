@@ -4,14 +4,17 @@ export const en = {
   templates: {
     project: `# Project
 
+<!-- specrow:section=purpose -->
 ## Purpose
 Describe what this project is for, who it serves, and what outcomes matter.
 
+<!-- specrow:section=working-language -->
 ## Working Language
 English.
 
 All built-in SpecRow files, agent-authored proposals, specs, tasks, and lifecycle messages should use this language unless a user explicitly asks for a quoted foreign-language term.
 
+<!-- specrow:section=domain-vocabulary -->
 ## Domain Vocabulary
 List project-specific terms, canonical names, acronyms, and words that must not be translated.
 
@@ -19,6 +22,7 @@ List project-specific terms, canonical names, acronyms, and words that must not 
   - Meaning:
   - Notes:
 
+<!-- specrow:section=architecture-notes -->
 ## Architecture Notes
 Capture stable technical context that helps an agent make correct changes.
 
@@ -27,6 +31,7 @@ Capture stable technical context that helps an agent make correct changes.
 - Important modules or boundaries:
 - Existing patterns to preserve:
 
+<!-- specrow:section=constraints -->
 ## Constraints
 Document hard rules, compatibility requirements, security or privacy boundaries, performance limits, and operational constraints.
 
@@ -34,6 +39,7 @@ Document hard rules, compatibility requirements, security or privacy boundaries,
   - Reason:
   - Verification:
 
+<!-- specrow:section=verification -->
 ## Verification
 Describe how changes are normally proven correct.
 
@@ -44,9 +50,11 @@ Describe how changes are normally proven correct.
 `,
     spec: `# <Spec Name>
 
+<!-- specrow:section=purpose -->
 ## Purpose
 State the user-visible capability or behavior this spec owns. Keep one focused capability per spec.
 
+<!-- specrow:section=current-behavior -->
 ## Current Behavior
 Describe what is true today. Specs are final truth only after explicit acceptance.
 
@@ -55,6 +63,7 @@ Describe what is true today. Specs are final truth only after explicit acceptanc
 - Error handling:
 - Important edge cases:
 
+<!-- specrow:section=requirements -->
 ## Requirements
 Use behavior-first requirements. Requirements describe observable behavior, interfaces, constraints, and error handling rather than implementation internals.
 
@@ -67,9 +76,11 @@ The system SHALL <observable behavior>.
 - **THEN** <expected outcome>
 - **AND** <additional expected outcome>
 
+<!-- specrow:section=constraints -->
 ## Constraints
 List non-negotiable rules that apply to this capability.
 
+<!-- specrow:section=decisions -->
 ## Decisions
 Record accepted product or technical decisions that explain why the current behavior exists.
 
@@ -77,6 +88,7 @@ Record accepted product or technical decisions that explain why the current beha
   - Reason:
   - Date:
 
+<!-- specrow:section=verification -->
 ## Verification
 List checks that prove this spec remains true.
 
@@ -86,12 +98,15 @@ List checks that prove this spec remains true.
 `,
     proposal: `# Proposal: <change-name>
 
+<!-- specrow:section=summary -->
 ## Summary
 Describe the intended change in a few sentences.
 
+<!-- specrow:section=problem -->
 ## Problem
 Explain the current pain, missing behavior, risk, or opportunity. Include user impact and why the change is worth doing now.
 
+<!-- specrow:section=proposed-change -->
 ## Proposed Change
 Describe the target behavior. Be explicit about each meaningful before/after change.
 
@@ -101,19 +116,23 @@ Describe the target behavior. Be explicit about each meaningful before/after cha
 - Reason: <why this change is needed>
 - Impact: <breaking or non-breaking, who is affected>
 
+<!-- specrow:section=scope -->
 ## Scope
 List what this change includes.
 
 - 
 
+<!-- specrow:section=out-of-scope -->
 ## Out of Scope
 List related work that this change intentionally does not include.
 
 - 
 
+<!-- specrow:section=user-impact -->
 ## User Impact
 Describe how users, agents, automation, CI, or maintainers experience the change.
 
+<!-- specrow:section=risks -->
 ## Risks
 Call out compatibility, migration, security, data, workflow, and localization risks.
 
@@ -121,12 +140,14 @@ Call out compatibility, migration, security, data, workflow, and localization ri
   - Mitigation:
   - Verification:
 
+<!-- specrow:section=decisions -->
 ## Decisions
 Record decisions made while shaping the proposal.
 
 - Decision:
   - Reason:
 
+<!-- specrow:section=estimation -->
 ## Estimation
 Fill this section only when .specrow/config.yml has estimation.enabled: true.
 
@@ -134,6 +155,7 @@ Fill this section only when .specrow/config.yml has estimation.enabled: true.
 - Assumptions:
 - Confidence:
 
+<!-- specrow:section=acceptance-criteria -->
 ## Acceptance Criteria
 Define the explicit checks required before the user can accept this change.
 
@@ -141,6 +163,7 @@ Define the explicit checks required before the user can accept this change.
 - [ ] Built-in files are written in the project language.
 - [ ] Specs are not updated as final truth before specrow accept.
 
+<!-- specrow:section=spec-updates -->
 ## Spec Updates
 Describe the intended spec changes using this structure when requirements change.
 
@@ -151,20 +174,24 @@ Describe the intended spec changes using this structure when requirements change
 `,
     tasks: `# Tasks: <change-name>
 
+<!-- specrow:section=implementation -->
 ## Implementation
 - [ ] Update code and generated artifacts required by the proposal.
 - [ ] Keep implementation scoped to the accepted proposal.
 - [ ] Do not update specs as final truth during build.
 
+<!-- specrow:section=verification -->
 ## Verification
 - [ ] Run targeted tests for changed behavior.
 - [ ] Run the relevant full test or typecheck command.
 - [ ] Validate generated SpecRow files use the configured language.
 
+<!-- specrow:section=documentation -->
 ## Documentation
 - [ ] Update user-facing or agent-facing documentation when behavior changes.
 - [ ] Note migration guidance if existing projects are affected.
 
+<!-- specrow:section=acceptance-gate -->
 ## Acceptance Gate
 - [ ] Build output is ready for user review.
 - [ ] The next step is specrow accept or specrow revise.
@@ -208,236 +235,5 @@ Original artifacts are preserved under {path}.`,
 - [ ] Confirm migrated output from {source} before treating it as final SpecRow truth.`,
     "error.missingTemplate": "Missing SpecRow template \"{name}\" for language \"{language}\".",
     "error.missingMessage": "Missing SpecRow message \"{name}\" for language \"{language}\"."
-  },
-  agentCommands: {
-    "/specrow:init": {
-      userIntent: "Set up SpecRow for the current project without requiring the user to know tool names or files.",
-      agentBehavior: [
-        "Determine the intended project language from the user or ask for it when it is ambiguous.",
-        "Call the SpecRow MCP init tool as an implementation detail.",
-        "Confirm that .specrow/config.yml, project.md, specs/, changes/, and archive/ exist."
-      ],
-      forbiddenActions: [
-        "Do not create legacy workspace directories.",
-        "Do not continue if the requested language resources are missing."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: ["Missing template or message resources for the requested language."]
-    },
-    "/specrow:migrate": {
-      userIntent: "Migrate existing OpenSpec, SpecKit, or documentation-folder specification artifacts into SpecRow.",
-      agentBehavior: [
-        "Identify whether the source is OpenSpec, SpecKit, or a documentation folder before writing migration output.",
-        "Initialize SpecRow when the project is not initialized.",
-        "Run migration through the SpecRow MCP tool or CLI core and preserve source traceability.",
-        "Validate migrated SpecRow files and report warnings that require user review."
-      ],
-      forbiddenActions: [
-        "Do not delete, move, or rewrite the legacy source.",
-        "Do not transform archived source entries; copy archive records as preserved history.",
-        "Do not treat migrated specs as final truth without user review."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "The requested source cannot be found or safely read.",
-        "The configured language has missing templates or lifecycle messages.",
-        "Migrated output would overwrite existing SpecRow files without explicit force."
-      ]
-    },
-    "/specrow:explore": {
-      userIntent: "Explore an idea, problem, or possible change before committing it to a proposal.",
-      agentBehavior: [
-        "Inspect project status and context before committing to a change.",
-        "Use read-only SpecRow tools and codebase context to clarify goals, options, risks, affected areas, and open questions.",
-        "Ask focused questions when the intended change, scope, or acceptance expectations are ambiguous.",
-        "End with a concise exploration summary and recommend /specrow:proposal when the intent is ready."
-      ],
-      forbiddenActions: [
-        "Do not create proposal.md, tasks.md, status.yml, or a change directory during exploration.",
-        "Do not implement code during exploration.",
-        "Do not accept, archive, or update specs as final truth."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "The project is not initialized and exploration requires project-specific context.",
-        "The requested topic is too broad to produce actionable questions or options.",
-        "The configured language has missing templates or lifecycle messages."
-      ]
-    },
-    "/specrow:proposal": {
-      userIntent: "Turn the user's intent into a concrete change proposal and task skeleton.",
-      agentBehavior: [
-        "Choose a stable change name from the user's intent.",
-        "Create proposal.md, tasks.md, and status.yml through SpecRow MCP tools.",
-        "Fill proposal and task content in the configured project language.",
-        "When the user's proposal input contains `brief` or `бриф:`, treat the following text as the original human-side task description and convert it into structured proposal content.",
-        "When .specrow/config.yml has estimation.enabled set to true, add an approximate implementation time estimate after shaping the proposal, including assumptions and a range.",
-        "Validate the change and surface any blocking issues before implementation starts.",
-        "After creating and validating the proposal, stop and wait for a separate /specrow:review or /specrow:build request."
-      ],
-      forbiddenActions: [
-        "Do not let a complete implementation brief override the proposal-only boundary.",
-        "Do not implement code as part of proposal creation.",
-        "Do not accept, archive, or update specs as final truth."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "The project is not initialized.",
-        "The configured language has missing templates or lifecycle messages.",
-        "Required proposal or task sections cannot be produced."
-      ]
-    },
-    "/specrow:review": {
-      userIntent: "Check proposal readiness before code; recommended by default and required only for risky changes.",
-      agentBehavior: [
-        "Review problem framing, scope, risks, decisions, acceptance criteria, and language consistency.",
-        "Treat review as required for risky changes and recommended for ordinary changes.",
-        "Ask the user or revise the proposal when review finds blocking ambiguity."
-      ],
-      forbiddenActions: [
-        "Do not implement code during review.",
-        "Do not use review as acceptance."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "Acceptance criteria are missing or too weak.",
-        "Risky changes lack explicit risk, migration, security, data, or compatibility decisions.",
-        "The configured language has missing templates or lifecycle messages."
-      ],
-      reviewPolicyRequiredWhen: [
-        "Security, privacy, or permission behavior changes.",
-        "Data model, migration, persistence, or destructive operation changes.",
-        "Public API, command contract, automation, or CI behavior changes.",
-        "Architecture, cross-module workflow, localization, or user-visible lifecycle changes."
-      ]
-    },
-    "/specrow:build": {
-      userIntent: "Implement and verify an approved change without turning it into final truth.",
-      agentBehavior: [
-        "Use SpecRow MCP context to load the proposal, tasks, status, and active-change warnings.",
-        "Implement only the work described by the change.",
-        "Run relevant verification and update the change tasks with implementation evidence when appropriate.",
-        "Finish by leaving the change waiting for specrow accept or specrow revise."
-      ],
-      forbiddenActions: [
-        "Do not run acceptance.",
-        "Do not archive the change.",
-        "Do not update specs as final truth."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "Validation fails before implementation.",
-        "The proposal is too ambiguous to implement safely.",
-        "The configured language has missing templates or lifecycle messages."
-      ]
-    },
-    "/specrow:revise": {
-      userIntent: "Handle user-requested changes after build without accepting or archiving the change.",
-      agentBehavior: [
-        "Mark the change as needing revision.",
-        "Apply the user's requested follow-up changes to the proposal, tasks, implementation, or verification evidence as needed.",
-        "Re-run relevant verification and leave the change ready for another user decision."
-      ],
-      forbiddenActions: [
-        "Do not treat revision as acceptance.",
-        "Do not archive the change.",
-        "Do not update specs as final truth."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "The requested revision conflicts with the proposal scope and needs a new user decision.",
-        "The configured language has missing templates or lifecycle messages."
-      ]
-    },
-    "/specrow:accept": {
-      userIntent: "Record explicit user acceptance and allow final spec integration and archive.",
-      agentBehavior: [
-        "Proceed only when the user clearly accepts the built or completed revision work.",
-        "Record explicit acceptance through SpecRow MCP tools.",
-        "Use this path as the only user-facing authorization for specs becoming final truth and for archive."
-      ],
-      forbiddenActions: [
-        "Do not infer acceptance from silence, successful tests, or completed implementation.",
-        "Do not accept a change that is not built or revision-complete."
-      ],
-      languageRules: [
-        "Read .specrow/config.yml before creating or revising built-in SpecRow files.",
-        "Use the configured language for project.md, specs, proposals, tasks, and lifecycle/status responses.",
-        "Stop with a clear missing-resource error when a required template or message is unavailable.",
-        "Do not silently fall back to English."
-      ],
-      stopConditions: [
-        "The user has not explicitly accepted the change.",
-        "The change is not built or revision-complete.",
-        "The configured language has missing templates or lifecycle messages."
-      ]
-    }
-  },
-  integration: {
-    managedHeader: "This file or section is managed by SpecRow. Regenerate it with:\nspecrow update",
-    commandSections: {
-      invocation: "Invocation",
-      userIntent: "User Intent",
-      toolCore: "Tool Core",
-      agentBehavior: "Agent Behavior",
-      forbiddenActions: "Forbidden Actions",
-      languageRules: "Language Rules",
-      stopConditions: "Stop Conditions",
-      nextCommands: "Next Commands",
-      none: "None."
-    },
-    invocationTemplate: "Use this workflow when the user writes `{command}` or asks for the same intent.",
-    agentInstructions: {
-      title: "SpecRow Agent Instructions",
-      overview: "SpecRow is an agent-first specification workflow. Treat user messages such as `specrow migrate`, `specrow explore`, `specrow proposal`, `specrow build`, or direct SpecRow requests as workflow intentions. Execute them through SpecRow MCP tools.",
-      languageRule: "Before creating or revising built-in SpecRow files, read `.specrow/config.yml` and use its configured `language`. Do not silently fall back to English.",
-      toolCore: "Tool core:",
-      forbidden: "Forbidden:"
-    },
-    toolCoreFallback: "Use these SpecRow MCP tools:",
-    skill: {
-      description: "Use SpecRow workflows when the user mentions SpecRow or asks for specrow migrate, explore, proposal, review, build, revise, or accept.",
-      whenToUse: "When to Use",
-      instructions: "Instructions",
-      triggers: [
-        "The user asks for a SpecRow workflow such as `specrow migrate`, `specrow explore`, `specrow proposal`, or `specrow build`.",
-        "The user asks to initialize SpecRow, migrate existing specification artifacts, explore an idea, create a proposal, review, build, revise, or accept a SpecRow change."
-      ]
-    }
   }
 } satisfies LanguageResources;

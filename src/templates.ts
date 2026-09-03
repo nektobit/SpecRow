@@ -5,16 +5,6 @@ import { zhCN } from "./locales/zh-CN.js";
 
 export type TemplateName = "project" | "spec" | "proposal" | "tasks";
 
-export type AgentCommandName =
-  | "/specrow:init"
-  | "/specrow:migrate"
-  | "/specrow:explore"
-  | "/specrow:proposal"
-  | "/specrow:review"
-  | "/specrow:build"
-  | "/specrow:revise"
-  | "/specrow:accept";
-
 export type MessageName =
   | "init.config.created"
   | "init.config.overwritten"
@@ -53,50 +43,16 @@ export type MessageName =
 export interface LanguageResources {
   templates: Record<TemplateName, string>;
   messages: Record<MessageName, string>;
-  agentCommands: Record<AgentCommandName, AgentCommandText>;
-  integration: IntegrationTextResources;
 }
 
 export const REQUIRED_TEMPLATES: readonly TemplateName[] = ["project", "spec", "proposal", "tasks"];
 
-export interface AgentCommandText {
-  userIntent: string;
-  agentBehavior: readonly string[];
-  forbiddenActions: readonly string[];
-  languageRules: readonly string[];
-  stopConditions: readonly string[];
-  reviewPolicyRequiredWhen?: readonly string[];
-}
-
-export interface IntegrationTextResources {
-  managedHeader: string;
-  commandSections: {
-    invocation: string;
-    userIntent: string;
-    toolCore: string;
-    agentBehavior: string;
-    forbiddenActions: string;
-    languageRules: string;
-    stopConditions: string;
-    nextCommands: string;
-    none: string;
-  };
-  invocationTemplate: string;
-  agentInstructions: {
-    title: string;
-    overview: string;
-    languageRule: string;
-    toolCore: string;
-    forbidden: string;
-  };
-  toolCoreFallback: string;
-  skill: {
-    description: string;
-    whenToUse: string;
-    instructions: string;
-    triggers: readonly string[];
-  };
-}
+export const TEMPLATE_SECTION_IDS = {
+  project: ["purpose", "working-language", "domain-vocabulary", "architecture-notes", "constraints", "verification"],
+  spec: ["purpose", "current-behavior", "requirements", "constraints", "decisions", "verification"],
+  proposal: ["summary", "problem", "proposed-change", "scope", "out-of-scope", "user-impact", "risks", "decisions", "estimation", "acceptance-criteria", "spec-updates"],
+  tasks: ["implementation", "verification", "documentation", "acceptance-gate"]
+} as const satisfies Record<TemplateName, readonly string[]>;
 
 export const REQUIRED_MESSAGES: readonly MessageName[] = [
   "init.config.created",
@@ -132,17 +88,6 @@ export const REQUIRED_MESSAGES: readonly MessageName[] = [
   "migration.tasksAppendix",
   "error.missingTemplate",
   "error.missingMessage"
-];
-
-export const REQUIRED_AGENT_COMMANDS: readonly AgentCommandName[] = [
-  "/specrow:init",
-  "/specrow:migrate",
-  "/specrow:explore",
-  "/specrow:proposal",
-  "/specrow:review",
-  "/specrow:build",
-  "/specrow:revise",
-  "/specrow:accept"
 ];
 
 export class MissingLanguageResourceError extends Error {
@@ -190,6 +135,53 @@ export function getSpecRowTemplate(language: string, name: TemplateName): string
   return template;
 }
 
+export function templateSectionHeadings(template: string): string[] {
+  return templateSections(template).map((section) => section.heading);
+}
+
+export interface TemplateSection {
+  id: string;
+  heading: string;
+}
+
+export function templateSections(template: string): TemplateSection[] {
+  const sections: TemplateSection[] = [];
+  let pendingId: string | undefined;
+
+  for (const line of template.split(/\r?\n/)) {
+    const marker = line.match(/^<!--\s*specrow:section=([a-z0-9]+(?:-[a-z0-9]+)*)\s*-->$/);
+    if (marker !== null) {
+      pendingId = marker[1];
+      continue;
+    }
+
+    if (line.startsWith("## ") && !line.startsWith("### ")) {
+      sections.push({ id: pendingId ?? "", heading: line.replace(/^##\s+/, "").trim() });
+      pendingId = undefined;
+    }
+  }
+
+  return sections;
+}
+
+export function templateSectionHeading(template: string, sectionId: string): string | undefined {
+  return templateSections(template).find((section) => section.id === sectionId)?.heading;
+}
+
+export function getSpecRowTemplateSectionHeading(language: string, templateName: TemplateName, sectionId: string): string {
+  if (!TEMPLATE_SECTION_IDS[templateName].some((candidate) => candidate === sectionId)) {
+    throw new Error(`Unknown SpecRow section "${templateName}.${sectionId}".`);
+  }
+
+  const heading = templateSectionHeading(getSpecRowTemplate(language, templateName), sectionId);
+
+  if (heading === undefined) {
+    throw new MissingLanguageResourceError(language, "template", `${templateName}.${sectionId}`);
+  }
+
+  return heading;
+}
+
 export function getSpecRowMessage(language: string, name: MessageName, values: Record<string, string> = {}): string {
   const message = getLanguageResources(language).messages[name];
 
@@ -198,20 +190,6 @@ export function getSpecRowMessage(language: string, name: MessageName, values: R
   }
 
   return renderMessage(message, values);
-}
-
-export function getSpecRowAgentCommandText(language: string, name: AgentCommandName): AgentCommandText {
-  const command = getLanguageResources(language).agentCommands[name];
-
-  if (command === undefined) {
-    throw new MissingLanguageResourceError(language, "message", `agentCommands.${name}`);
-  }
-
-  return command;
-}
-
-export function getSpecRowIntegrationText(language: string): IntegrationTextResources {
-  return getLanguageResources(language).integration;
 }
 
 function renderMessage(message: string, values: Record<string, string>): string {

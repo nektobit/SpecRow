@@ -1,7 +1,9 @@
+<!-- specrow:readme-section=title -->
 # SpecRow
 
 SpecRow is an agent-first specification workflow. Users describe intent in plain language, such as `specrow migrate`, `specrow explore`, `specrow proposal`, or `specrow build`; agents execute the workflow through the SpecRow MCP server.
 
+<!-- specrow:readme-section=language-links -->
 ## Read This In Your Language
 
 - [English](README.md)
@@ -9,21 +11,26 @@ SpecRow is an agent-first specification workflow. Users describe intent in plain
 - [Español](README.es.md)
 - [中文](README.zh-CN.md)
 
+<!-- specrow:readme-section=documentation -->
 ## Documentation
 
 GitHub Pages: https://nektobit.github.io/SpecRow/
 
 The site covers the full MVP workflow: getting started, explore, proposal to accept, MCP tools, templates, localization, validation, lifecycle rules, and differences from OpenSpec.
 
+<!-- specrow:readme-section=quick-start -->
 ## Quick Start
 
-Use the agent installer first. Pass the project working language explicitly:
+Install the complete plugin with a supported client:
 
-```txt
-apply https://raw.githubusercontent.com/nektobit/SpecRow/refs/heads/main/install language=en
-```
+- GitHub Copilot CLI: `copilot plugin install nektobit/SpecRow`.
+- GitHub Copilot in VS Code: run `Chat: Install Plugin From Source` and enter `https://github.com/nektobit/SpecRow`.
+- Kiro IDE (experimental): choose `Powers → Add Custom Power → Import power from GitHub` and enter the same repository URL.
+- Codex desktop/CLI and Cursor: the compatible package is included, but a public one-click flow depends on SpecRow being published in each client marketplace.
 
-The agent uses the SpecRow MCP server to inspect the workspace, initialize `.specrow` with that language when needed, validate the workspace, and report the next logical step.
+Hermes Agent, OpenClaw, Grok Bot, and NanoClaw are compatible with the Agent Plugins format but are not yet tested by SpecRow. Claude Code, Gemini CLI, and Windsurf/Cascade do not currently have a supported one-package SpecRow install. Node.js 20+, local stdio MCP, and target-project filesystem access are required. These installation paths are documented by their client vendors, but SpecRow does not yet run client-specific end-to-end installation tests.
+
+`npm i -g specrow` installs only the standalone CLI; it does not register the plugin in an agent. After a complete plugin install, start a new chat and ask the agent to check SpecRow for the intended project.
 
 Then tell the agent what SpecRow workflow you want:
 
@@ -44,12 +51,12 @@ For automation outside an agent session, the `specrow` binary is also available:
 
 ```bash
 npm i -g specrow
-specrow init --language en --estimation --tools codex,claude,cursor,windsurf,generic
+specrow init --language en --estimation
 specrow migrate ./docs
 specrow validate
-specrow integrations status
 ```
 
+<!-- specrow:readme-section=workspace -->
 ## Workspace
 
 SpecRow initialization creates:
@@ -81,12 +88,12 @@ estimation:
   enabled: true
 ```
 
+<!-- specrow:readme-section=accept-gate -->
 ## Accept Gate
 
 Build does not update specs as final truth and does not archive a change. Specs and archive are updated only after explicit user acceptance through the `specrow accept` workflow.
 
+<!-- specrow:readme-section=migration -->
 ## Migration Notes
 
-Use `specrow migrate openspec`, `specrow migrate speckit`, or `specrow migrate ./docs` to bring existing specification artifacts into `.specrow/`. If `.specrow` is missing, migration initializes it first. The legacy source is not deleted, and archived records are copied as preserved history without transformation.
-
-Older local prototypes may have used the `specfly` CLI name or a `.specfly` workspace directory. New projects use the `specrow` binary and `.specrow/`.
+Use `specrow migrate openspec`, `specrow migrate speckit`, or `specrow migrate ./docs` to bring existing specification artifacts into `.specrow/`. If `.specrow` is missing, migration initializes it first. The source system is not deleted, and archived records are copied as preserved history without transformation.

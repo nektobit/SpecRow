@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "specrow",
+  "version": "0.2.0",
+  "description": "Agent-first specification workflow with explicit review, implementation, acceptance, and archival stages.",
+  "author": {
+    "name": "nektobit",
+    "url": "https://github.com/nektobit"
+  },
+  "homepage": "https://nektobit.github.io/SpecRow/",
+  "repository": "https://github.com/nektobit/SpecRow",
+  "license": "MIT",
+  "keywords": [
+    "specifications",
+    "spec-driven-development",
+    "agent-workflow",
+    "mcp"
+  ]
+}

@@ -11,4 +11,12 @@ describe("SpecRow CLI program", () => {
   it("reports the package CLI version", () => {
     expect(createProgram().version()).toBe(packageJson.version);
   });
+
+  it("does not expose removed client-integration commands", () => {
+    const commandNames = createProgram().commands.map((command) => command.name());
+
+    expect(commandNames).not.toContain("integrate");
+    expect(commandNames).not.toContain("update");
+    expect(commandNames).not.toContain("integrations");
+  });
 });

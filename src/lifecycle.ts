@@ -1,11 +1,13 @@
 import { constants } from "node:fs";
-import { access, copyFile, mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { access, copyFile, mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { parse, stringify } from "yaml";
 import { z } from "zod";
 
 import { loadSpecRowConfig } from "./config.js";
+import { assertLifecycleAction } from "./domain/lifecycle.js";
 import { getSpecRowTemplate } from "./templates.js";
 
 export const LIFECYCLE_STATES = [
@@ -73,7 +75,9 @@ export async function createChange(options: CreateChangeOptions): Promise<Change
   const cwd = path.resolve(options.cwd ?? process.cwd());
   const changeName = normalizeChangeName(options.changeName);
   const config = await loadSpecRowConfig(cwd);
+  const changesRoot = path.join(cwd, SPECROW_DIR, "changes");
   const changeRoot = activeChangePath(cwd, changeName);
+  const stagingRoot = path.join(changesRoot, `.tmp-${changeName}-${randomUUID()}`);
   const statusPath = path.join(changeRoot, "status.yml");
   const proposalPath = path.join(changeRoot, "proposal.md");
   const tasksPath = path.join(changeRoot, "tasks.md");
@@ -97,10 +101,25 @@ export async function createChange(options: CreateChangeOptions): Promise<Change
     updatedAt: now
   };
 
-  await mkdir(changeRoot, { recursive: true });
-  await writeFile(proposalPath, renderChangeTemplate(getSpecRowTemplate(config.language, "proposal"), changeName), "utf8");
-  await writeFile(tasksPath, renderChangeTemplate(getSpecRowTemplate(config.language, "tasks"), changeName), "utf8");
-  await writeFile(statusPath, serializeLifecycleStatus(status), "utf8");
+  await mkdir(stagingRoot, { recursive: true });
+
+  try {
+    await writeFile(
+      path.join(stagingRoot, "proposal.md"),
+      renderChangeTemplate(getSpecRowTemplate(config.language, "proposal"), changeName),
+      "utf8"
+    );
+    await writeFile(
+      path.join(stagingRoot, "tasks.md"),
+      renderChangeTemplate(getSpecRowTemplate(config.language, "tasks"), changeName),
+      "utf8"
+    );
+    await writeFile(path.join(stagingRoot, "status.yml"), serializeLifecycleStatus(status), "utf8");
+    await rename(stagingRoot, changeRoot);
+  } catch (error) {
+    await rm(stagingRoot, { recursive: true, force: true });
+    throw error;
+  }
 
   return {
     root: changeRoot,
@@ -119,6 +138,7 @@ export async function readChangeStatus(cwd: string, changeName: string): Promise
 
 export async function markChangeReviewed(cwd: string, changeName: string, now?: Date): Promise<LifecycleStatus> {
   const status = await readChangeStatus(cwd, changeName);
+  assertLifecycleAction(status, "review");
   status.state = "reviewed";
   status.review.state = "completed";
   return writeChangeStatus(cwd, updateTimestamp(status, now));
@@ -126,12 +146,14 @@ export async function markChangeReviewed(cwd: string, changeName: string, now?: 
 
 export async function markChangeBuilt(cwd: string, changeName: string, now?: Date): Promise<LifecycleStatus> {
   const status = await readChangeStatus(cwd, changeName);
+  assertLifecycleAction(status, "build");
   status.state = "built";
   return writeChangeStatus(cwd, updateTimestamp(status, now));
 }
 
 export async function markRevisionNeeded(cwd: string, changeName: string, now?: Date): Promise<LifecycleStatus> {
   const status = await readChangeStatus(cwd, changeName);
+  assertLifecycleAction(status, "revise");
   status.state = "revision-needed";
   return writeChangeStatus(cwd, updateTimestamp(status, now));
 }
@@ -142,14 +164,7 @@ export async function acceptChange(
   options: { explicitUserAcceptance: boolean; followUpWorkCompleted?: boolean; now?: Date }
 ): Promise<LifecycleStatus> {
   const status = await readChangeStatus(cwd, changeName);
-
-  if (options.explicitUserAcceptance !== true) {
-    throw new Error(`Change "${status.change}" requires explicit user acceptance.`);
-  }
-
-  if (status.state !== "built" && !(status.state === "revision-needed" && options.followUpWorkCompleted === true)) {
-    throw new Error(`Change "${status.change}" must be built before acceptance.`);
-  }
+  assertLifecycleAction(status, "accept", options);
 
   const acceptedAt = toIso(options.now);
   status.state = "accepted";
@@ -164,14 +179,7 @@ export async function acceptChange(
 export async function archiveChange(cwd: string, changeName: string, now?: Date): Promise<LifecycleStatus> {
   const root = path.resolve(cwd);
   const status = await readChangeStatus(root, changeName);
-
-  if (status.state !== "accepted") {
-    throw new Error(`Change "${status.change}" must be accepted before archive.`);
-  }
-
-  if (status.acceptance.explicit !== true || status.acceptance.acceptedAt === undefined) {
-    throw new Error(`Change "${status.change}" must have explicit acceptance recorded before archive.`);
-  }
+  assertLifecycleAction(status, "archive");
 
   const archiveRoot = path.join(root, SPECROW_DIR, "archive", status.change);
 

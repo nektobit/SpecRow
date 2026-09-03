@@ -138,23 +138,19 @@ describe("SpecRow MCP runtime", () => {
     });
   });
 
-  it("includes migrate and explore in the workflow guide without adding a mutating explore tool", async () => {
+  it("does not expose removed compatibility tools", async () => {
     const cwd = await createTempProject();
     const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
 
-    await expect(runtime.callTool("specrow_workflow_guide")).resolves.toMatchObject({
-      success: true,
-      workflow: ["migrate", "explore", "proposal", "review", "build", "revise", "accept", "archive"],
-      tools: {
-        migrate: expect.stringContaining("specrow_migrate"),
-        explore: expect.stringContaining("specrow_context"),
-        proposal: "specrow_create_proposal"
-      }
-    });
-    await expect(runtime.callTool("specrow_explore")).resolves.toMatchObject({
-      success: false,
-      code: "NOT_FOUND"
-    });
+    for (const toolName of [
+      "specrow_list",
+      "specrow_workflow_guide",
+      "specrow_template_context",
+      "specrow_language_status",
+      "specrow_integration_status"
+    ]) {
+      await expect(runtime.callTool(toolName)).resolves.toMatchObject({ success: false, code: "NOT_FOUND" });
+    }
   });
 
   it("migrates project-local documentation through specrow_migrate", async () => {
@@ -211,6 +207,7 @@ describe("SpecRow MCP runtime", () => {
     });
 
     await createChange({ cwd, changeName: "revision-gate" });
+    await markChangeBuilt(cwd, "revision-gate");
     await markRevisionNeeded(cwd, "revision-gate");
     await expect(runtime.callTool("specrow_accept", { changeName: "revision-gate", explicitUserAcceptance: true })).resolves.toMatchObject({
       success: false,
@@ -225,6 +222,31 @@ describe("SpecRow MCP runtime", () => {
     ).resolves.toMatchObject({
       success: true,
       status: { state: "accepted" }
+    });
+  });
+
+  it("enforces required review before the MCP build workflow", async () => {
+    const cwd = await createTempProject();
+    await createChange({ cwd, changeName: "required-review", review: "required" });
+    const runtime = await createSpecRowMcpRuntime({ projectRoot: cwd });
+
+    await expect(runtime.callTool("specrow_build_start", { changeName: "required-review" })).resolves.toMatchObject({
+      success: false,
+      code: "INVALID_STATE"
+    });
+    await expect(runtime.callTool("specrow_build_finish", { changeName: "required-review" })).resolves.toMatchObject({
+      success: false,
+      code: "INVALID_STATE"
+    });
+
+    await expect(runtime.callTool("specrow_review", { changeName: "required-review" })).resolves.toMatchObject({
+      success: true,
+      projectRoot: path.resolve(cwd),
+      status: { state: "reviewed" }
+    });
+    await expect(runtime.callTool("specrow_build_start", { changeName: "required-review" })).resolves.toMatchObject({
+      success: true,
+      projectRoot: path.resolve(cwd)
     });
   });
 

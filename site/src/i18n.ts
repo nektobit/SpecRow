@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n'
 
-import { defaultLocale, type LocaleCode } from './content'
+import { defaultLocale, type LocaleCode, type PageSlug } from './content'
 import { readLocalePreference } from './localePreference'
 
 type ShellMessages = {
@@ -17,10 +17,10 @@ type ShellMessages = {
   extraInfo: string
   copyCommand: string
   commandCopied: string
-  nav: Record<string, string>
+  nav: Record<PageSlug, string>
 }
 
-const messages: Record<LocaleCode, ShellMessages> = {
+export const messages: Record<LocaleCode, ShellMessages> = {
   en: {
     skip: 'Skip to content',
     navLabel: 'Documentation',
@@ -42,6 +42,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       'agent-commands': 'Agent Commands',
       'mcp-server': 'MCP Server',
       'cli-reference': 'CLI',
+      migration: 'Migration',
       templates: 'Templates',
       localization: 'Localization',
       'validation-lifecycle': 'Validation',
@@ -69,6 +70,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       'agent-commands': 'Команды агента',
       'mcp-server': 'MCP Server',
       'cli-reference': 'CLI',
+      migration: 'Миграция',
       templates: 'Шаблоны',
       localization: 'Локализация',
       'validation-lifecycle': 'Валидация',
@@ -96,6 +98,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       'agent-commands': 'Comandos de agente',
       'mcp-server': 'MCP Server',
       'cli-reference': 'CLI',
+      migration: 'Migración',
       templates: 'Plantillas',
       localization: 'Localización',
       'validation-lifecycle': 'Validación',
@@ -123,6 +126,7 @@ const messages: Record<LocaleCode, ShellMessages> = {
       'agent-commands': '代理命令',
       'mcp-server': 'MCP Server',
       'cli-reference': 'CLI',
+      migration: '迁移',
       templates: '模板',
       localization: '本地化',
       'validation-lifecycle': '验证',
@@ -131,9 +135,24 @@ const messages: Record<LocaleCode, ShellMessages> = {
   },
 }
 
+export const shellSourceLocale: LocaleCode = 'en'
+export const shellSourceDigest = '9c39a7f2d7bdec08'
+export const reviewedShellDigests: Record<LocaleCode, string> = {
+  en: '9c39a7f2d7bdec08',
+  ru: '24a490d8a5a63f87',
+  es: '2b4d4039421fc354',
+  'zh-CN': '0c23ea62295dcb46',
+}
+export const reviewedShellSourceDigests: Record<LocaleCode, string> = {
+  en: '9c39a7f2d7bdec08',
+  ru: '9c39a7f2d7bdec08',
+  es: '9c39a7f2d7bdec08',
+  'zh-CN': '9c39a7f2d7bdec08',
+}
+
 export const i18n = createI18n({
   legacy: false,
   locale: readLocalePreference() ?? defaultLocale,
-  fallbackLocale: defaultLocale,
+  fallbackLocale: false,
   messages,
 })

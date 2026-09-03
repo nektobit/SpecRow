@@ -1,4 +1,4 @@
-import type { Block, PageContent, Paragraph, TextPart } from './content'
+import { resolvedAnchorAliases, type Block, type PageContent, type PageSlug, type Paragraph, type TextPart } from './content'
 
 const WORDS_PER_MINUTE = 200
 
@@ -8,13 +8,17 @@ export interface SectionLink {
   level: 2 | 3
 }
 
-export function blockId(index: number): string {
-  return `section-${index + 1}`
+export function blockId(block: Block): string {
+  return block.id
+}
+
+export function blockAliases(page: PageSlug, block: Block): string[] {
+  return resolvedAnchorAliases(page, block.id)
 }
 
 export function sectionLinks(page: PageContent): SectionLink[] {
   return page.blocks
-    .map((block, index) => ('heading' in block ? { id: blockId(index), label: block.heading, level: block.headingLevel ?? 2 } : null))
+    .map((block) => ('heading' in block ? { id: blockId(block), label: block.heading, level: block.headingLevel ?? 2 } : null))
     .filter((item): item is SectionLink => item !== null)
 }
 
@@ -44,7 +48,7 @@ function blockText(block: Block): string {
     return [block.heading, ...block.paragraphs.map(paragraphText), ...(block.commands ?? [])].join(' ')
   }
 
-  return block.paragraphs.map(paragraphText).join(' ')
+  return ''
 }
 
 function paragraphText(paragraph: Paragraph): string {

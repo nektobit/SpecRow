@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -33,17 +35,28 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: site/pnpm-lock.yaml
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            site/pnpm-lock.yaml
+
+      - name: Install project dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install dependencies
         working-directory: site
         run: pnpm install --frozen-lockfile
+
+      - name: Validate project and localized content
+        env:
+          CONTENT_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: pnpm test && pnpm typecheck && pnpm locale:validate && pnpm plugin:validate
 
       - name: Build
         working-directory: site
         env:
           BASE_PATH: ${{ secrets.BASE_PATH || '/' }}
           SITE_URL: ${{ secrets.SITE_URL || 'https://specrow.com/' }}
+          CONTENT_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: pnpm build
 
       - name: Install deploy client

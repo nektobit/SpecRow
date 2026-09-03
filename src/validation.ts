@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { loadSpecRowConfig } from "./config.js";
 import { listActiveChanges, parseLifecycleStatus } from "./lifecycle.js";
-import { getSpecRowTemplate, type TemplateName } from "./templates.js";
+import { getSpecRowTemplate, getSpecRowTemplateSectionHeading, templateSectionHeadings, type TemplateName } from "./templates.js";
 
 export type ValidationSeverity = "error" | "warning";
 
@@ -60,8 +60,7 @@ export async function reviewChangeReadiness(cwd = process.cwd(), changeName: str
 
   if (await pathExists(absoluteProposalPath)) {
     const proposal = await readFile(absoluteProposalPath, "utf8");
-    const proposalTemplate = getSpecRowTemplate(result.language, "proposal");
-    const acceptanceHeading = requiredSections(proposalTemplate).at(-2);
+    const acceptanceHeading = getSpecRowTemplateSectionHeading(result.language, "proposal", "acceptance-criteria");
 
     if (acceptanceHeading !== undefined) {
       const body = sectionBody(proposal, acceptanceHeading);
@@ -147,10 +146,7 @@ async function validateFileSections(
 }
 
 function requiredSections(template: string): string[] {
-  return template
-    .split(/\r?\n/)
-    .filter((line) => line.startsWith("## ") && !line.startsWith("### "))
-    .map((line) => line.replace(/^##\s+/, "").trim());
+  return templateSectionHeadings(template);
 }
 
 function hasHeading(source: string, heading: string): boolean {

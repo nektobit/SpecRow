@@ -150,6 +150,7 @@ describe("SpecRow change lifecycle", () => {
   it("allows accepting a revision-needed change only after completed follow-up work", async () => {
     const cwd = await createTempProject();
     await createChange({ cwd, changeName: "revision-flow" });
+    await markChangeBuilt(cwd, "revision-flow");
     await markRevisionNeeded(cwd, "revision-flow");
 
     await expect(acceptChange(cwd, "revision-flow", { explicitUserAcceptance: true })).rejects.toThrow(
@@ -161,6 +162,22 @@ describe("SpecRow change lifecycle", () => {
         followUpWorkCompleted: true
       })
     ).resolves.toMatchObject({ state: "accepted" });
+  });
+
+  it("enforces lifecycle transitions and the required-review build gate", async () => {
+    const cwd = await createTempProject();
+    await createChange({ cwd, changeName: "guarded", review: "required" });
+
+    await expect(markChangeBuilt(cwd, "guarded")).rejects.toThrow("requires completed review before build");
+    await expect(markRevisionNeeded(cwd, "guarded")).rejects.toThrow("cannot transition");
+
+    await markChangeReviewed(cwd, "guarded");
+    await markChangeBuilt(cwd, "guarded");
+    await acceptChange(cwd, "guarded", { explicitUserAcceptance: true });
+
+    await expect(markChangeReviewed(cwd, "guarded")).rejects.toThrow("cannot transition");
+    await expect(markChangeBuilt(cwd, "guarded")).rejects.toThrow("cannot transition");
+    await expect(markRevisionNeeded(cwd, "guarded")).rejects.toThrow("cannot transition");
   });
 
   it("archives only accepted changes and keeps archived changes out of active list", async () => {

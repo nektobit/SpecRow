@@ -1,6 +1,6 @@
 {
   "name": "specrow",
-  "version": "0.1.13",
+  "version": "0.2.0",
   "description": "Multilingual specification system for spec-driven development.",
   "type": "module",
   "license": "MIT",
@@ -26,10 +26,6 @@
     ".": {
       "types": "./dist/cli.d.ts",
       "import": "./dist/cli.js"
-    },
-    "./agent-commands": {
-      "types": "./dist/agentCommands.d.ts",
-      "import": "./dist/agentCommands.js"
     }
   },
   "bin": {
@@ -38,14 +34,21 @@
   },
   "files": [
     "dist",
-    "install"
+    "runtime",
+    "plugin.json",
+    "mcp.json",
+    ".codex-plugin",
+    ".mcp.json",
+    "skills"
   ],
   "scripts": {
     "build": "tsup",
+    "plugin:validate": "node scripts/validate-plugin.mjs",
     "prepack": "pnpm build",
-    "prepublishOnly": "pnpm test && pnpm typecheck && pnpm locale:validate",
+    "prepublishOnly": "pnpm test && pnpm typecheck && pnpm locale:validate && pnpm plugin:validate",
     "test": "vitest run",
-    "locale:validate": "npm run build --silent && node dist/bin.js locales validate",
+    "content:validate": "pnpm --dir site content:validate",
+    "locale:validate": "npm run build --silent && node dist/bin.js locales validate && pnpm content:validate",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

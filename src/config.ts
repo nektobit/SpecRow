@@ -3,24 +3,6 @@ import { z } from "zod";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export const INTEGRATION_TOOLS = ["codex", "claude", "cursor", "windsurf", "generic"] as const;
-
-export const IntegrationToolSchema = z.enum(INTEGRATION_TOOLS);
-
-export type IntegrationTool = z.infer<typeof IntegrationToolSchema>;
-
-const ManagedIntegrationFileSchema = z.object({
-  tool: IntegrationToolSchema,
-  path: z.string().min(1),
-  kind: z.enum(["command", "skill", "instructions", "workflow", "prompt", "rule", "mcp-config"])
-});
-
-const IntegrationsConfigSchema = z.object({
-  tools: z.array(IntegrationToolSchema),
-  installedAt: z.string().min(1),
-  managedFiles: z.array(ManagedIntegrationFileSchema)
-});
-
 const EstimationConfigSchema = z.object({
   enabled: z.boolean()
 });
@@ -32,8 +14,7 @@ export const SpecRowConfigSchema = z.object({
     .min(2)
     .max(32)
     .regex(/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/, "Use a language code like ru, en, es, or zh-CN."),
-  estimation: z.union([EstimationConfigSchema, z.boolean().transform((enabled) => ({ enabled }))]).optional(),
-  integrations: IntegrationsConfigSchema.optional()
+  estimation: EstimationConfigSchema.optional()
 });
 
 export type SpecRowConfig = z.infer<typeof SpecRowConfigSchema>;

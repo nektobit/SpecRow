@@ -1,4 +1,8 @@
 node_modules/
 dist/
+runtime/
+!runtime/
+runtime/*
+!runtime/specrow-mcp.cjs
 coverage/
 .vitest/

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "content:validate": "node scripts/validate-content.mjs",
+    "build": "pnpm content:validate && vue-tsc -b && vite build",
     "postbuild": "node scripts/copy-404.js && node scripts/generate-sitemap.js",
     "preview": "vite preview"
   },

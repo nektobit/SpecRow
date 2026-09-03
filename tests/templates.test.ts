@@ -2,14 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import {
   getSpecRowMessage,
-  getSpecRowAgentCommandText,
-  getSpecRowIntegrationText,
   getSpecRowTemplate,
+  getSpecRowTemplateSectionHeading,
   MissingLanguageResourceError,
-  REQUIRED_AGENT_COMMANDS,
   REQUIRED_MESSAGES,
   REQUIRED_TEMPLATES,
   SUPPORTED_LANGUAGES,
+  TEMPLATE_SECTION_IDS,
+  templateSectionHeadings,
+  templateSectionHeading,
+  templateSections,
   TEMPLATE_REGISTRY
 } from "../src/templates.js";
 
@@ -30,20 +32,31 @@ describe("SpecRow templates", () => {
     }
   });
 
-  it("has every required agent command and integration text for every supported language", () => {
-    for (const language of SUPPORTED_LANGUAGES) {
-      for (const commandName of REQUIRED_AGENT_COMMANDS) {
-        expect(getSpecRowAgentCommandText(language, commandName).userIntent, `${language}.${commandName}`).toBeTruthy();
-      }
-
-      expect(getSpecRowIntegrationText(language).managedHeader, `${language}.integration.managedHeader`).toContain("specrow update");
-    }
-  });
-
   it("returns localized templates without falling back to English", () => {
     expect(getSpecRowTemplate("ru", "project")).toContain("# Проект");
     expect(getSpecRowTemplate("es", "proposal")).toContain("# Propuesta");
     expect(getSpecRowTemplate("zh-CN", "tasks")).toContain("# 任务");
+  });
+
+  it("maps localized template headings through stable semantic section IDs", () => {
+    for (const language of SUPPORTED_LANGUAGES) {
+      for (const templateName of REQUIRED_TEMPLATES) {
+        expect(templateSections(getSpecRowTemplate(language, templateName)).map(({ id }) => id)).toEqual(
+          TEMPLATE_SECTION_IDS[templateName]
+        );
+        expect(templateSectionHeadings(getSpecRowTemplate(language, templateName))).toHaveLength(
+          TEMPLATE_SECTION_IDS[templateName].length
+        );
+      }
+
+      const acceptanceHeading = getSpecRowTemplateSectionHeading(language, "proposal", "acceptance-criteria");
+      expect(getSpecRowTemplate(language, "proposal")).toContain(`## ${acceptanceHeading}`);
+    }
+  });
+
+  it("resolves a semantic section by marker rather than position", () => {
+    const reordered = "<!-- specrow:section=acceptance-criteria -->\n## Acceptance\n<!-- specrow:section=summary -->\n## Summary\n";
+    expect(templateSectionHeading(reordered, "acceptance-criteria")).toBe("Acceptance");
   });
 
   it("includes OpenSpec-like behavior-first guidance in every supported language", () => {
