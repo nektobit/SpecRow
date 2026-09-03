@@ -1,7 +1,7 @@
 <!-- specrow:readme-section=title -->
 # SpecRow
 
-SpecRow 是 agent-first 的规格工作流。用户用自然语言描述意图，例如 `specrow migrate`、`specrow explore`、`specrow proposal` 或 `specrow build`；代理通过 SpecRow MCP 服务器执行该 workflow。
+SpecRow 是 agent-first 的规格工作流。用户用自然语言描述意图，例如 `specrow migrate`、`specrow explore`、`specrow proposal` 或 `specrow build`；代理通过 SpecRow MCP 工具或为 Codex 打包的本地 CLI 适配器执行该 workflow。
 
 <!-- specrow:readme-section=language-links -->
 ## 使用你的语言阅读
@@ -16,7 +16,7 @@ SpecRow 是 agent-first 的规格工作流。用户用自然语言描述意图�
 
 网站：https://specrow.com/zh-CN/
 
-站点覆盖完整 MVP 流程：开始使用、explore、从 proposal 到 accept、MCP 工具、模板、本地化、验证、生命周期规则，以及与 OpenSpec 的区别。
+站点覆盖完整 MVP 流程：开始使用、explore、从 proposal 到 accept、MCP 与本地 CLI 适配器、模板、本地化、验证、生命周期规则，以及与 OpenSpec 的区别。
 
 <!-- specrow:readme-section=quick-start -->
 ## 快速开始
@@ -26,9 +26,9 @@ SpecRow 是 agent-first 的规格工作流。用户用自然语言描述意图�
 - GitHub Copilot CLI：`copilot plugin install nektobit/SpecRow`。
 - VS Code 中的 GitHub Copilot：运行 `Chat: Install Plugin From Source`，然后输入 `https://github.com/nektobit/SpecRow`。
 - Kiro IDE（实验性）：选择 `Powers → Add Custom Power → Import power from GitHub`，然后输入同一仓库 URL。
-- Codex desktop/CLI 和 Cursor：兼容包已包含在仓库中，但公开的一键安装需要先在各客户端 marketplace 发布 SpecRow。
+- Codex desktop/CLI：仓库包含 skills-only 适配器和内置本地 CLI；公开一键安装需通过 OpenAI Plugins Directory 审核。Cursor 仍需在自己的 marketplace 单独发布。
 
-Hermes Agent、OpenClaw、Grok Bot 和 NanoClaw 与 Agent Plugins 格式兼容，但尚未经过 SpecRow 测试。Claude Code、Gemini CLI 和 Windsurf/Cascade 目前没有受支持的 SpecRow 单包安装方式。运行环境需要 Node.js 20+、本地 stdio MCP 和目标项目文件访问权限。这些路径由客户端厂商提供文档，但 SpecRow 尚未运行特定客户端的端到端安装测试。
+Hermes Agent、OpenClaw、Grok Bot 和 NanoClaw 与 Agent Plugins 格式兼容，但尚未经过 SpecRow 测试。Claude Code、Gemini CLI 和 Windsurf/Cascade 目前没有受支持的 SpecRow 单包安装方式。运行环境需要 Node.js 20+ 和目标项目文件访问权限；Agent Plugins 客户端还需要本地 stdio MCP，而 Codex 使用本地 shell 和内置 CLI。这些路径由客户端厂商提供文档，但 SpecRow 尚未运行特定客户端的端到端安装测试。
 
 `npm i -g specrow` 只安装独立 CLI，不会在代理中注册插件。完整安装插件后，请新建聊天并让代理检查目标项目的 SpecRow。
 
@@ -43,7 +43,7 @@ specrow build
 specrow accept
 ```
 
-代理应将这些短语视为 workflow 意图，并通过 MCP 工具执行。
+代理应将这些短语视为 workflow 意图，并通过客户端提供的适配器执行：MCP 工具，或 Codex 中内置的本地 CLI。
 
 提示：使用 `brief: 任务文本` 或 `бриф: текст задачи` 标记原始的人类侧任务描述。代理应以 brief 及其中规则为出发点来准备 proposal，但 brief 本身不是最终 proposal。
 

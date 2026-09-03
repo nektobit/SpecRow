@@ -13,14 +13,13 @@
     "specifications",
     "spec-driven-development",
     "agent-workflow",
-    "mcp"
+    "cli"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "SpecRow",
     "shortDescription": "Agent-first specification workflow",
-    "longDescription": "Plan, review, build, accept, and archive changes through a traceable specification workflow.",
+    "longDescription": "Plan, review, build, accept, and archive local project changes through a traceable specification workflow and bundled CLI.",
     "developerName": "nektobit",
     "category": "Developer Tools",
     "capabilities": [

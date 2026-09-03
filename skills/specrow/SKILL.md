@@ -1,6 +1,6 @@
 ---
 name: specrow
-description: Manage agent-first specification workflows in a .specrow workspace. Use when a user wants to initialize or migrate specifications, explore and propose a change, review or implement it, request revisions, explicitly accept completed work, or archive an accepted change.
+description: Manage agent-first specification workflows in a local .specrow workspace. Use when a user wants to initialize or migrate specifications, explore and propose a change, review or implement it, request revisions, explicitly accept completed work, or archive an accepted change.
 license: MIT
 metadata:
   author: nektobit
@@ -9,22 +9,26 @@ metadata:
 
 # SpecRow
 
-Use the SpecRow MCP tools as the single mutation path for `.specrow`. The CLI is reserved for CI and manual automation, not a parallel workflow implementation for agents.
+Use one SpecRow execution adapter for the whole request:
 
-This plugin requires Node.js 20+, an Agent Plugins client with MCP stdio support, and filesystem access to the target workspace.
+- Prefer the `specrow_*` MCP tools when the client provides them.
+- Otherwise, in a local Codex workspace, use the bundled CLI at `scripts/specrow-cli.cjs` through the local shell.
+- If neither MCP tools nor a local shell are available, explain that SpecRow requires a local Codex workspace or an MCP-capable Agent Plugins client. Do not install packages or substitute an unbundled global CLI.
+
+Both adapters require Node.js 20+ and filesystem access to the target workspace. Read [references/cli.md](references/cli.md) before using the bundled CLI. Read [references/mcp-tools.md](references/mcp-tools.md) when using MCP.
 
 ## Resolve the workspace
 
-Start with `specrow_project_status`. Pass the absolute `projectRoot` for the workspace named by the user. If the client advertises exactly one MCP filesystem root, the server can select it automatically; when roots are absent or ambiguous, an explicit `projectRoot` is required.
+Resolve the project the user named before reading or writing. With MCP, start with `specrow_project_status` and pass the absolute `projectRoot` when roots are absent or ambiguous. With the CLI, run every command with the shell working directory set to the project root.
 
-Confirm the returned `projectRoot` before any mutation. Do not use the plugin installation directory as the project workspace.
+Confirm the returned `projectRoot` before any MCP mutation. With the CLI, resolve and verify the shell working directory before the first mutation. Do not use the plugin installation directory as the project workspace.
 
 ## Route the request
 
 - For initialization and workspace structure, read [references/workspace.md](references/workspace.md).
 - For explore, proposal, review, build, revise, accept, or archive, read [references/workflow.md](references/workflow.md).
 - For OpenSpec, Spec Kit, or documentation-folder imports, read [references/migration.md](references/migration.md).
-- For tool inputs, root selection, and failure handling, read [references/mcp-tools.md](references/mcp-tools.md).
+- For adapter-specific commands and failure handling, read the matching CLI or MCP reference above.
 
 ## Invariants
 

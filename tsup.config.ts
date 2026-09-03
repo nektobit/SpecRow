@@ -27,5 +27,18 @@ export default defineConfig([
     noExternal: [/.*/],
     outExtension: () => ({ js: ".cjs" }),
     outDir: "runtime"
+  },
+  {
+    ...shared,
+    format: ["cjs"],
+    entry: {
+      "specrow-cli": "src/pluginCli.ts"
+    },
+    clean: true,
+    dts: false,
+    sourcemap: false,
+    noExternal: [/.*/],
+    outExtension: () => ({ js: ".cjs" }),
+    outDir: "skills/specrow/scripts"
   }
 ]);

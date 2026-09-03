@@ -14,7 +14,10 @@ const source = await readFile(contentPath, 'utf8')
 const contentModule = await loadContentModule(source, contentPath)
 const issues = contentModule.validateSiteContent()
 
-const cliSource = await readFile(path.join(projectRoot, 'src', 'cli.ts'), 'utf8')
+const cliSource = [
+  await readFile(path.join(projectRoot, 'src', 'cliCore.ts'), 'utf8'),
+  await readFile(path.join(projectRoot, 'src', 'cli.ts'), 'utf8'),
+].join('\n')
 const mcpSource = await readFile(path.join(projectRoot, 'src', 'mcpServer.ts'), 'utf8')
 const templatesSource = await readFile(path.join(projectRoot, 'src', 'templates.ts'), 'utf8')
 const i18nSource = await readFile(path.join(siteRoot, 'src', 'i18n.ts'), 'utf8')
@@ -23,7 +26,7 @@ const actualMcpTools = readStringArrayConst(mcpSource, 'SPECROW_MCP_TOOL_NAMES')
 const runtimeLocales = readObjectKeysConst(templatesSource, 'TEMPLATE_REGISTRY')
 const siteLocales = contentModule.locales.map(({ code }) => code)
 
-compareCatalog(issues, 'src/cli.ts', actualCliCommands, contentModule.documentedCliCommands)
+compareCatalog(issues, 'src/cliCore.ts + src/cli.ts', actualCliCommands, contentModule.documentedCliCommands)
 compareCatalog(issues, 'src/mcpServer.ts', actualMcpTools, contentModule.documentedMcpTools)
 compareCatalog(issues, 'src/templates.ts', runtimeLocales, siteLocales)
 validateNonEmptyStringLeaves(issues, i18nSource, 'messages', 'site/src/i18n.ts')

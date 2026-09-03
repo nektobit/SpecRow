@@ -1,13 +1,14 @@
 # Удаление старых интеграций
 
-Ранние версии SpecRow генерировали отдельные файлы для Codex, Claude, Cursor, Windsurf и generic agents, а также вручную добавляли MCP-конфигурации. Agent Plugin заменяет этот primary install path стандартными `plugin.json`, `mcp.json` и `skills/`.
+Ранние версии SpecRow генерировали отдельные файлы для Codex, Claude, Cursor, Windsurf и generic agents, а также вручную добавляли MCP-конфигурации. Новый пакет заменяет этот primary install path стандартными `plugin.json`, `mcp.json` и `skills/`, а для Codex — skills-only manifest со встроенным CLI.
 
 ## Что меняется
 
 - skill поставляется вместе с плагином, а не копируется в каждый проект или home-каталог;
-- MCP-сервер обнаруживается из `mcp.json`;
-- версия skill и runtime поставляется одним plugin artifact;
-- workspace выбирается на каждый вызов через MCP roots или `projectRoot`;
+- MCP-сервер обнаруживается из `mcp.json` в Agent Plugins клиентах;
+- Codex обнаруживает skill и запускает CLI bundle из его `scripts/`;
+- версия skill и обоих runtime поставляется одним plugin artifact;
+- workspace выбирается через MCP roots/`projectRoot` либо через рабочий каталог локальной Codex-сессии;
 - клиентские command/rule/workflow файлы больше не считаются каноническими.
 
 ## Состояние кода
@@ -18,8 +19,8 @@ SpecRow не удаляет автоматически ранее созданн
 
 ## Рекомендуемая проверка
 
-1. Подключить новый Agent Plugin.
-2. В новой сессии убедиться, что обнаружены skill `specrow` и MCP tools.
-3. Проверить `specrow_project_status` на реальном workspace.
+1. Подключить подходящий пакет: Agent Plugin либо skills-only пакет Codex.
+2. В новой сессии убедиться, что обнаружен skill `specrow` и доступен его адаптер — MCP tools либо встроенный CLI.
+3. Проверить project status на реальном workspace через выбранный адаптер.
 4. Сравнить старые generated instructions с plugin skill и сохранить пользовательские дополнения.
 5. Удалить старые клиентские конфиги вручную после проверки, что в них нет пользовательских дополнений.

@@ -1,13 +1,15 @@
 # Документация нового SpecRow
 
-Эта папка содержит русскоязычную документацию архитектуры SpecRow как переносимого Agent Plugin. Она не является содержимым текущего сайта и не публикуется автоматически.
+Эта папка содержит русскоязычную документацию архитектуры SpecRow как переносимого Agent Plugin и skills-only адаптера для Codex. Она не является содержимым текущего сайта и не публикуется автоматически.
 
 Новая модель основана на [Agent Plugins Specification 1.0.0](https://agent-plugins.org/specification) и [Agent Skills](https://agentskills.io/specification):
 
 - `plugin.json` задаёт переносимую идентичность пакета;
 - `mcp.json` подключает локальный stdio MCP runtime;
 - `skills/specrow/SKILL.md` описывает agent-first workflow;
-- CLI остаётся интерфейсом для CI и ручной автоматизации; агент использует единый MCP runtime плагина.
+- `.codex-plugin/plugin.json` регистрирует skills-only пакет в Codex;
+- `skills/specrow/scripts/specrow-cli.cjs` даёт Codex автономный локальный CLI-адаптер без глобальной установки;
+- standalone CLI остаётся интерфейсом для CI и ручной автоматизации.
 
 ## Разделы
 
@@ -21,4 +23,4 @@
 
 ## Текущий статус
 
-Сформирован переносимый core плагина, добавлен автономный MCP bundle и request-scoped выбор workspace. Генераторы клиентских конфигов, старый installer, дублирующие agent-команды и переходные MCP-инструменты удалены.
+Сформированы два адаптера над одним lifecycle: переносимый Agent Plugin с автономным MCP bundle и skills-only пакет Codex со встроенным CLI. Генераторы клиентских конфигов, старый installer, дублирующие agent-команды и переходные MCP-инструменты удалены.

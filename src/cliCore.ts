@@ -19,7 +19,6 @@ import {
 } from "./lifecycle.js";
 import { validateLocaleContract } from "./localeContract.js";
 import { runMigration, type MigrationResult } from "./migration.js";
-import { startSpecRowMcpServer } from "./mcpServer.js";
 import { getSpecRowMessage } from "./templates.js";
 import {
   reviewChangeReadiness,
@@ -29,7 +28,11 @@ import {
 import { SPECROW_VERSION } from "./version.js";
 import { buildSpecRowContext } from "./workspace/context.js";
 
-export function createProgram(): Command {
+export interface CliProgramOptions {
+  registerMcpCommand?: (program: Command) => void;
+}
+
+export function createCoreProgram(options: CliProgramOptions = {}): Command {
   const program = new Command();
 
   program
@@ -125,17 +128,7 @@ export function createProgram(): Command {
       }
     });
 
-  program
-    .command("mcp")
-    .description("Run the local SpecRow MCP stdio server for agents.")
-    .argument("[project-path]")
-    .action(async (projectPath?: string) => {
-      try {
-        await startSpecRowMcpServer({ projectRoot: projectPath });
-      } catch (error) {
-        handleCommandError(error);
-      }
-    });
+  options.registerMcpCommand?.(program);
 
   program
     .command("proposal")

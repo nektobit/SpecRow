@@ -24,21 +24,20 @@ const PLUGIN_FIELDS = new Set([
 
 const errors = [];
 
-const [packageJson, plugin, mcp, codexPlugin, codexMcp] = await Promise.all([
+const [packageJson, plugin, mcp, codexPlugin] = await Promise.all([
   readJson("package.json"),
   readJson("plugin.json"),
   readJson("mcp.json"),
-  readJson(".codex-plugin/plugin.json"),
-  readJson(".mcp.json")
+  readJson(".codex-plugin/plugin.json")
 ]);
 
 validatePlugin(plugin, packageJson);
 validateMcp(mcp);
 validateCodexPlugin(codexPlugin, packageJson);
-validateCodexMcp(codexMcp);
 validatePackageFiles(packageJson);
 await validateSkills();
 await requireFile("runtime/specrow-mcp.cjs");
+await requireFile("skills/specrow/scripts/specrow-cli.cjs");
 
 if (errors.length > 0) {
   for (const error of errors) {
@@ -137,8 +136,12 @@ function validateCodexPlugin(value, npmPackage) {
     errors.push(".codex-plugin/plugin.json: version must match package.json.");
   }
 
-  if (value.skills !== "./skills/" || value.mcpServers !== "./.mcp.json") {
-    errors.push(".codex-plugin/plugin.json: skills and mcpServers must point to the bundled plugin resources.");
+  if (value.skills !== "./skills/") {
+    errors.push(".codex-plugin/plugin.json: skills must point to the bundled plugin resources.");
+  }
+
+  if ("mcpServers" in value) {
+    errors.push(".codex-plugin/plugin.json: the Codex adapter must remain skills-only.");
   }
 
   if (!isRecord(value.interface) || value.interface.displayName !== "SpecRow") {
@@ -146,20 +149,8 @@ function validateCodexPlugin(value, npmPackage) {
   }
 }
 
-function validateCodexMcp(value) {
-  if (!isRecord(value) || !isRecord(value.mcpServers) || !isRecord(value.mcpServers.specrow)) {
-    errors.push(".mcp.json: specrow server must be declared under mcpServers.");
-    return;
-  }
-
-  const server = value.mcpServers.specrow;
-  if (server.type !== "stdio" || server.command !== "node" || !Array.isArray(server.args) || server.args[0] !== "${PLUGIN_ROOT}/runtime/specrow-mcp.cjs") {
-    errors.push(".mcp.json: specrow must start the bundled stdio runtime.");
-  }
-}
-
 function validatePackageFiles(value) {
-  const requiredEntries = ["dist", "runtime", "plugin.json", "mcp.json", ".codex-plugin", ".mcp.json", "skills"];
+  const requiredEntries = ["dist", "runtime", "plugin.json", "mcp.json", ".codex-plugin", "skills"];
   if (!Array.isArray(value.files)) {
     errors.push("package.json: files must include every portable plugin resource.");
     return;

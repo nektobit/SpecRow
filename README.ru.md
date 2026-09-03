@@ -1,7 +1,7 @@
 <!-- specrow:readme-section=title -->
 # SpecRow
 
-SpecRow: agent-first workflow для спецификаций. Пользователь описывает намерение обычной фразой, например `specrow migrate`, `specrow explore`, `specrow proposal` или `specrow build`; агент выполняет workflow через MCP-сервер SpecRow.
+SpecRow: agent-first workflow для спецификаций. Пользователь описывает намерение обычной фразой, например `specrow migrate`, `specrow explore`, `specrow proposal` или `specrow build`; агент выполняет workflow через MCP-инструменты SpecRow или встроенный локальный CLI-адаптер для Codex.
 
 <!-- specrow:readme-section=language-links -->
 ## Читать на своем языке
@@ -16,7 +16,7 @@ SpecRow: agent-first workflow для спецификаций. Пользова�
 
 Сайт: https://specrow.com/ru/
 
-На сайте описан полный MVP-flow: старт, explore, путь от proposal до accept, MCP-инструменты, шаблоны, локализация, валидация, lifecycle-правила и отличия от OpenSpec.
+На сайте описан полный MVP-flow: старт, explore, путь от proposal до accept, MCP- и локальный CLI-адаптеры, шаблоны, локализация, валидация, lifecycle-правила и отличия от OpenSpec.
 
 <!-- specrow:readme-section=quick-start -->
 ## Быстрый старт
@@ -26,9 +26,9 @@ SpecRow: agent-first workflow для спецификаций. Пользова�
 - GitHub Copilot CLI: `copilot plugin install nektobit/SpecRow`.
 - GitHub Copilot в VS Code: выполните `Chat: Install Plugin From Source` и укажите `https://github.com/nektobit/SpecRow`.
 - Kiro IDE (экспериментально): выберите `Powers → Add Custom Power → Import power from GitHub` и укажите тот же URL репозитория.
-- Codex desktop/CLI и Cursor: совместимый пакет уже входит в репозиторий, но публичная установка одной кнопкой зависит от публикации SpecRow в marketplace каждого клиента.
+- Codex desktop/CLI: репозиторий содержит skills-only адаптер со встроенным локальным CLI; публичная установка одной кнопкой появится после одобрения в OpenAI Plugins Directory. Для Cursor по-прежнему нужна отдельная публикация в его marketplace.
 
-Hermes Agent, OpenClaw, Grok Bot и NanoClaw совместимы с форматом Agent Plugins, но пока не проверены командой SpecRow. Для Claude Code, Gemini CLI и Windsurf/Cascade сейчас нет поддерживаемой установки SpecRow единым пакетом. Требуются Node.js 20+, локальный stdio MCP и доступ к файлам целевого проекта. Эти пути описаны разработчиками клиентов, но SpecRow пока не запускает клиентские end-to-end тесты установки.
+Hermes Agent, OpenClaw, Grok Bot и NanoClaw совместимы с форматом Agent Plugins, но пока не проверены командой SpecRow. Для Claude Code, Gemini CLI и Windsurf/Cascade сейчас нет поддерживаемой установки SpecRow единым пакетом. Требуются Node.js 20+ и доступ к файлам целевого проекта; клиентам Agent Plugins также нужен локальный stdio MCP, а Codex использует локальный shell и встроенный CLI. Эти пути описаны разработчиками клиентов, но SpecRow пока не запускает клиентские end-to-end тесты установки.
 
 `npm i -g specrow` устанавливает только отдельный CLI и не регистрирует плагин в агенте. После полной установки плагина начните новый чат и попросите агента проверить SpecRow для нужного проекта.
 
@@ -43,7 +43,7 @@ specrow build
 specrow accept
 ```
 
-Агент должен считать эти фразы намерениями workflow и выполнять их через MCP-инструменты.
+Агент должен считать эти фразы намерениями workflow и выполнять их через адаптер клиента: MCP-инструменты или встроенный локальный CLI в Codex.
 
 Совет: используйте `brief: текст задачи` или `бриф: текст задачи`, чтобы указать исходное человеческое описание задачи. Агент должен отталкиваться от брифа и его правил при подготовке proposal, но сам бриф не является конечным proposal.
 
