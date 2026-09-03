@@ -6,7 +6,7 @@
     "name": "nektobit",
     "url": "https://github.com/nektobit"
   },
-  "homepage": "https://nektobit.github.io/SpecRow/",
+  "homepage": "https://specrow.com/",
   "repository": "https://github.com/nektobit/SpecRow",
   "license": "MIT",
   "keywords": [
@@ -27,7 +27,7 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://nektobit.github.io/SpecRow/",
+    "websiteURL": "https://specrow.com/",
     "defaultPrompt": [
       "Check SpecRow for this project.",
       "Explore this change before creating a proposal.",

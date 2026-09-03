@@ -14,7 +14,7 @@ SpecRow is an agent-first specification workflow. Users describe intent in plain
 <!-- specrow:readme-section=documentation -->
 ## Documentation
 
-GitHub Pages: https://nektobit.github.io/SpecRow/
+Website: https://specrow.com/
 
 The site covers the full MVP workflow: getting started, explore, proposal to accept, MCP tools, templates, localization, validation, lifecycle rules, and differences from OpenSpec.
 

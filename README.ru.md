@@ -14,7 +14,7 @@ SpecRow: agent-first workflow для спецификаций. Пользова�
 <!-- specrow:readme-section=documentation -->
 ## Документация
 
-GitHub Pages: https://nektobit.github.io/SpecRow/
+Сайт: https://specrow.com/ru/
 
 На сайте описан полный MVP-flow: старт, explore, путь от proposal до accept, MCP-инструменты, шаблоны, локализация, валидация, lifecycle-правила и отличия от OpenSpec.
 

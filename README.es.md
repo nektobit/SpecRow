@@ -14,7 +14,7 @@ SpecRow es un flujo de especificaciones agent-first. Los usuarios describen la i
 <!-- specrow:readme-section=documentation -->
 ## Documentación
 
-GitHub Pages: https://nektobit.github.io/SpecRow/
+Sitio web: https://specrow.com/es/
 
 El sitio cubre el flujo MVP completo: primeros pasos, explore, de proposal a accept, herramientas MCP, plantillas, localización, validación, reglas lifecycle y diferencias frente a OpenSpec.
 

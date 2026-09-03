@@ -14,7 +14,7 @@ SpecRow 是 agent-first 的规格工作流。用户用自然语言描述意图�
 <!-- specrow:readme-section=documentation -->
 ## 文档
 
-GitHub Pages: https://nektobit.github.io/SpecRow/
+网站：https://specrow.com/zh-CN/
 
 站点覆盖完整 MVP 流程：开始使用、explore、从 proposal 到 accept、MCP 工具、模板、本地化、验证、生命周期规则，以及与 OpenSpec 的区别。
 

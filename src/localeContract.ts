@@ -32,18 +32,18 @@ const DOCUMENTATION_FILES: Record<SupportedLanguage, string> = {
 };
 
 const README_SECTION_IDS = ["title", "language-links", "documentation", "quick-start", "workspace", "accept-gate", "migration"] as const;
-const README_SOURCE_DIGEST = "b84a69fb232b6a8f";
+const README_SOURCE_DIGEST = "4cd8a1de4146dc05";
 const README_CONTENT_DIGESTS: Record<SupportedLanguage, string> = {
-  en: "b84a69fb232b6a8f",
-  ru: "574b0da4d943fcee",
-  es: "88309b361b88643a",
-  "zh-CN": "d7b7e877a3132155"
+  en: "4cd8a1de4146dc05",
+  ru: "e1a245ef68b91fad",
+  es: "a4ca257ede7ac1d1",
+  "zh-CN": "5a05422ebc6038c4"
 };
 const README_REVIEWED_SOURCE_DIGESTS: Record<SupportedLanguage, string> = {
-  en: "b84a69fb232b6a8f",
-  ru: "b84a69fb232b6a8f",
-  es: "b84a69fb232b6a8f",
-  "zh-CN": "b84a69fb232b6a8f"
+  en: "4cd8a1de4146dc05",
+  ru: "4cd8a1de4146dc05",
+  es: "4cd8a1de4146dc05",
+  "zh-CN": "4cd8a1de4146dc05"
 };
 const RUNTIME_SOURCE_DIGEST = "5ac21ab4dac86400";
 const RUNTIME_CONTENT_DIGESTS: Record<SupportedLanguage, string> = {
